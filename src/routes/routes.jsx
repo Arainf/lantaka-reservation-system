@@ -5,8 +5,8 @@ import Dashboard from '@/pages/(admin-pages)/dashboard';
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      {/* <Route path="/" element={<Navigate to="/auth/login" />} /> */}
+      <Route path="/" element={<Navigate to="/auth/login" />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/auth/Login" element={<LoginPage />} />
     </Routes>
   );
