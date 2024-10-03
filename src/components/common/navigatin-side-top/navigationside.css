@@ -59,9 +59,10 @@
   padding: 0.5rem 0.75rem;
   margin-bottom: 0.5rem;
   border-radius: 0.875rem;
-  transition: all 0.2s;
+  transition: background-color 0.5s ease, color 0.5s ease;
   justify-content: flex-start;
   text-decoration: none;
+  color: white; /* Text is white when stationary */
 }
 
 .linkTextStyle {
@@ -112,13 +113,24 @@
   color: #ccc;
   margin: 0;
 }
-
+.navMoreInfo {
+  transition: background-color .5s ease, color .5s ease; 
+  background-color: transparent;
+  color: #ffffff;
+}
 
 /* ===================================================================== */
 /* HOVER STATE */
 
 .linkStyle:hover {
-  background-color: bisque;
+  color: black;
+  background-color: #70A7FF;
+}
+
+
+.navMoreInfo:hover {
+  color: black;
+  background-color: #FCB813;
 }
 
 

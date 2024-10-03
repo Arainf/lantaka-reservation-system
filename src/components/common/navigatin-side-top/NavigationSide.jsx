@@ -1,9 +1,12 @@
 import { NavLink } from "react-router-dom"
 import { FaIdBadge, FaHome } from "react-icons/fa"
-import { FaCalendarPlus, FaCircleQuestion } from "react-icons/fa6"
-import { useState } from 'react'
-import { IoSettingsSharp } from "react-icons/io5"
-import { TbBrandReact } from "react-icons/tb"
+import { IoCalendarSharp } from "react-icons/io5";
+import { FaCircleQuestion } from "react-icons/fa6"
+import { FaPeopleGroup } from "react-icons/fa6";
+import { IoPerson } from "react-icons/io5";
+import { BiLogOut } from "react-icons/bi";
+
+
 import sidebarBg from '@/assets/images/sidebar.png'
 import './navigationside.css';
 
@@ -14,17 +17,17 @@ const navLinks = [
     url: "/home"
   },
   {
-    icon: <FaIdBadge style={{ height: '1rem', width: '1rem' }} />,
+    icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' }} />,
     display: "Reservations",
     url: "/account"
   },
   {
-    icon: <FaCalendarPlus style={{ height: '1rem', width: '1rem' }} />,
+    icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />,
     display: "Guest",
     url: "/reservation"
   },
   {
-    icon: <FaCalendarPlus style={{ height: '1rem', width: '1rem' }} />,
+    icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />,
     display: "Accounts",
     url: "/reservation"
   },
@@ -32,7 +35,7 @@ const navLinks = [
 
 const navMoreInfo = [
   {
-    icon: <FaCircleQuestion style={{ height: '1rem', width: '1rem' }} />,
+    icon: <BiLogOut style={{ height: '1rem', width: '1rem' }} />,
     display: "Logout",
     url: "/"
   },
@@ -60,7 +63,7 @@ const NavigationSide = ({ isOpen }) => {
     // justifyContent: isOpen ? 'flex-start' : 'center',
     // color: isActive ? '#ffcc00' : '#ccc',
     // backgroundColor: isActive ? '#001a33' : 'transparent',
-    color: isActive ? '#ffcc00' : '#ccc',
+    // color: isActive ? '#ffcc00' : '#ccc',
     // backgroundColor: isActive ? '#001a33' : 'transparent',
   })
 
@@ -111,16 +114,16 @@ const NavigationSide = ({ isOpen }) => {
         ))}
       </nav>
 
-      <hr style={{ height: '2px', borderWidth: '0', color: 'gray', backgroundColor: 'yellow', position: 'sticky', bottom: '7%' }} />
-
+      <hr style={{ height: '1px', borderWidth: '0', color: 'gray', backgroundColor: 'yellow', position: 'sticky', bottom: '7%' }} />
+      
       <nav
         className="navstyleBottom">
         {navMoreInfo.map((item, index) => (
           <NavLink
             key={index}
             to={item.url}
-            className="linkStyle"
-            style={({ isActive }) => linkStyle(isActive)}
+            className="linkStyle navMoreInfo"
+
           >
             {item.icon}
             <span
