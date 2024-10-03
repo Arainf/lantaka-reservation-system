@@ -1,48 +1,79 @@
 import { useEffect, useState } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
+import { Bell, Menu, Search } from 'lucide-react'
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import './navigationside.css';
 
-const NavigationTop = (onSidebarToggle) => {
+
+const NavigationTop = ({ onSidebarToggle, headerTitle, headerSubtitle }) => {
   const [profile, setProfile] = useState({
     imageUrl: "", // Will be dynamically fetched
     name: "Adrian Rainier Fabian",
     email: "220622@adzu.edu.ph",
   });
 
+  // Default values for headerTitle and headerSubtitle
+  headerTitle = headerTitle || "Dashboard";
+  headerSubtitle = headerSubtitle || "Home / Dashboard";
+
+  const [loading, setLoading] = useState(false); // State for loading spinner
+
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      setLoading(true); // Show spinner
+      try {
+        // Simulate a delay for logout process (replace with actual logout logic)
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate async logout
+        // Perform any logout logic here if needed (e.g., clearing tokens)
+        navigate('/');  // Redirect to the login page
+      } catch (error) {
+        console.error("Error during logout:", error);
+      } finally {
+        setLoading(false); // Hide spinner
+      }
+    }
+  };
+
   return (
-    <div className="flex p-0 justify-between flex-row items-center overflow-hidden w-screen text-white h-14" style={{backgroundColor: '#001932'}}>
-      <div className="flex flex-row items-center">
-        <div className="menu flex flex-row items-center mx-5 menu" onClick={onSidebarToggle}>
-          <GiHamburgerMenu />
+    <header className="flex items-center justify-between w-full h-14 px-4 py-2 bg-[#0f172a] text-white">
+      <div className="flex items-center space-x-4">
+        <div onClick={onSidebarToggle} className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all">
+          <Menu size={24} />
+        </div>
+        <div>
+          <h1 className="text-xl font-semibold">{headerTitle}</h1>
+          <p className="text-xs text-gray-400">{headerSubtitle}</p>
         </div>
       </div>
-      <div>
-        <div className="profile">
-          {/* profile section */}
-          <div className="profile_primary flex flex-row relative items-center justify-start h-14 w-auto p-5 no-underline text-white">
-            <img src={profile.imageUrl} alt="Profile" className="profile-img w-12 h-10  " />
-            <div className="profile-details flex justify-between flex-row items-center w-screen">
-              <div className="profile-text flex flex-col ">
-                <h4 className="profile-name">{profile.name}</h4>
-                <p className="profile-email ">{profile.email}</p>
-              </div>
-              {/* <button
-                  // onClick={handleLogout}
-                  className='profile-logout-button'>
-                  <SlLogout />
-                </button> */}
-            </div>
+      
+      <div className="flex-1 max-w-xl px-4">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Input 
+            type="search" 
+            placeholder="Search..." 
+            className="w-full pl-10 pr-4 py-2 bg-[#1e293b] border-none rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      
+      <div className="flex items-center space-x-4">
+        <div className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all">
+          <Bell size={24} />
+        </div>
+        <div className="flex items-center space-x-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/placeholder-avatar.jpg" alt="Adrian" />
+            <AvatarFallback>AF</AvatarFallback>
+          </Avatar>
+          <div className="text-sm">
+            <p className="font-medium">Welcome, Adrian!</p>
+            <p className="text-xs text-gray-400">Administrator</p>
           </div>
         </div>
       </div>
-    </div>
-
-    // {/* Spinner overlay */}
-    // {loading && (
-    //   <div className="spinner-overlay">
-    //     <div className="loader"></div>
-    //   </div>
-    // )}
+    </header>
   );
 };
 
