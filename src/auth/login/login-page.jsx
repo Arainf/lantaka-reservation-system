@@ -3,7 +3,7 @@
 import { LoginForm } from "@/components/common/login-form/LoginForm";
 import LogoLRRS from "@/assets/images/logo.png";
 import '../../components/common/login-form/LoginForm';
-import LantakaBg from "@/assets/images/LantakaBg.jpg"
+import LantakaBg from "@/assets/images/LantakaBg.jpg";
 import { Italic } from "lucide-react";
 
 const LoginPage = () => {
