@@ -1,0 +1,196 @@
+:root {
+  --primary-color: #FCB813;
+  --primary-dark: #FCB813;
+  --text-color: #333333;
+  --background-color: #F0F4F8;
+  --input-background: #FFFFFF;
+  --input-border: #D1D5DB;
+  --input-focus: #3182CE;
+  --error-color: #E53E3E;
+}
+
+/* body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+} */
+
+.input-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  margin-top: 10%;
+}
+
+.input-field {
+  height: 45px;
+  width: 100%;
+  padding: 1rem 1rem 1rem 2.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  background-color: var(--input-background);
+  /* border: 2px solid var(--input-border); */
+  border-radius: 5spx;
+  transition: all 0.3s ease;
+  margin-bottom: -7%;
+}
+
+.focus-input{
+  display: block;
+  position: absolute;
+  border-radius: 25px;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0px 0px 0px 0px;
+  color: #FCB81399;
+}
+
+.form-field:focus-within > .focus-input{
+  -webkit-animation: anim-shadow 0.5s ease-in-out forwards;
+  animation: anim-shadow 0.5s ease-in-out forwards;
+}
+
+@keyframes anim-shadow {
+  to {
+    box-shadow: 0px 0px 80px 30px;
+    opacity: 0;
+  }
+}
+
+.icon{
+  color: gray;
+  transition: all 250ms ease-in-out;
+}
+
+.form-field:focus-within > .icon {
+  color: #FCB81399;
+  left: 12px;
+}
+
+.input-field:focus {
+  outline: none;
+  /* border-color: var(--input-focus); */
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.input-field::placeholder {
+  color: #A0AEC0;
+}
+
+.input-container svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #718096;
+  transition: color 0.3s ease;
+}
+
+.input-container:focus-within svg {
+  color: var(--primary-color);
+}
+
+.LoginForm_button {
+  display: flex;
+  width: 100%;
+  height: 48px;
+  padding: 0 1rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #121212;
+  background: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  margin-top: 50px;
+  font-family: 'Oswald';
+}
+
+.LoginForm_button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: #e4e6e745;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  color: #FFFFFF;
+  z-index: 0;
+}
+
+.LoginForm_button:hover {
+  background: var(--primary-dark);
+}
+
+.LoginForm_button:hover::after {
+  width: 300px;
+  height: 300px;
+}
+
+.LoginForm_button:active {
+  transform: scale(0.98);
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.input-field:invalid:not(:placeholder-shown) {
+  border-color: var(--error-color);
+  animation: shake 0.5s ease-in-out;
+}
+
+@media (max-width: 480px) {
+
+  .input-container,
+  .LoginForm_button {
+    width: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(500px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-title,form {
+  animation: fadeIn 0.5s ease-out;
+}
