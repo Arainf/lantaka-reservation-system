@@ -5,6 +5,7 @@ import { FaCircleQuestion } from "react-icons/fa6"
 import { FaPeopleGroup } from "react-icons/fa6";
 import { IoPerson } from "react-icons/io5";
 import { BiLogOut } from "react-icons/bi";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 
 import sidebarBg from '@/assets/images/sidebar.png'
@@ -24,6 +25,7 @@ const navLinks = [
   {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />,
     display: "Guest",
+    icon2: <IoMdArrowDropdown style={{ flexGrow: '1', height: '1.5rem', width: '1.5rem' , paddingLeft: '50px' }} />,
     url: "/reservation"
   },
   {
@@ -110,6 +112,7 @@ const NavigationSide = ({ isOpen }) => {
               style={linkTextStyle}>
               {item.display}
             </span>
+            {item.icon2}
           </NavLink>
         ))}
       </nav>
