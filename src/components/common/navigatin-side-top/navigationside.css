@@ -70,9 +70,55 @@
 }
 
 
+/* ============================================================ */
+/* NavigationTop */
+
+.menu>svg {
+  transition: all 0.3s ease-in-out;
+}
+
+.menu>svg:hover {
+  color: #ffcc00;
+  scale: 1.5;
+}
+
+.profile_primary {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(3.8px);
+  -webkit-backdrop-filter: blur(3.8px);
+  border: 1px solid rgba(255, 204, 0, 1);
+}
+
+.profile-text {
+  margin-left: 5%;
+}
+
+.profile-img {
+  border-radius: 50%;
+  object-fit: cover;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.profile-name {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.profile-email {
+  font-size: 10px;
+  color: #ccc;
+  margin: 0;
+}
+
+
 /* ===================================================================== */
 /* HOVER STATE */
 
 .linkStyle:hover {
   background-color: bisque;
 }
+
+
