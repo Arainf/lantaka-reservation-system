@@ -1,4 +1,4 @@
-import React from 'react'
+import './adminPages.css';
 import NavigationSide from '@/components/common/navigatin-side-top/NavigationSide'
 import NavigationTop from '@/components/common/navigatin-side-top/NavigationTop'
 import ReservationCard from '@/components/common/cards/ReservationCard'
@@ -6,6 +6,85 @@ import { IoCalendarSharp, IoPersonSharp, IoCashSharp, IoPeopleSharp } from "reac
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+
+// dummy data
+
+const dummyData = [
+  {
+    customer: "John Doe",
+    reservationType: "room",
+    ID: "R101",
+    email: "johndoe@example.com",
+  },
+  {
+    customer: "Jane Smith",
+    reservationType: "venue",
+    ID: "V201",
+    email: "janesmith@example.com",
+  },
+  {
+    customer: "Alice Johnson",
+    reservationType: "room",
+    ID: "R102",
+    email: "alicejohnson@example.com",
+  },
+  {
+    customer: "Bob Lee",
+    reservationType: "venue",
+    ID: "V202",
+    email: "boblee@example.com",
+  },
+  {
+    customer: "Charlie Brown",
+    reservationType: "room",
+    ID: "R103",
+    email: "charliebrown@example.com",
+  },
+  {
+    customer: "David Kim",
+    reservationType: "venue",
+    ID: "V203",
+    email: "davidkim@example.com",
+  },
+  {
+    customer: "Eva Green",
+    reservationType: "room",
+    ID: "R104",
+    email: "evagreen@example.com",
+  },
+  {
+    customer: "Frank Miller",
+    reservationType: "venue",
+    ID: "V204",
+    email: "frankmiller@example.com",
+  },
+  {
+    customer: "Grace Hopper",
+    reservationType: "room",
+    ID: "R105",
+    email: "gracehopper@example.com",
+  },
+  {
+    customer: "Hank Pym",
+    reservationType: "venue",
+    ID: "V205",
+    email: "hankpym@example.com",
+  },
+];
+
+
+
 
 const Dashboard = ({sidebarOpen, toggleSidebar}) => {
   return (
@@ -26,9 +105,50 @@ const Dashboard = ({sidebarOpen, toggleSidebar}) => {
               <CardContent className="mt-2 flex scale-110 justify-center align-center">
                 <Calendar mode="single" className="rounded-md border" />
               </CardContent>
-              <CardContent className="mt-2 flex scale-110 justify-center align-center">
-                <h1>legends</h1>
+
+              <CardContent className="customerTable mt-5 flex scale-110 justify-center align-center">
+                <div className="w-full max-w-4xl mx-auto p-4">
+                  <div className="border-2">
+                    <Table className="border-collapse">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="border-b-2 border-r-2 bg-gray-100 font-bold sticky top-0 z-10">Customer</TableHead>
+                          <TableHead className="border-b-2 border-r-2 w-[79px] bg-gray-100 font-bold text-center sticky top-0 z-10">Type</TableHead>
+                          <TableHead className="border-b-2 bg-gray-100 w-[79px] font-bold text-center sticky top-0 z-10">ID</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                    </Table>
+                    <div className="max-h-[200px] overflow-y-auto overflow-x-hidden">
+                      <Table className="border-collapse">
+                        <TableBody>
+                          {dummyData.map((data, index) => (
+                            <TableRow key={index}>
+                              <TableCell className=" bg-blue-50">
+                                <div className="font-medium">{data.customer}</div>
+                                <div className="text-xs italic text-gray-600">{data.email}</div>
+                              </TableCell>
+                              <TableCell 
+                                className={` text-center ${
+                                  data.reservationType === "room" ? "bg-green-50" : "bg-yellow-50"
+                                }`}
+                              >
+                                {data.reservationType}
+                              </TableCell>
+                              <TableCell className=" bg-red-50 text-center">
+                                {data.ID}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
+
+
+
+              
             </Card>
             
             <Card className='col-span-2 row-span-2'>
