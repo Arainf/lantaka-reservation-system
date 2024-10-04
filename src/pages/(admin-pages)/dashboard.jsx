@@ -113,8 +113,8 @@ const Dashboard = ({sidebarOpen, toggleSidebar}) => {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="border-b-2 border-r-2 bg-gray-100 font-bold sticky top-0 z-10">Customer</TableHead>
-                          <TableHead className="border-b-2 border-r-2 w-[79px] bg-gray-100 font-bold text-center sticky top-0 z-10">Type</TableHead>
-                          <TableHead className="border-b-2 bg-gray-100 w-[79px] font-bold text-center sticky top-0 z-10">ID</TableHead>
+                          <TableHead className="border-b-2 border-r-2 md:w-[79px] bg-gray-100 font-bold text-center sticky top-0 z-10">Type</TableHead>
+                          <TableHead className="border-b-2 bg-gray-100 md:w-[79px] font-bold text-center sticky top-0 z-10">ID</TableHead>
                         </TableRow>
                       </TableHeader>
                     </Table>
@@ -177,7 +177,7 @@ const Dashboard = ({sidebarOpen, toggleSidebar}) => {
             
 
             {/* Right section with booking calendar and reservation cards */}
-            <div className='flex flex-col gap-4 justify-self-center'>
+            <div className='flex flex-col gap-4 justify-self-center justify-center'>
               
 
               {/* Various reservation statistics in cards */}

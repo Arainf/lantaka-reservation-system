@@ -19,9 +19,31 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ::-webkit-scrollbar {
-  display: none;
-} */
+::-webkit-scrollbar {
+  width: 3px; /* Width of the scrollbar */
+}
+
+/* Scrollbar track (the background) */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light gray background */
+  border-radius: 10px; /* Rounded corners for track */
+}
+
+/* Scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Darker gray for the thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+/* Scrollbar thumb hover effect */
+::-webkit-scrollbar-thumb:hover {
+  background: #143774; /* Darker gray when hovered */
+}
+
+/* Scrollbar corner when both horizontal and vertical scrollbars appear */
+::-webkit-scrollbar-corner {
+  background-color: #f1f1f1; /* Light gray for the scrollbar corner */
+}
 
 a {
   font-weight: 500;
