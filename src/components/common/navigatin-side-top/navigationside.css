@@ -134,6 +134,7 @@
 
 .linkStyle:hover {
   color: black;
+  background-position: 0;
   background-color: #FFF7DC;
 }
 
