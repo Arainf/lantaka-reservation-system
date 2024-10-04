@@ -7,27 +7,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 
-const Dashboard = () => {
+const Dashboard = ({sidebarOpen, toggleSidebar}) => {
   return (
     <div className='flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100'>
       {/* Side navigation bar */}
-      <NavigationSide />
+      <NavigationSide isOpen={sidebarOpen} />
       <div className='flex-1 overflow-auto'>
         {/* Top navigation bar */}
-        <NavigationTop />
+        <NavigationTop onSidebarToggle={toggleSidebar} />
         <main className='p-6'>
           {/* Main grid layout for the dashboard, consisting of 2 sections */}
           <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6'>
             {/* Large card displaying the hotel floor plan */}
-            <Card>
+            <Card className='row-span-1'>
               <CardHeader>
                 <CardTitle className="text-xl font-bold">Booking Calendar</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="mt-2 flex scale-110 justify-center align-center">
                 <Calendar mode="single" className="rounded-md border" />
               </CardContent>
+              <CardContent className="mt-2 flex scale-110 justify-center align-center">
+                <h1>legends</h1>
+              </CardContent>
             </Card>
-            <Card className='col-span-3 row-span-2'>
+            
+            <Card className='col-span-2 row-span-2'>
               <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                 <CardTitle className="text-xl font-bold">Hotel Floor Plan</CardTitle>
                 <Select>
@@ -47,8 +51,9 @@ const Dashboard = () => {
                 </div>
               </CardContent>
               {/* Booking calendar */}
-              
             </Card>
+
+            
             
 
             {/* Right section with booking calendar and reservation cards */}

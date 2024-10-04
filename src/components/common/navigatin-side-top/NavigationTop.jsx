@@ -5,17 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import './navigationside.css';
 
 
-const NavigationTop = ({ onSidebarToggle, headerTitle, headerSubtitle }) => {
+const NavigationTop = ({ onSidebarToggle }) => {
   const [profile, setProfile] = useState({
     imageUrl: "", // Will be dynamically fetched
     name: "Adrian Rainier Fabian",
     email: "220622@adzu.edu.ph",
   });
-
-  // Default values for headerTitle and headerSubtitle
-  headerTitle = headerTitle || "Dashboard";
-  headerSubtitle = headerSubtitle || "Home / Dashboard";
-
+  
   const [loading, setLoading] = useState(false); // State for loading spinner
 
   const handleLogout = async () => {
@@ -41,14 +37,7 @@ const NavigationTop = ({ onSidebarToggle, headerTitle, headerSubtitle }) => {
       <div onClick={onSidebarToggle} className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all cursor-pointer">
         <Menu size={24} />
       </div>
-      <div>
-        <h1 className="text-xl font-semibold">{headerTitle}</h1>
-        <p className="text-xs text-gray-400">{headerSubtitle}</p>
-      </div>
-    </div>
-    
-    <div className="flex-1 max-w-xl px-4">
-      <div className="relative">
+       <div className="relative">
         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <Input 
           type="search" 
