@@ -15,7 +15,7 @@ const navLinks = [
   {
     icon: <FaHome style={{ height: '1rem', width: '1rem' }} />, // Icon for Dashboard
     display: "Dashboard", // Text displayed for Dashboard
-    url: "/home" // URL for Dashboard
+    url: "/dashboard" // URL for Dashboard
   },
   {
     icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' }} />, // Icon for Reservations
