@@ -26,7 +26,7 @@ const navLinks = [
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />,
     display: "Guest",
     icon2: <IoMdArrowDropdown style={{ flexGrow: '1', height: '1.5rem', width: '1.5rem' , paddingLeft: '50px' }} />,
-    url: "/reservation"
+    url: ""
   },
   {
     icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />,
@@ -46,19 +46,23 @@ const navMoreInfo = [
 
 const NavigationSide = ({ isOpen }) => {
   const sidebarStyle = {
-    // width: isOpen ? '15rem' : '4rem',
-    backgroundImage: `url(${sidebarBg})`,
+    width: isOpen ? '15rem' : '4rem',
+    // backgroundImage: `url(${sidebarBg})`,
   }
 
   const logoStyle = {
-    // marginRight: isOpen ? '0.5rem' : '0',
-    // marginLeft: isOpen ? '0' : 'auto',
-    // marginRight: isOpen ? '0' : 'auto',
+    marginRight: isOpen ? '0.5rem' : '0',
+    marginLeft: isOpen ? '0' : 'auto',
+    marginRight: isOpen ? '0' : 'auto',
     display: 'none',
   }
 
   const titleStyle = {
-    // display: isOpen ? 'block' : 'none',
+    display: isOpen ? 'block' : 'none',
+  }
+
+  const subtitleStyle = {
+    display: isOpen ? 'block' : 'none',
   }
 
   const linkStyle = (isActive) => ({
@@ -70,8 +74,10 @@ const NavigationSide = ({ isOpen }) => {
   })
 
   const linkTextStyle = {
-    // display: isOpen ? 'inline' : 'none',
+    display: isOpen ? 'inline' : 'none',
   }
+
+  console.log(isOpen)
 
   return (
     <div
@@ -92,7 +98,8 @@ const NavigationSide = ({ isOpen }) => {
           &lt; Lantaka Reservation System / &gt;
         </h1>
         <h6
-          className="subtitleStyle">
+          className="subtitleStyle"
+          style={subtitleStyle}>
           "Database Management & Web System and Technologies"
         </h6>
       </div>
