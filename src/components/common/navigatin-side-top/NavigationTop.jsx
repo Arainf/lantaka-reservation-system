@@ -32,7 +32,7 @@ const NavigationTop = ({ onSidebarToggle }) => {
   };
 
   return (
-    <header className="flex items-center justify-between h-14 px-4 py-2 bg-[#0f172a] text-white sticky top-0 right-0 left-[250px] z-10">
+    <header className="flex items-center justify-between h-14 px-4 py-2 bg-[#0f172a] text-white sticky top-0 right-0  z-10">
     <div className="flex items-center space-x-4">
       <div onClick={onSidebarToggle} className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all cursor-pointer">
         <Menu size={24} />

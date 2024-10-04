@@ -6,10 +6,19 @@ import ReservationCard from '@/components/common/cards/ReservationCard';
 import { IoCalendarSharp, IoPersonSharp, IoCashSharp, IoPeopleSharp } from "react-icons/io5";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
 import CustomerTable from '@/components/common/cards/CustomerTable';
 import BookingCalendar from '@/components/common/cards/BookingCalendar';
+import FloorPlan from "@/assets/images/Floorplan.svg"
 
+
+const chartData = [
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+]
 
 
 const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
@@ -27,6 +36,8 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={172}
                 percentageChange={20.1}
                 percentageSuffix="from last month"
+                baseColor='#143774'
+                graphData={chartData}
               />
               <ReservationCard
                 title="Available Rooms"
@@ -34,6 +45,8 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={103}
                 percentageChange={2.5}
                 percentageSuffix="from last month"
+                baseColor='#ad7600'
+                graphData={chartData}
               />
               <ReservationCard
                 title="Check In"
@@ -41,6 +54,8 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={71}
                 percentageChange={15.3}
                 percentageSuffix="from last month"
+                baseColor='#EC1C24'
+                graphData={chartData}
               />
               <ReservationCard
                 title="Check Out"
@@ -48,6 +63,8 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={29}
                 percentageChange={7.2}
                 percentageSuffix="from last month"
+                baseColor='#494992'
+                graphData={chartData}
               />
             </div>
           </div>
@@ -69,8 +86,8 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 </Select>
               </CardHeader>
               <CardContent>
-                <div className='bg-gray-200 h-[calc(100%-2rem)] flex items-center justify-center'>
-                  Floor Plan Placeholder
+                <div className='bg-gray-200 h-[calc(100%-2rem)] p-10 flex items-center justify-center '>
+                  <img src={FloorPlan} alt="" srcset="" />
                 </div>
               </CardContent>
               {/* Booking calendar */}
