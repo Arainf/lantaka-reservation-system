@@ -15,24 +15,24 @@ const navLinks = [
   {
     icon: <FaHome style={{ height: '1rem', width: '1rem' }} />, // Icon for Dashboard
     display: "Dashboard", // Text displayed for Dashboard
-    url: "/home" // URL for Dashboard
+    url: "/dashboard" // URL for Dashboard
   },
   {
     icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' }} />, // Icon for Reservations
     display: "Reservations", // Text displayed for Reservations
-    url: "/account" // URL for Reservations
+    url: "/reservations" // URL for Reservations
   },
   {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />, // Icon for Guest
     display: "Guest", // Text displayed for Guest
     icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
-    url: "", // No URL since it's a dropdown
+    url: "guests", // No URL since it's a dropdown
     dropdown: true // Indicate this item is a dropdown
   },
   {
     icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />, // Icon for Accounts
     display: "Accounts", // Text displayed for Accounts
-    url: "/reservation" // URL for Accounts
+    url: "/accounts" // URL for Accounts
   },
 ];
 
