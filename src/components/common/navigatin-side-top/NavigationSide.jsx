@@ -25,8 +25,10 @@ const navLinks = [
   {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />,
     display: "Guest",
-    icon2: <IoMdArrowDropdown style={{ flexGrow: '1', height: '1.5rem', width: '1.5rem' , paddingLeft: '50px' }} />,
-    url: ""
+    
+    icon2: <IoMdArrowDropdown style={{ }} />,
+    url: "",
+    dropdown: true // Add this property to indicate a dropdown
   },
   {
     icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />,
@@ -57,6 +59,17 @@ const NavigationSide = ({ isOpen }) => {
     display: 'none',
   }
 
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev); // Toggle dropdown state
+  };
+
+  const icon2style = {
+    flexGrow: '1',
+    paddingLeft: '60px', // Adjust as necessary
+    display: isOpen ? 'block' : 'none',
+  };
+
+ 
   const titleStyle = {
     display: isOpen ? 'block' : 'none',
   }
@@ -119,7 +132,13 @@ const NavigationSide = ({ isOpen }) => {
               style={linkTextStyle}>
               {item.display}
             </span>
-            {item.icon2}
+
+            <div
+              style={icon2style}>
+              {item.icon2}
+            </div>
+
+            
           </NavLink>
         ))}
       </nav>

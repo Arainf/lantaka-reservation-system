@@ -103,10 +103,7 @@
   background-color:#FCB813; /* Line color */
   transition: width 0.3s ease; /* Smooth transition for line */
 }
-.linkStyle svg {
-  transition: color 0.3s ease; /* Smooth transition for the icon */
-  color: white; /* Default icon color */
-}
+
 .linkTextStyle {
   margin-left: 0.5rem;
   display: inline;
@@ -161,22 +158,28 @@
   margin: 0;
 }
 
-.dropdown {
+.dropdownMenu {
+  background-color: #fff;
+  position: relative; /* Position relative to the parent */
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-left: 2rem; /* Adjust spacing for dropdown */
   display: flex;
-  flex-direction: column;
-  background-color: #001a33;
-  padding-left: 1rem;
+  flex-direction: column; /* Stack dropdown items vertically */
 }
 
 .dropdownItem {
-  color: #ccc;
-  padding: 0.5rem 0;
+  color: #333;
   text-decoration: none;
+  padding: 5px 10px; /* Padding for each dropdown item */
 }
 
 .dropdownItem:hover {
-  color: #FCB813;
+  background-color: #f0f0f0; /* Hover effect for dropdown items */
+  border-radius: 3px;
 }
+
 
 /* ===================================================================== */
 /* HOVER STATE */
