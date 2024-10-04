@@ -6,7 +6,7 @@
   color: white;
   transition: all 0.3s ease-in-out;
   background-size: cover;
-  box-shadow: -11px 0px 48px 16px rgba(0, 0, 0, 0.75);
+  box-shadow: -11px 0px 48px 16px rgba(80, 78, 78, 0.75);
   background-color: #001f3f;
 }
 
@@ -45,6 +45,7 @@
   font-family: 'Montserrat';
   display:flex;
   flex-direction: column;
+  color: white
 }
 .navMoreInfo{
   display: flex;
@@ -108,7 +109,11 @@
   margin-left: 0.5rem;
   display: inline;
 }
-
+.linkTextStyle::after {
+  height: 2px; /* Line thickness */
+  background-color:#FCB813; /* Line color */
+  transition: width 0.3s ease; /* Smooth transition for line */
+}
 
 /* ============================================================ */
 /* NavigationTop */
@@ -186,9 +191,14 @@
 
 .linkStyle:hover::after {
   width: 100%; /* Line expands across the full width on hover */
+
 }
-.linkStyle:hover {
-  color: #FCB813; /* Change text color on hover */
+.linkStyle:hover{
+  color: #FCB813; /* Change color to #FCB813 on hover */
+
+}
+.linkTextStyle:hover {
+  color: #FCB813; /* Change color to #FCB813 on hover */
 }
 
 .linkStyle:hover svg {
@@ -197,7 +207,12 @@
 .navMoreInfo:hover {
   color:  #FCB813
 }
-
+.navstyleBottom .linkStyle {
+  color: white; /* Set text color for bottom nav links */
+}
+.dropdownItem:hover {
+  color: #FCB813; /* Change dropdown item color on hover */
+}
 /* =================================================================== */
 /* Add this to your header.css or another CSS file */
 .spinner-overlay {

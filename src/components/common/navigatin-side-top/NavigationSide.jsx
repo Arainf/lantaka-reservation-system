@@ -1,171 +1,134 @@
-import { NavLink } from "react-router-dom"
-import { FaIdBadge, FaHome } from "react-icons/fa"
-import { IoCalendarSharp } from "react-icons/io5";
-import { FaCircleQuestion } from "react-icons/fa6"
-import { FaPeopleGroup } from "react-icons/fa6";
-import { IoPerson } from "react-icons/io5";
-import { BiLogOut } from "react-icons/bi";
-import { IoMdArrowDropdown } from "react-icons/io";
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom"; // Import NavLink for routing
+import { FaHome } from "react-icons/fa"; // Import home icon
+import { IoCalendarSharp } from "react-icons/io5"; // Import calendar icon
+import { FaPeopleGroup } from "react-icons/fa6"; // Import people group icon
+import { IoPerson } from "react-icons/io5"; // Import person icon
+import { BiLogOut } from "react-icons/bi"; // Import logout icon
+import { IoMdArrowDropdown } from "react-icons/io"; // Import dropdown arrow icon
 
+import sidebarBg from '@/assets/images/sidebar.png'; // Sidebar background image
+import './navigationside.css'; // Import CSS for styling
 
-import sidebarBg from '@/assets/images/sidebar.png'
-import './navigationside.css';
-
+// Array of navigation links for the sidebar
 const navLinks = [
   {
-    icon: <FaHome style={{ height: '1rem', width: '1rem' }} />,
-    display: "Dashboard",
-    url: "/home"
+    icon: <FaHome style={{ height: '1rem', width: '1rem' }} />, // Icon for Dashboard
+    display: "Dashboard", // Text displayed for Dashboard
+    url: "/home" // URL for Dashboard
   },
   {
-    icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' }} />,
-    display: "Reservations",
-    url: "/account"
+    icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' }} />, // Icon for Reservations
+    display: "Reservations", // Text displayed for Reservations
+    url: "/account" // URL for Reservations
   },
   {
-    icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />,
-    display: "Guest",
-    
-    icon2: <IoMdArrowDropdown style={{ }} />,
-    url: "",
-    dropdown: true // Add this property to indicate a dropdown
+    icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />, // Icon for Guest
+    display: "Guest", // Text displayed for Guest
+    icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
+    url: "", // No URL since it's a dropdown
+    dropdown: true // Indicate this item is a dropdown
   },
   {
-    icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />,
-    display: "Accounts",
-    url: "/reservation"
+    icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />, // Icon for Accounts
+    display: "Accounts", // Text displayed for Accounts
+    url: "/reservation" // URL for Accounts
   },
-]
+];
 
+// Array of additional navigation links (bottom)
 const navMoreInfo = [
   {
-    icon: <BiLogOut style={{ height: '1rem', width: '1rem' }} />,
-    display: "Logout",
-    url: "/"
+    icon: <BiLogOut style={{ height: '1rem', width: '1rem' }} />, // Icon for Logout
+    display: "Logout", // Text displayed for Logout
+    url: "/" // URL for Logout
   },
-]
-
+];
 
 const NavigationSide = ({ isOpen }) => {
-  const sidebarStyle = {
-    width: isOpen ? '15rem' : '4rem',
-    // backgroundImage: `url(${sidebarBg})`,
-  }
+  const [dropdownOpen, setDropdownOpen] = useState(false); // State for controlling dropdown visibility
 
-  const logoStyle = {
-    marginRight: isOpen ? '0.5rem' : '0',
-    marginLeft: isOpen ? '0' : 'auto',
-    marginRight: isOpen ? '0' : 'auto',
-    display: 'none',
-  }
-
+  // Function to toggle dropdown visibility
   const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev); // Toggle dropdown state
+    setDropdownOpen((prev) => !prev); // Toggle the current state
   };
 
-  const icon2style = {
-    flexGrow: '1',
-    paddingLeft: '60px', // Adjust as necessary
-    display: isOpen ? 'block' : 'none',
+  // Style for the sidebar depending on whether it's open or not
+  const sidebarStyle = {
+    width: isOpen ? '15rem' : '5rem', // Expand or collapse sidebar
   };
 
- 
-  const titleStyle = {
-    display: isOpen ? 'block' : 'none',
-  }
-
-  const subtitleStyle = {
-    display: isOpen ? 'block' : 'none',
-  }
-
-  const linkStyle = (isActive) => ({
-    // justifyContent: isOpen ? 'flex-start' : 'center',
-    // color: isActive ? '#ffcc00' : '#ccc',
-    // backgroundColor: isActive ? '#001a33' : 'transparent',
-    // color: isActive ? '#ffcc00' : '#ccc',
-    // backgroundColor: isActive ? '#001a33' : 'transparent',
-  })
-
+  // Style for the text links based on sidebar state
   const linkTextStyle = {
-    display: isOpen ? 'inline' : 'none',
-  }
-
-  console.log(isOpen)
+    display: isOpen ? 'inline' : 'none', // Show or hide text based on sidebar state
+  };
 
   return (
-    <div
-      className="sidebarStyle"
-      style={sidebarStyle}>
-
-      <div
-        className="headerStyle">
+    <div className="sidebarStyle" style={sidebarStyle}>
+      <div className="headerStyle">
         <img
-          src="/placeholder.svg?height=50&width=50"
-          alt="AteneoSeal"
-          className="logoStyle"
-          style={logoStyle}
+          src="src/assets/images/logo.png?height=50&width=50" // Logo image
+          alt="AteneoSeal" // Alt text for logo
+          className="logoStyle" // Logo styling class
+          style={{ display: isOpen ? 'none' : 'block' }}
         />
-        <h1
-          className="titleStyle"
-          style={titleStyle}>
-          &lt; Lantaka Reservation System / &gt;
+        <h1 className="titleStyle" style={{ display: isOpen ? 'block' : 'none' }}>
+          &lt; Lantaka Reservation System / &gt; {/* Title text for the system */}
         </h1>
-        <h6
-          className="subtitleStyle"
-          style={subtitleStyle}>
-          "Database Management & Web System and Technologies"
+        <h6 className="subtitleStyle" style={{ display: isOpen ? 'block' : 'none' }}>
+          "Database Management & Web System and Technologies" {/* Subtitle */}
         </h6>
       </div>
 
-      <nav
-        className="navStyle">
-        {navLinks.map((item, index) => (
-          <NavLink
-            key={index}
-            to={item.url}
-            className="linkStyle"
-            style={({ isActive }) => linkStyle(isActive)}
-          >
-            {item.icon}
-            <span
-              className="linkTextStyle"
-              style={linkTextStyle}>
-              {item.display}
-            </span>
-
-            <div
-              style={icon2style}>
-              {item.icon2}
-            </div>
-
-            
-          </NavLink>
+      <nav className="navStyle">
+        {navLinks.map((item, index) => ( // Iterate through navLinks
+          <div key={index}>
+            {item.dropdown ? ( // If the item is a dropdown
+              <div onClick={toggleDropdown} className="linkStyle" style={{ cursor: 'pointer' }}>
+                {item.icon} {/* Icon for dropdown */}
+                <span className="linkTextStyle" style={linkTextStyle}>
+                  {item.display} {/* Display text */}
+                </span>
+                <div style={{ flexGrow: '1', paddingLeft: '60px', display: isOpen ? 'block' : 'none' }}>
+                  {item.icon2} {/* Dropdown arrow icon */}
+                </div>
+              </div>
+            ) : (
+              <NavLink
+                to={item.url} // Navigation link
+                className="linkStyle"
+                style={({ isActive }) => ({ color: isActive ? '#FCB813' : 'white' })} // Active link color
+              >
+                {item.icon} {/* Link icon */}
+                <span className="linkTextStyle" style={linkTextStyle}>
+                  {item.display} {/* Link text */}
+                </span>
+              </NavLink>
+            )}
+            {item.dropdown && dropdownOpen && ( // Render dropdown items if open
+              <div className="dropdownMenu">
+                <NavLink to="/guest-list" className="dropdownItem">Guest List</NavLink> {/* Dropdown item */}
+                <NavLink to="/guest-details" className="dropdownItem">Guest Details</NavLink> {/* Dropdown item */}
+              </div>
+            )}
+          </div>
         ))}
       </nav>
 
-      <hr style={{ height: '1px', borderWidth: '0', color: 'gray', backgroundColor: 'yellow', position: 'sticky', bottom: '7%' }} />
-      
-      <nav
-        className="navstyleBottom">
-        {navMoreInfo.map((item, index) => (
-          <NavLink
-            key={index}
-            to={item.url}
-            className="linkStyle navMoreInfo"
+      <hr style={{ height: '1px', borderWidth: '0', color: 'gray', backgroundColor: 'yellow', position: 'sticky', bottom: '7%' }} /> {/* Divider */}
 
-          >
-            {item.icon}
-            <span
-              className="linkTextStyle"
-              style={linkTextStyle}>
-              {item.display}
+      <nav className="navstyleBottom">
+        {navMoreInfo.map((item, index) => ( // Iterate through navMoreInfo
+          <NavLink key={index} to={item.url} className="linkStyle">
+            {item.icon} {/* Icon for bottom links */}
+            <span className="linkTextStyle" style={linkTextStyle}>
+              {item.display} {/* Display text for bottom links */}
             </span>
           </NavLink>
         ))}
       </nav>
-
     </div>
-  )
-}
+  );
+};
 
-export default NavigationSide
+export default NavigationSide; // Export the component for use in other parts of the app
