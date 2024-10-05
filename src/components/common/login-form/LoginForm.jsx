@@ -2,10 +2,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState } from "react"; // Import useState for managing error state
+import { useState, useContext } from "react"; // Import useContext
 import './loginform.css';
 import { FaUser, FaLock } from "react-icons/fa"; // Import icons
-
+import axios from 'axios';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,26 +14,30 @@ import {
   FormItem,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { UserContext } from '@/context/contexts'; // Import UserContext
 
 // Define the validation schema using Zod for login
 const loginSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
+  username: z.string().nonempty({
+    message: "Username is required",
   }),
   password: z.string().nonempty({
-    message: "Password is required.",
+    message: "Password is required.", 
   }),
 });
 
 export function LoginForm() {
   // State for backend error message
   const [backendError, setBackendError] = useState(null);
+  const { setUserRole } = useContext(UserContext); // Get setUserRole from context
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Set up the form with react-hook-form and zodResolver for validation
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -41,47 +45,53 @@ export function LoginForm() {
   // Define the onSubmit handler
   const onSubmit = async (values) => {
     try {
-      // Send login data to your Flask backend
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
+      const response = await axios.post('http://localhost:5000/login', {
+        username: values.username,
+        password: values.password,
       });
 
-      const data = await response.json();
+      // Check for successful login
+      if (response.status === 200) {
 
-      // If login fails, set error message
-      if (!response.ok) {
-        setBackendError(data.message || 'Invalid credentials');
-      } else {
-        // Handle successful login
-        console.log('Login successful!', data);
+        console.log(response.data + "success");
+        const { account_id, role } = response.data; // Get both account_id and role from backend
+        localStorage.setItem('account_id', account_id); // Store account_id in localStorage
+        localStorage.setItem('userRole', role); // Store role in localStorage
+        console.log(account_id, role);
+        
+        setUserRole(role); // Update UserContext with the role
+
+        navigate('/dashboard'); // Navigate to the dashboard after login
       }
     } catch (error) {
-      setBackendError('Something went wrong. Please try again.');
+      if (error.response && error.response.data) {
+        // Set backend error message from the response
+        setBackendError(error.response.data.message || 'Invalid credentials');
+      } else {
+        setBackendError('Something went wrong. Please try again.');
+      }
+      console.error('Login failed', error);
     }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        {/* Email Input with User Icon */}
+        {/* Username Input with User Icon */}
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem className="space-y-8">
               <FormControl>
                 <div className="relative form-field">
-                <span className="focus-input"></span>
+                  <span className="focus-input"></span>
                   {/* Icon */}
                   <FaUser className="absolute left-5 top-3 z-10 icon" />
                   {/* Input Field */}
                   <div className="input-container">
                     <Input
-                      id="email"
+                      id="username"
                       className="input-field bg-white"
                       placeholder="Username"
                       {...field}
@@ -123,7 +133,9 @@ export function LoginForm() {
         {/* Display backend error below form */}
         {backendError && <p className="text-red-600">{backendError}</p>}
 
-        <Button className="LoginForm_button" type="submit"><span>Login</span></Button>
+        <Button className="LoginForm_button" type="submit">
+          <span>Login</span>
+        </Button>
       </form>
     </Form>
   );
