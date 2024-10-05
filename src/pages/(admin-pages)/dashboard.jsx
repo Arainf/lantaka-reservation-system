@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FloorPlan from "@/assets/images/Floorplan.svg";
 import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
+import { DataContext } from '@/context/contexts';
 
 
 // Lazy-loaded components
