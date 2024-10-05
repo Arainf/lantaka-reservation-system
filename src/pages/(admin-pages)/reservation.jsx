@@ -11,11 +11,17 @@ const Reservation = ({ sidebarOpen, toggleSidebar }) => {
     { id: 1, guest: "John Doe", roomName: "Room 101", roomType: "Single Bed", roomFloor: "First Floor", status: "Confirmed" },
     { id: 2, guest: "Jane Smith", roomName: "Room 102", roomType: "Double Bed", roomFloor: "Second Floor", status: "Pending" },
     { id: 3, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    { id: 4, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    { id: 5, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    { id: 6, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    { id: 7, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    { id: 8, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    { id: 9, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
 
   // State to manage checkbox selection
   const [selectedIds, setSelectedIds] = useState([]);
