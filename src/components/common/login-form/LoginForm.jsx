@@ -55,6 +55,8 @@ export function LoginForm() {
 
         console.log(response.data + "success");
         const { account_id, role } = response.data; // Get both account_id and role from backend
+
+        // find a way that it will now store in the local storage
         localStorage.setItem('account_id', account_id); // Store account_id in localStorage
         localStorage.setItem('userRole', role); // Store role in localStorage
         console.log(account_id, role);
