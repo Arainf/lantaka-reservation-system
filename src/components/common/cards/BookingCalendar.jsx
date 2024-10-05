@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { RxChevronLeft, RxChevronRight } from "react-icons/rx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -77,19 +77,19 @@ const BookingCalendar = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xl font-bold">Booking Schedule</CardTitle>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon" onClick={prevMonth}>
-            <ChevronLeft className="h-4 w-4" />
+          <Button variant="outline"  onClick={prevMonth}>
+            <RxChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium">
             {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
           </span>
-          <Button variant="outline" size="icon" onClick={nextMonth}>
-            <ChevronRight className="h-4 w-4 " />
+          <Button variant="outline" onClick={nextMonth}>
+            <RxChevronRight className="h-4 w-4 " />
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-7 gap-1 text-center">
+        <div className="grid grid-cols-7 pt-8 gap-1 text-center">
           {daysOfWeek.map(day => (
             <div key={day} className="text-xs font-medium text-gray-500 py-1">
               {day}

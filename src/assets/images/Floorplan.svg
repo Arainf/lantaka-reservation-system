@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 917.3 227.46">
+    <defs>
+        <style>
+            .cls-1{fill:none;stroke-width:4px;}.cls-1,.cls-17,.cls-5{stroke:#000;stroke-miterlimit:10;}.cls-2{font-size:21px;}.cls-18,.cls-2,.cls-6,.cls-7{font-family:CalSans-SemiBold,
+            Cal
+            Sans;font-weight:600;}.cls-3{letter-spacing:-0.01em;}.cls-4{letter-spacing:0em;}.cls-6{font-size:12px;}.cls-7{font-size:15px;letter-spacing:0.5em;}.cls-8{letter-spacing:0.38em;}.cls-9{letter-spacing:0.41em;}.cls-10{letter-spacing:0.42em;}.cls-11{letter-spacing:0.49em;}.cls-12{letter-spacing:-0.08em;}.cls-13{letter-spacing:-0.06em;}.cls-14{letter-spacing:-0.01em;}.cls-15{letter-spacing:-0.01em;}.cls-16{letter-spacing:-0.02em;}.cls-17{opacity:0.46;}.cls-18{writing-mode:tb;text-orientation:upright;glyph-orientation-vertical:0deg;font-size:14px;}</style>
+    </defs>
+    <title>Asset 8</title>
+    <g id="Layer_2" data-name="Layer 2">
+        <g id="Layer_1-2" data-name="Layer 1">
+            <g id="_2_STORY_ANNEX_1" data-name="2 STORY ANNEX 1">
+                <polygon class="cls-1"
+                    points="2 46.47 291.03 46.47 291.03 2 386.56 2 386.56 43.18 915.3 43.18 915.3 225.46 2 225.46 2 46.47" />
+                <polyline class="cls-1"
+                    points="96.6 46.47 96.6 95.74 122.75 121.89 291.03 121.89 291.03 46.47" />
+                <polyline class="cls-1"
+                    points="146.22 225.46 146.22 144.34 291.03 144.34 291.03 225.46" />
+                <polyline class="cls-1" points="338.55 225.46 338.55 144.34 915.3 144.34" />
+                <text class="cls-2" transform="translate(166 81.79)">CAPI<tspan class="cls-3"
+                        x="44.2" y="0">S</tspan><tspan x="55.63" y="0"> </tspan><tspan x="3.97"
+                        y="25.2">HAL</tspan><tspan class="cls-4" x="41.77" y="25.2">L</tspan></text>
+                <line class="cls-5" x1="291.03" y1="215.76" x2="338.55" y2="215.76" />
+                <polyline class="cls-1" points="386.28 42.35 386.12 121.89 915.3 123.47" />
+                <line class="cls-1" x1="434.72" y1="42.35" x2="434.72" y2="123.47" />
+                <line class="cls-1" x1="483.15" y1="42.35" x2="483.15" y2="122.25" />
+                <line class="cls-1" x1="530.05" y1="41.74" x2="530.05" y2="122.86" />
+                <line class="cls-1" x1="578.49" y1="41.74" x2="578.49" y2="122.86" />
+                <line class="cls-1" x1="626.92" y1="41.74" x2="626.92" y2="121.65" />
+                <line class="cls-1" x1="674.43" y1="41.13" x2="674.43" y2="122.25" />
+                <line class="cls-1" x1="722.86" y1="41.13" x2="722.86" y2="122.25" />
+                <line class="cls-1" x1="771.3" y1="41.13" x2="771.3" y2="121.04" />
+                <line class="cls-1" x1="819.03" y1="42.35" x2="819.03" y2="123.47" />
+                <line class="cls-1" x1="867.47" y1="42.35" x2="867.47" y2="122.25" />
+                <text class="cls-6" transform="translate(450.19 114.95)">
+                    <tspan xml:space="preserve"> 120</tspan>
+                </text>
+                <text class="cls-7" transform="translate(346 137.42)">HAL<tspan class="cls-8"
+                        x="49.5" y="0">L</tspan><tspan class="cls-9" x="62.38" y="0">W</tspan><tspan
+                        class="cls-10" x="84.16" y="0">A</tspan><tspan class="cls-11" x="100.35"
+                        y="0">Y</tspan></text>
+                <text class="cls-2" transform="translate(40.94 156.26)">MAIN <tspan class="cls-12"
+                        x="-3.4" y="25.2">L</tspan><tspan x="5.02" y="25.2">OB</tspan><tspan
+                        class="cls-13" x="33.41" y="25.2">B</tspan><tspan class="cls-14" x="44.18"
+                        y="25.2">Y</tspan></text>
+                <line class="cls-1" x1="291.03" y1="121.89" x2="386.12" y2="121.89" />
+                <line class="cls-5" x1="291.03" y1="207.32" x2="338.55" y2="207.32" />
+                <line class="cls-5" x1="291.03" y1="198.73" x2="338.55" y2="198.73" />
+                <line class="cls-5" x1="291.03" y1="190.29" x2="338.55" y2="190.29" />
+                <line class="cls-5" x1="291.72" y1="182.86" x2="339.24" y2="182.86" />
+                <line class="cls-5" x1="291.72" y1="174.42" x2="339.24" y2="174.42" />
+                <line class="cls-5" x1="291.72" y1="165.83" x2="339.24" y2="165.83" />
+                <line class="cls-5" x1="291.72" y1="157.39" x2="339.24" y2="157.39" />
+                <text class="cls-6" transform="translate(499.21 114.93)">
+                    <tspan xml:space="preserve"> 118</tspan>
+                </text>
+                <text class="cls-6" transform="translate(547.49 114.93)">
+                    <tspan xml:space="preserve"> 116</tspan>
+                </text>
+                <text class="cls-6" transform="translate(595.05 114.94)">
+                    <tspan xml:space="preserve"> 1</tspan>
+                    <tspan class="cls-15" x="5.48" y="0">1</tspan>
+                    <tspan x="8.88" y="0">4</tspan>
+                </text>
+                <text class="cls-6" transform="translate(642.1 114.92)">
+                    <tspan xml:space="preserve"> 112</tspan>
+                </text>
+                <text class="cls-6" transform="translate(690.1 114.92)">
+                    <tspan xml:space="preserve"> 110</tspan>
+                </text>
+                <text class="cls-6" transform="translate(737.73 115.54)">
+                    <tspan xml:space="preserve"> 108</tspan>
+                </text>
+                <text class="cls-6" transform="translate(785.91 114.93)">
+                    <tspan xml:space="preserve"> 106</tspan>
+                </text>
+                <text class="cls-6" transform="translate(833.21 114.93)">
+                    <tspan xml:space="preserve"> 1</tspan>
+                    <tspan class="cls-16" x="5.48" y="0">0</tspan>
+                    <tspan x="12.61" y="0">4</tspan>
+                </text>
+                <text class="cls-6" transform="translate(881.65 114.93)">
+                    <tspan xml:space="preserve"> 102</tspan>
+                </text>
+                <rect class="cls-17" x="338.55" y="144.34" width="576.75" height="81.12" />
+                <rect class="cls-17" x="146.22" y="144.34" width="144.81" height="81.12" />
+                <rect class="cls-17" x="291.72" y="1.79" width="94.4" height="120.09" />
+                <rect class="cls-17" x="387.52" y="43.69" width="47.2" height="77.35" />
+                <text class="cls-18" transform="translate(460.67 62.25)">O</text>
+                <text class="cls-18" transform="translate(460.67 48.41)">R</text>
+                <text class="cls-18" transform="translate(460.67 90.46)">M</text>
+                <text class="cls-18" transform="translate(460.67 76.23)">O</text>
+                <text class="cls-18" transform="translate(507.87 62.19)">O</text>
+                <text class="cls-18" transform="translate(507.88 48.35)">R</text>
+                <text class="cls-18" transform="translate(507.88 90.39)">M</text>
+                <text class="cls-18" transform="translate(507.87 76.17)">O</text>
+                <text class="cls-18" transform="translate(556.08 62.09)">O</text>
+                <text class="cls-18" transform="translate(556.08 48.25)">R</text>
+                <text class="cls-18" transform="translate(556.08 90.3)">M</text>
+                <text class="cls-18" transform="translate(556.08 76.08)">O</text>
+                <text class="cls-18" transform="translate(603.29 62.03)">O</text>
+                <text class="cls-18" transform="translate(603.29 48.19)">R</text>
+                <text class="cls-18" transform="translate(603.29 90.23)">M</text>
+                <text class="cls-18" transform="translate(603.29 76.01)">O</text>
+                <text class="cls-18" transform="translate(651.51 62.24)">O</text>
+                <text class="cls-18" transform="translate(651.52 48.4)">R</text>
+                <text class="cls-18" transform="translate(651.52 90.44)">M</text>
+                <text class="cls-18" transform="translate(651.51 76.22)">O</text>
+                <text class="cls-18" transform="translate(699.72 62.17)">O</text>
+                <text class="cls-18" transform="translate(699.72 48.33)">R</text>
+                <text class="cls-18" transform="translate(699.72 90.38)">M</text>
+                <text class="cls-18" transform="translate(699.72 76.16)">O</text>
+                <text class="cls-18" transform="translate(747.93 62.08)">O</text>
+                <text class="cls-18" transform="translate(747.93 48.24)">R</text>
+                <text class="cls-18" transform="translate(747.93 90.28)">M</text>
+                <text class="cls-18" transform="translate(747.93 76.06)">O</text>
+                <text class="cls-18" transform="translate(796.14 62.02)">O</text>
+                <text class="cls-18" transform="translate(796.14 48.17)">R</text>
+                <text class="cls-18" transform="translate(796.14 90.22)">M</text>
+                <text class="cls-18" transform="translate(796.14 76)">O</text>
+                <text class="cls-18" transform="translate(843.96 63.92)">O</text>
+                <text class="cls-18" transform="translate(843.96 50.08)">R</text>
+                <text class="cls-18" transform="translate(843.96 92.13)">M</text>
+                <text class="cls-18" transform="translate(843.96 77.9)">O</text>
+                <text class="cls-18" transform="translate(892.03 63.92)">O</text>
+                <text class="cls-18" transform="translate(892.03 50.08)">R</text>
+                <text class="cls-18" transform="translate(892.03 92.13)">M</text>
+                <text class="cls-18" transform="translate(892.03 77.9)">O</text>
+            </g>
+        </g>
+    </g>
+</svg>

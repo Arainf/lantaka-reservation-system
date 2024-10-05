@@ -96,7 +96,7 @@ const CustomerTable = () => {
       <CardHeader className="mb-0 pb-0">
         <CardTitle>Customer Reservations</CardTitle>
         <Table className="min-w-full">
-            <TableHeader className="sticky top-0 bg-white z-10">
+            <TableHeader className="sticky top-0 bg-white ">
               <TableRow>
                 <TableHead className="bg-gray-100 text-center w-[7%] " >Reservation ID</TableHead>
                 <TableHead className="bg-gray-100 text-center w-[9%] " >Customer</TableHead>
