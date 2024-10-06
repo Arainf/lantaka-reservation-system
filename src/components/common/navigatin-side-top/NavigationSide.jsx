@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom"; // Import NavLink for routing
+import { NavLink, useNavigate} from "react-router-dom"; // Import NavLink for routing
 import { FaHome } from "react-icons/fa"; // Import home icon
 import { IoCalendarSharp } from "react-icons/io5"; // Import calendar icon
 import { FaPeopleGroup } from "react-icons/fa6"; // Import people group icon
@@ -41,11 +41,31 @@ const navMoreInfo = [
   {
     icon: <BiLogOut style={{ height: '1rem', width: '1rem' , margin: '5px 0'}} />, // Icon for Logout
     display: "Logout", // Text displayed for Logout
-    url: "/" // URL for Logout
   },
 ];
 
 const NavigationSide = ({ isOpen }) => {
+
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // State for loading spinner
+
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      setLoading(true); // Show spinner
+      try {
+        // Simulate a delay for logout process (replace with actual logout logic)
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate async logout
+        // Perform any logout logic here if needed (e.g., clearing tokens)
+        navigate('/');  // Redirect to the login page
+      } catch (error) {
+        console.error("Error during logout:", error);
+      } finally {
+        setLoading(false); // Hide spinner
+      }
+    }
+  };
+
   const [dropdownOpen, setDropdownOpen] = useState(false); // State for controlling dropdown visibility
 
   // Function to toggle dropdown visibility
@@ -121,7 +141,7 @@ const NavigationSide = ({ isOpen }) => {
 
       <hr style={{ height: '1px', borderWidth: '0', color: 'gray', backgroundColor: 'yellow', position: 'sticky', bottom: '7%' }} /> {/* Divider */}
 
-      <nav className="navstyleBottom">
+      <nav className="navstyleBottom" onClick={handleLogout}>
         {navMoreInfo.map((item, index) => ( // Iterate through navMoreInfo
           <NavLink key={index} to={item.url} className="navMoreInfo">
             {item.icon} {/* Icon for bottom links */}
@@ -131,6 +151,13 @@ const NavigationSide = ({ isOpen }) => {
           </NavLink>
         ))}
       </nav>
+
+            {/* Spinner overlay */}
+      {loading && (
+        <div className="spinner-overlay">
+          <div className="loader"></div>
+        </div>
+      )}
     </div>
   );
 };
