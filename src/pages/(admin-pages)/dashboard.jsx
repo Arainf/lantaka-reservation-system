@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import FloorPlan from "@/assets/images/Floorplan.svg";
 import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
 import { DataContext } from '@/context/contexts';
+// import { Component as CalendarComponent } from '@/components/common/calendar/Calendar';
 
 
 // Lazy-loaded components
@@ -133,6 +134,11 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
               </CardContent>
             </Card>
           </div>
+
+          {/* <div>
+            <CalendarComponent/>
+
+          </div> */}
         </main>
       </div>
     </div>

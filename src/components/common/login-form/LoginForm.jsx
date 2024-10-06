@@ -30,7 +30,7 @@ const loginSchema = z.object({
 export function LoginForm() {
   // State for backend error message
   const [backendError, setBackendError] = useState(null);
-  const { setUserRole } = useContext(UserContext); // Get setUserRole from context
+  const { setUserRole, setUserData, setUserImg } = useContext(UserContext); // Get setUserRole from context
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Set up the form with react-hook-form and zodResolver for validation
@@ -49,23 +49,38 @@ export function LoginForm() {
         username: values.username,
         password: values.password,
       });
-
+  
       // Check for successful login
       if (response.status === 200) {
-
-        console.log(response.data + "success");
-        const { account_id, role } = response.data; // Get both account_id and role from backend
-        localStorage.setItem('account_id', account_id); // Store account_id in localStorage
-        localStorage.setItem('userRole', role); // Store role in localStorage
-        console.log(account_id, role);
+        console.log('Full response:', response);
         
-        setUserRole(role); // Update UserContext with the role
-
+        // Destructure account_id, role, and other userData properly
+        const { account_id, role, imageUrl, ...userData } = response.data; 
+        
+        // Print role before storing to ensure it's captured
+        console.log('Role before storing:', role);
+        // Store role and userData in localStorage
+        localStorage.setItem('account_id', account_id);
+        localStorage.setItem('userRole', role);
+        localStorage.setItem('userImg', imageUrl);
+        localStorage.setItem('userData', JSON.stringify(userData));
+  
+        // Print stored role in localStorage for validation
+        console.log('Stored role in localStorage:', localStorage.getItem('userRole'));
+        
+        // Update UserContext with the role and userData
+        setUserRole(role);
+        setUserData(userData);
+        setUserImg(imageUrl);
+        
+        // Print the updated role from the context for debugging
+        console.log('Role after context update:', userData.role);
+        console.log('Role after context update:', userData.first_name);
+  
         navigate('/dashboard'); // Navigate to the dashboard after login
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        // Set backend error message from the response
         setBackendError(error.response.data.message || 'Invalid credentials');
       } else {
         setBackendError('Something went wrong. Please try again.');
@@ -73,6 +88,8 @@ export function LoginForm() {
       console.error('Login failed', error);
     }
   };
+  
+  
 
   return (
     <Form {...form}>

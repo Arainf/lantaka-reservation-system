@@ -43,12 +43,12 @@ const ReservationCard = ({
          font-semibold">{title}</CardTitle>
       </CardHeader>
       <CardContent className="justify-between">
-        {/* {isLoading ? (
+        {isLoading ? (
           <>
             <Skeleton className="h-12 w-[100px] bg-sky-200" />
             <Skeleton className="mt-2 h-4 w-[120px] bg-sky-200" />
           </>
-        ) : ( */}
+        ) : (
           <div className="flex items-center justify-between">
             <div className="flex-shrink">
               <div style={{ color: textColor }} className="text-5xl font-bold">
@@ -62,7 +62,7 @@ const ReservationCard = ({
               <LineChartComponent chartData={graphData} barColor={textColor}/>
             </div>
           </div>
-        {/* )} */}
+        )} 
       </CardContent>
     </Card>
   );
