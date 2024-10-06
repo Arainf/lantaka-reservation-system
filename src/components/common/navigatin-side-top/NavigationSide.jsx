@@ -13,24 +13,24 @@ import './navigationside.css'; // Import CSS for styling
 // Array of navigation links for the sidebar
 const navLinks = [
   {
-    icon: <FaHome style={{ height: '1rem', width: '1rem' }} />, // Icon for Dashboard
+    icon: <FaHome style={{ height: '1rem', width: '1rem', margin: '5px 0'}} />, // Icon for Dashboard
     display: "Dashboard", // Text displayed for Dashboard
     url: "/dashboard" // URL for Dashboard
   },
   {
-    icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' }} />, // Icon for Reservations
+    icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem' , margin: '5px 0'}} />, // Icon for Reservations
     display: "Reservations", // Text displayed for Reservations
     url: "/reservations" // URL for Reservations
   },
   {
-    icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' }} />, // Icon for Guest
+    icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem' , margin: '5px 0'}} />, // Icon for Guest
     display: "Guest", // Text displayed for Guest
     icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
     url: "guests", // No URL since it's a dropdown
     dropdown: true // Indicate this item is a dropdown
   },
   {
-    icon: <IoPerson style={{ height: '1rem', width: '1rem' }} />, // Icon for Accounts
+    icon: <IoPerson style={{ height: '1rem', width: '1rem' , margin: '5px 0'}} />, // Icon for Accounts
     display: "Accounts", // Text displayed for Accounts
     url: "/accounts" // URL for Accounts
   },
@@ -39,7 +39,7 @@ const navLinks = [
 // Array of additional navigation links (bottom)
 const navMoreInfo = [
   {
-    icon: <BiLogOut style={{ height: '1rem', width: '1rem' }} />, // Icon for Logout
+    icon: <BiLogOut style={{ height: '1rem', width: '1rem' , margin: '5px 0'}} />, // Icon for Logout
     display: "Logout", // Text displayed for Logout
     url: "/" // URL for Logout
   },
@@ -64,64 +64,68 @@ const NavigationSide = ({ isOpen }) => {
   };
 
   return (
+    
     <div className="sidebarStyle" style={sidebarStyle}>
-      <div className="headerStyle">
-        <img
-          src="src/assets/images/logo1.png?height=50&width=50" // Logo image
-          alt="AteneoSeal" // Alt text for logo
-          className="logoStyle" // Logo styling class
-          style={{ display: isOpen ? 'none' : 'block' }}
-        />
-        <h1 className="titleStyle" style={{ display: isOpen ? 'block' : 'none' }}>
-          &lt; Lantaka Reservation System / &gt; {/* Title text for the system */}
+    <div className="headerStyle">
+      <img
+        src="src/assets/images/logo1.png?height=50&width=50" // Logo image
+        alt="AteneoSeal" // Alt text for logo
+        className="logoStyle" // Logo styling class
+        style={{ display: isOpen ? 'block' : 'block' }}
+      />
+      <div className="title">
+        <h1 className={`titleStyle ${isOpen ? 'visible' : 'invisible'}`}>
+          &lt; Lantaka Reservation System / &gt;
         </h1>
-        <h6 className="subtitleStyle" style={{ display: isOpen ? 'block' : 'none' }}>
-          "Database Management & Web System and Technologies" {/* Subtitle */}
+        <h6 className={`subtitleStyle ${isOpen ? 'visible' : 'invisible'}`}>
+          "Database Management & Web System and Technologies"
         </h6>
       </div>
+    </div>
 
-      <nav className="navStyle">
-        {navLinks.map((item, index) => ( // Iterate through navLinks
-          <div key={index}>
-            {item.dropdown ? ( // If the item is a dropdown
-              <div onClick={toggleDropdown} className="linkStyle" style={{ cursor: 'pointer' }}>
-                {item.icon} {/* Icon for dropdown */}
-                <span className="linkTextStyle" style={linkTextStyle}>
-                  {item.display} {/* Display text */}
-                </span>
-                <div style={{ flexGrow: '1', paddingLeft: '60px', display: isOpen ? 'block' : 'none' }}>
-                  {item.icon2} {/* Dropdown arrow icon */}
+    <nav className="navStyle">
+    {navLinks.map((item, index) => ( // Iterate through navLinks array
+        <div key={index}> 
+            {item.dropdown ? ( // Check if the current item has a dropdown
+                <div onClick={toggleDropdown} className="linkStyle" style={{ cursor: 'pointer' }}>
+                    {item.icon} {/* Icon for dropdown (e.g., could be a dashboard icon) */}
+                    <span className="linkTextStyle" style={linkTextStyle}>
+                        {item.display} {/* Display text (e.g., "Dashboard") */}
+                    </span>
+                    <div style={{ flexGrow: '1', paddingLeft: '70px', display: isOpen ? 'block' : 'none' }}>
+                        {item.icon2} {/* Dropdown arrow icon */}
+                    </div>
                 </div>
-              </div>
             ) : (
-              <NavLink
-                to={item.url} // Navigation link
-                className="linkStyle"
-                style={({ isActive }) => ({ color: isActive ? '#FCB813' : 'white' })} // Active link color
-              >
-                {item.icon} {/* Link icon */}
-                <span className="linkTextStyle" style={linkTextStyle}>
-                  {item.display} {/* Link text */}
-                </span>
-              </NavLink>
+                <NavLink
+                    to={item.url} // Navigation link to specific URL (e.g., /reservations)
+                    className="linkStyle"
+                    style={({ isActive }) => ({ color: isActive ? '#FCB813' : 'white' })} // Active link color
+                >
+                    {item.icon} {/* Link icon (e.g., could be an icon for reservations) */}
+                    <span className="linkTextStyle" style={linkTextStyle}>
+                        {item.display} {/* Link text (e.g., "Reservations") */}
+                    </span>
+                </NavLink>
             )}
-            {item.dropdown && dropdownOpen && ( // Render dropdown items if open
-              <div className="dropdownMenu">
-                <NavLink to="/guest-list" className="dropdownItem">Guest List</NavLink> {/* Dropdown item */}
-                <NavLink to="/guest-details" className="dropdownItem">Guest Details</NavLink> {/* Dropdown item */}
-              </div>
+            {item.dropdown && dropdownOpen && ( // Render dropdown items if the dropdown is open
+                <div className="dropdownMenu">
+                    <NavLink to="/guest-list" className="dropdownItem">Guest List</NavLink> {/* Dropdown item (link to guest list) */}
+                    <NavLink to="/guest-details" className="dropdownItem">Guest Details</NavLink> {/* Dropdown item (link to guest details) */}
+                </div>
             )}
-          </div>
-        ))}
-      </nav>
+        </div>
+    ))}
+</nav>
+
 
       <hr style={{ height: '1px', borderWidth: '0', color: 'gray', backgroundColor: 'yellow', position: 'sticky', bottom: '7%' }} /> {/* Divider */}
 
       <nav className="navstyleBottom">
         {navMoreInfo.map((item, index) => ( // Iterate through navMoreInfo
-          <NavLink key={index} to={item.url} className="linkStyle">
+          <NavLink key={index} to={item.url} className="navMoreInfo">
             {item.icon} {/* Icon for bottom links */}
-            <span className="linkTextStyle" style={linkTextStyle}>
+            <span className="linkTexStyle" style={linkTextStyle}>
               {item.display} {/* Display text for bottom links */}
             </span>
           </NavLink>
