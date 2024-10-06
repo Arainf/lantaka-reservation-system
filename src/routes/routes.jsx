@@ -1,25 +1,23 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import React, { useState, useEffect, useContext } from 'react';
-import LoginPage from '@/auth/login/login-page'; // Your Login Page
+import React, { useState, useEffect } from 'react';
+import LoginPage from '@/auth/login/login-page'; 
 import Dashboard from '@/pages/(admin-pages)/dashboard';
-import DashboardRegistrationForm from '@/pages/test/test';
-import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
+import Reservation from '@/pages/(admin-pages)/reservation';
 import { UserContext } from '@/context/contexts';
-import ProtectedRoute from './protectedRoutes'; // Import the ProtectedRoute component
+import ProtectedRoute from './protectedRoutes'; 
+import Unauthorize from '@/pages/unathorize'
 
 const AppRoutes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUsername] = useState("");
-  const [userRole, setUserRole] = useState(""); // State to manage user roles (admin/employee)
+  const [userRole, setUserRole] = useState(""); 
 
   const toggleSidebar = () => {
     setSidebarOpen(prevState => !prevState);
   };
 
-  // Effect to simulate a role being set after login (replace with actual login logic)
   useEffect(() => {
-    // Simulate setting role (admin or employee) after login
-    const storedRole = localStorage.getItem('userRole'); // Assume role is stored in localStorage after login
+    const storedRole = localStorage.getItem('userRole'); 
     if (storedRole) {
       setUserRole(storedRole);
     }
@@ -45,24 +43,8 @@ const AppRoutes = () => {
           }
         />
 
-        {/* Employee Dashboard: Placeholder Route (uncomment when ready) */}
-        {/* 
-        <Route
-          path="/employee/dashboard"
-          element={
-            <ProtectedRoute
-              element={<EmployeeDashboard sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
-              allowedRoles={['employee']}
-            />
-          }
-        /> 
-        */}
-
-        {/* Test Route for possible design */}
-        <Route path="/test" element={<DashboardRegistrationForm/>} />
-
         {/* Unauthorized page */}
-        <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
+        <Route path="/unauthorized" element={< Unauthorize />} />
         
         {/* Redirect based on user role after login */}
         <Route
