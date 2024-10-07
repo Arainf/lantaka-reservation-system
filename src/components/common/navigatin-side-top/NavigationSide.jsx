@@ -145,7 +145,7 @@ const NavigationSide = ({ isOpen }) => {
         {navMoreInfo.map((item, index) => ( // Iterate through navMoreInfo
           <NavLink key={index} to={item.url} className="navMoreInfo">
             {item.icon} {/* Icon for bottom links */}
-            <span className="linkTexStyle" style={linkTextStyle}>
+            <span className="linkTextStyle" style={linkTextStyle}>
               {item.display} {/* Display text for bottom links */}
             </span>
           </NavLink>

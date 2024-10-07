@@ -84,9 +84,8 @@
 
 .linkTextStyle {
   display: flex;
-
   margin-left: 0.5rem;
-  transition-delay:0.5s ;
+
 }
 
 
@@ -125,10 +124,9 @@
   padding: 0.5rem 1rem;
   font-family: 'Montserrat';
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   color: white;
   overflow: hidden;
- 
 }
 
 
