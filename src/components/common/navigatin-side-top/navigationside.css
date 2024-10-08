@@ -12,8 +12,8 @@
  /* side bar title and logo */
 .headerStyle {
   display: flex;
-  align-items: center;
   height: 60px; /* Set a fixed height */
+  flex-direction: column;
 }
 
 .logoStyle {
@@ -30,6 +30,9 @@
   height: 40px;
   flex-direction: column;
   width: 170px;
+  padding: 8px;
+  padding-top: 15px;
+  padding-left: 32px;
   font-family: 'Montserrat';
 }
 

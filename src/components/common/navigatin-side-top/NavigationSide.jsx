@@ -23,17 +23,18 @@ const navLinks = [
     url: "/reservations" // URL for Reservations
   },
   {
-    icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Accounts", // Text displayed for Accounts
-    url: "/accounts" // URL for Accounts
-  },
-  {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Guest
     display: "Guest", // Text displayed for Guest
     icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
     url: "guests", // No URL since it's a dropdown
     dropdown: true // Indicate this item is a dropdown
   },
+  {
+    icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
+    display: "Accounts", // Text displayed for Accounts
+    url: "/accounts" // URL for Accounts
+  },
+  
 ];
 
 // Array of additional navigation links (bottom)
@@ -72,16 +73,16 @@ const NavigationSide = ({ isOpen }) => {
           src="src/assets/images/logo1.png?height=50&width=50" // Logo image
           alt="AteneoSeal" // Alt text for logo
           className="logoStyle" // Logo styling class
-          style={{ display: isOpen ? 'block' : 'block' }}
+          style={{ display: isOpen ? 'none' : 'block' }}
         />
         <div className="title">
           <h1 className={`titleStyle ${isOpen ? 'visible' : 'invisible'}`} style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
-            Lantaka Reservation System
+            Lantaka Reservation ‎‎‎‎‎‎‎‎ㅤ‎‎‎‎‎‎‎‎ㅤ‎‎‎‎‎‎‎‎ㅤSystem
           </h1>
           {/* remove this when the project is done */}
-          <h6 className={`subtitleStyle ${isOpen ? 'visible' : 'invisible'}`}>
-            "Database Management & Web System and Technologies"
-          </h6>
+          {/* <h6 className={`subtitleStyle ${isOpen ? 'visible' : 'invisible'}`}> */}
+            {/* "Database Management & Web System and Technologies" */}
+          {/* </h6> */}
         </div>
       </div>
 
