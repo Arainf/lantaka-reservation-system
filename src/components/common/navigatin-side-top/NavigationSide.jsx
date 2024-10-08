@@ -7,6 +7,7 @@ import { IoPerson } from "react-icons/io5"; // Import person icon
 import { BiLogOut } from "react-icons/bi"; // Import logout icon
 import { IoMdArrowDropdown } from "react-icons/io"; // Import dropdown arrow icon
 
+
 import sidebarBg from '@/assets/images/sidebar.png'; // Sidebar background image
 import './navigationside.css'; // Import CSS for styling
 
@@ -28,12 +29,12 @@ const navLinks = [
   {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Guest
     display: "Guest", // Text displayed for Guest
-    url: "guests", // No URL since it's a dropdown
+    url: "/guestlist", // No URL since it's a dropdown
   },
   {
     icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Accounts", // Text displayed for Accounts
-    url: "/accounts" // URL for Accounts
+    display: "Event Logs", // Text displayed for Accounts
+    url: "/eventlogs" // URL for Accounts
   },
   
 ];
@@ -52,10 +53,21 @@ const NavigationSide = ({ isOpen }) => {
 
   // Function to toggle dropdown visibility
   const toggleDropdown = () => {
-    if (isOpen) { // Only toggle dropdown if sidebar is open
-      setDropdownOpen((prev) => !prev); // Toggle the current state
+    if (!isOpen) { // If the sidebar is closed, open it
+      setIsOpen(true);
     }
+    setDropdownOpen((prev) => !prev); // Toggle the current state
   };
+
+  const ParentComponent = () => {
+    const [isOpen, setIsOpen] = useState(false);
+  
+    return (
+      <NavigationSide isOpen={isOpen} setIsOpen={setIsOpen} />
+    );
+  };
+
+  
 
   // Style for the sidebar depending on whether it's open or not
   const sidebarStyle = {
@@ -78,7 +90,7 @@ const NavigationSide = ({ isOpen }) => {
         />
         <div className="title">
           <h1 className={`titleStyle ${isOpen ? 'visible' : 'invisible'}`} style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
-            Lantaka Reservation ‎‎‎‎‎‎‎‎ㅤ‎‎‎‎‎‎‎‎ㅤ‎‎‎‎‎‎‎‎ㅤSystem
+          &lt; Lantaka Reservation System / &gt;
           </h1>
           {/* remove this when the project is done */}
           {/* <h6 className={`subtitleStyle ${isOpen ? 'visible' : 'invisible'}`}> */}
@@ -112,10 +124,10 @@ const NavigationSide = ({ isOpen }) => {
                 </span>
               </NavLink>
             )}
-            {item.dropdown && dropdownOpen && isOpen && (
-              <div className="dropdownMenu">
-                <NavLink to="/guest-list" className="dropdownItem">Room List</NavLink>
-                <NavLink to="/guest-details" className="dropdownItem">Venue Details</NavLink>
+              {item.dropdown && dropdownOpen && isOpen && (
+                <div className="dropdownMenu">
+                  <NavLink to="/reservations" className="dropdownItem">Room List</NavLink>
+                  <NavLink to="/guest-details" className="dropdownItem">Venue Details</NavLink>
               </div>
             )}
            
@@ -139,4 +151,4 @@ const NavigationSide = ({ isOpen }) => {
   );
 };
 
-export default NavigationSide; 
+export default NavigationSide;

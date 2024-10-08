@@ -2,11 +2,13 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import React, { useState, useContext } from 'react';
 import LoginPage from '@/auth/login/login-page';
 import Dashboard from '@/pages/(admin-pages)/dashboard';
-// import DashboardRegistrationForm from '@/pages/test/test';
+import EventLogs from '@/pages/(admin-pages)/eventlogs';
 import Reservation from '@/pages/(admin-pages)/reservation';
+import GuestList from '@/pages/(admin-pages)/guestlist';
 import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
 import { UserContext } from '@/context/contexts';
 import ProtectedRoute from './protectedRoutes';
+import Unauthorize from '@/pages/unathorize';
 
 const AppRoutes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -42,6 +44,28 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Reservation sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
+            allowedRoles={['Administrator']}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+      
+      <Route
+        path="/guestlist"
+        element={
+          <ProtectedRoute
+            element={<GuestList sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
+            allowedRoles={['Administrator']}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+
+      <Route
+        path="/eventlogs"
+        element={
+          <ProtectedRoute
+            element={<EventLogs sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
             allowedRoles={['Administrator']}
             isDevMode={isDevMode}
           />

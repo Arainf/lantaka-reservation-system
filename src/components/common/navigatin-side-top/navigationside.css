@@ -42,6 +42,7 @@
   display: table-cell;
   vertical-align: middle;
   width: 175px;
+  text-align: center; /* Add this line to center the text */
 }
 
 .subtitleStyle {
@@ -134,8 +135,6 @@
   overflow: hidden;
 }
 
-
-
 .linkStyle::after {
   content: '';
   position: absolute;
@@ -148,8 +147,6 @@
   left: -30%;
 
 }
-
-
 
 .header-container {
   justify-content: space-between;

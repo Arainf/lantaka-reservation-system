@@ -26,7 +26,7 @@ const TableHeader = () => {
         <th className="p-4 text-xs font-semibold leading-none text-left bg-gray-200 text-black-900">Room Type</th>
         <th className="p-4 text-xs font-semibold leading-none text-left bg-gray-200 text-black-900">Room Floor</th>
         <th className="p-4 text-xs font-semibold leading-none text-left bg-gray-200 text-black-900">Status</th>
-        <th className="p-4 text-xs font-semibold leading-none text-left bg-gray-200 text-black-900 w-[139px]">Actions</th>
+        <th className="p-4 text-xs font-semibold leading-none text-center bg-gray-200 text-black-900 w-[80px]">Actions</th>
       </tr>
     </thead>
   );
