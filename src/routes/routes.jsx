@@ -2,6 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import React, { useState, useContext } from 'react';
 import LoginPage from '@/auth/login/login-page';
 import Dashboard from '@/pages/(admin-pages)/dashboard';
+<<<<<<< HEAD
+=======
+// import DashboardRegistrationForm from '@/pages/test/test';
+>>>>>>> 40256dc4164b9835b283096d41cf7cc8493d6bcd
 import Reservation from '@/pages/(admin-pages)/reservation';
 import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
 import { UserContext } from '@/context/contexts';
@@ -48,6 +52,12 @@ const AppRoutes = () => {
         }
       />
 
+<<<<<<< HEAD
+=======
+      {/* Test Route */}
+      {/* <Route path="/test" element={<DashboardRegistrationForm />} /> */}
+
+>>>>>>> 40256dc4164b9835b283096d41cf7cc8493d6bcd
       {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorize />} />
 

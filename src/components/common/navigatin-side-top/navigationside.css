@@ -12,8 +12,8 @@
  /* side bar title and logo */
 .headerStyle {
   display: flex;
-  align-items: center;
   height: 60px; /* Set a fixed height */
+  flex-direction: column;
 }
 
 .logoStyle {
@@ -25,16 +25,19 @@
 
 .title {
   margin-left: 0;
-  transition: opacity  ease-in-out ;
   font-size: 1rem;
   display: flex;
-  height: 50px;
+  height: 40px;
   flex-direction: column;
   width: 170px;
+  padding: 8px;
+  padding-top: 15px;
+  padding-left: 32px;
+  font-family: 'Montserrat';
 }
 
 .titleStyle {
-  font-size: 1rem;
+  font-size: 15px;
   position: relative;
   display: table-cell;
   vertical-align: middle;
@@ -55,6 +58,7 @@
 /* links pages */
 
 .linkStyle {
+  
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
@@ -84,9 +88,9 @@
 
 .linkTextStyle {
   display: flex;
-
   margin-left: 0.5rem;
-  transition-delay:0.5s ;
+   font-family: 'Montserrat';
+
 }
 
 
@@ -125,10 +129,9 @@
   padding: 0.5rem 1rem;
   font-family: 'Montserrat';
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   color: white;
   overflow: hidden;
- 
 }
 
 
@@ -184,27 +187,40 @@
   margin: 0;
 }
 
-.dropdownMenu {
-  background-color: #fff;
-  position: relative;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-left: 2rem;
+/* Dropdown item hover style to match linkStyle */
+.dropdownItem {
+  color: white;
+  text-decoration: none;
+  padding: 5px 45px;
   display: flex;
-  flex-direction: column;
+  position: relative;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-.dropdownItem {
-  color: #333;
-  text-decoration: none;
-  padding: 5px 10px;
+.dropdownItem::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #FCB813;
+  transition: width 0.3s ease;
+  left: -30%;
+}
+
+.dropdownItem:hover::after {
+  width: 150%;
 }
 
 .dropdownItem:hover {
-  background-color: #f0f0f0;
-  border-radius: 3px;
+  color: #FCB813;
 }
+
+.dropdownItem:hover svg {
+  color: #FCB813;
+}
+
 
 /* ===================================================================== */
 /* HOVER STATE */
