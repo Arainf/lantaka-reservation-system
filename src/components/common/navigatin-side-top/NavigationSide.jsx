@@ -20,14 +20,15 @@ const navLinks = [
   {
     icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Reservations
     display: "Reservations", // Text displayed for Reservations
-    url: "/reservations" // URL for Reservations
+    icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
+    url: "/reservations", // No URL since it's a dropdown
+    dropdown: true // Indicate this item is a dropdown
+    
   },
   {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Guest
     display: "Guest", // Text displayed for Guest
-    icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
     url: "guests", // No URL since it's a dropdown
-    dropdown: true // Indicate this item is a dropdown
   },
   {
     icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
@@ -95,7 +96,7 @@ const NavigationSide = ({ isOpen }) => {
                 <span className="linkTextStyle" style={linkTextStyle}>
                   {item.display}
                 </span>
-                <div style={{ flexGrow: '1', paddingLeft: '70px', display: isOpen ? 'block' : 'none' }}>
+                <div style={{ flexGrow: '1', paddingLeft: '44px', display: isOpen ? 'block' : 'none' }}>
                   {item.icon2}
                 </div>
               </div>
@@ -113,10 +114,11 @@ const NavigationSide = ({ isOpen }) => {
             )}
             {item.dropdown && dropdownOpen && isOpen && (
               <div className="dropdownMenu">
-                <NavLink to="/guest-list" className="dropdownItem">Guest List</NavLink>
-                <NavLink to="/guest-details" className="dropdownItem">Guest Details</NavLink>
+                <NavLink to="/guest-list" className="dropdownItem">Room List</NavLink>
+                <NavLink to="/guest-details" className="dropdownItem">Venue Details</NavLink>
               </div>
             )}
+           
           </div>
         ))}
       </nav>
