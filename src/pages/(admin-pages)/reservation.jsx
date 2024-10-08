@@ -3,7 +3,7 @@ import { createIcons, icons } from "lucide";
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
 import GuestTable from "@/components/common/tables/guesttable"; // Import your GuestTable component
-import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit } from "lucide-react";
+import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit, Search } from "lucide-react";
 
 const Reservation = ({ sidebarOpen, toggleSidebar }) => {
   // Dummy reservation data
@@ -11,12 +11,7 @@ const Reservation = ({ sidebarOpen, toggleSidebar }) => {
     { id: 1, guest: "John Doe", roomName: "Room 101", roomType: "Single Bed", roomFloor: "First Floor", status: "Confirmed" },
     { id: 2, guest: "Jane Smith", roomName: "Room 102", roomType: "Double Bed", roomFloor: "Second Floor", status: "Pending" },
     { id: 3, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
-    { id: 4, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
-    { id: 5, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
-    { id: 6, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
-    { id: 7, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
-    { id: 8, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
-    { id: 9, guest: "Alice Johnson", roomName: "Room 103", roomType: "Single Bed", roomFloor: "Third Floor", status: "Cancelled" },
+    // Add more entries here...
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,7 +55,7 @@ const Reservation = ({ sidebarOpen, toggleSidebar }) => {
 
   // Toggle individual checkbox
   const handleCheckboxChange = (id) => {
-    setSelectedIds((prevSelected) => 
+    setSelectedIds((prevSelected) =>
       prevSelected.includes(id)
         ? prevSelected.filter(selectedId => selectedId !== id)
         : [...prevSelected, id]
@@ -103,23 +98,28 @@ const Reservation = ({ sidebarOpen, toggleSidebar }) => {
           <h1 className="text-xl font-bold mb-4">Reservations Management</h1>
 
           {/* Search and Control Area */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-5">
             <div className="flex items-center">
               {/* Settings Icon */}
               <div className="relative mr-2">
-                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
+                <button className="p-2 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center">
                   <Settings size={18} />
                 </button>
               </div>
               <span className="mx-2 border-l border-gray-400 h-6"></span>
               {/* Search Input */}
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border border-gray-300 p-2 rounded-lg w-2/4"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                  <Search className="text-gray-900" size={18} />
+                </div>
+              </div>
             </div>
 
             {/* Pagination and Filter Controls */}

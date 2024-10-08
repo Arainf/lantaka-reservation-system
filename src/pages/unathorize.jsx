@@ -1,5 +1,5 @@
 import React from "react";
-import logoImage from "@/assets/images/logo.png"; // Import the local image
+import logoImage from "@/assets/images/logo1.png";
 
 function LostInMetaverse() {
   return (

@@ -36,7 +36,7 @@ const navLinks = [
   },
 ];
 
-// Array of additional navigation links (bottom)
+// Array of additional navigation links (bottom) 
 const navMoreInfo = [
   {
     icon: <BiLogOut style={{ height: '1rem', width: '1rem' , margin: '5px 0'}} />, // Icon for Logout
@@ -162,4 +162,4 @@ const NavigationSide = ({ isOpen }) => {
   );
 };
 
-export default NavigationSide; // Export the component for use in other parts of the app
+export default NavigationSide; 

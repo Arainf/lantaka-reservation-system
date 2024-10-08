@@ -37,10 +37,10 @@ const GuestRow = ({ guest }) => {
         </div>
       </td>
       <td className="flex gap-2 items-center p-4 min-h-[60px]">
-        <button onClick={handleEdit} className="flex items-center">
-          <Edit size={18} />
+        <button onClick={handleEdit} className="flex items-center bg-gray-200">
+          <Edit size={18}  />
         </button>
-        <button onClick={handleDelete} className="flex items-center">
+        <button onClick={handleDelete} className="flex items-center bg-red-500">
           <Trash2 size={18} />
         </button>
       </td>
