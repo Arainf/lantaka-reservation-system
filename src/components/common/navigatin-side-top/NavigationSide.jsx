@@ -139,8 +139,4 @@ const NavigationSide = ({ isOpen }) => {
   );
 };
 
-<<<<<<< HEAD
 export default NavigationSide; 
-=======
-export default NavigationSide;
->>>>>>> 40256dc4164b9835b283096d41cf7cc8493d6bcd
