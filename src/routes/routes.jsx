@@ -19,9 +19,9 @@ import AdminDashboard from '@/pages/(admin-pages)/dashboard';
 import AdminEventLogs from '@/pages/(admin-pages)/eventlogs';
 import AdminReservation from '@/pages/(admin-pages)/reservation';
 import AdminGuestList from '@/pages/(admin-pages)/guestlist';
-
+import AdminAccounts from '@/pages/(admin-pages)/accounts';
 // employee pages import routes
-import EmployeeDashboard from '@/pages/(employee-pages)/dashboard';
+import EmployeeDashboard from '@/pages/KennethP-test/dashboard';
 
 
 const AppRoutes = () => {
@@ -31,7 +31,7 @@ const AppRoutes = () => {
   const { userRole, userData } = useContext(UserContext);
 
   console.log(userRole);
-  const isDevMode = false; // Set this to true to disable route protection for developers
+  const isDevMode = true; // Set this to true to disable route protection for developers
 
   const toggleSidebar = () => {
     setSidebarOpen(prevState => !prevState);
@@ -81,6 +81,17 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<AdminEventLogs sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
+            allowedRoles={['Administrator']}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+
+<Route
+        path="/accounts"
+        element={
+          <ProtectedRoute
+            element={<AdminAccounts sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
             allowedRoles={['Administrator']}
             isDevMode={isDevMode}
           />
