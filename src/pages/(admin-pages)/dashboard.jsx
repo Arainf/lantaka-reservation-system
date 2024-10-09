@@ -10,7 +10,7 @@ import { Component as BarChartComponent } from '@/components/common/charts/BarCh
 import { Skeleton } from '@/components/ui/skeleton';
 import CustomerTable from '@/components/common/cards/CustomerTable';
 import BookingCalendar from '@/components/common/cards/BookingCalendar';
-
+import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
 // // Lazy-loaded components
 // const CustomerTable = lazy(() => import('@/components/common/cards/CustomerTable'));
 // const BookingCalendar = lazy(() => import('@/components/common/cards/BookingCalendar'));
@@ -95,7 +95,19 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
       <NavigationSide isOpen={sidebarOpen} />
       <div className="flex-1 overflow-auto">
         <NavigationTop onSidebarToggle={toggleSidebar} />
-        <main className="p-20">
+        <main className="p-6">
+          <div className="flex w-full justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-xl text-gray-400 ">Dashboard</h1>
+              <h1 className="text-4xl font-bold mb-4">Overview</h1>
+            </div>
+            <div className="flex-shrink mt-4 flex flex-row">
+              <DatePicker className="min-w-max" />
+              <h1 className='m-2 text-center text-[1.2rem] font-[Oswald]'> to </h1>
+              <DatePicker />
+            </div>
+          </div>
+        
           <div className="mb-6">
             <div className="grid grid-cols-4 gap-4 row">
               <ReservationCard
