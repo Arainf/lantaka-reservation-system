@@ -21,7 +21,7 @@ import AdminReservation from '@/pages/(admin-pages)/reservation';
 import AdminGuestList from '@/pages/(admin-pages)/guestlist';
 import AdminAccounts from '@/pages/(admin-pages)/accounts';
 // employee pages import routes
-import EmployeeDashboard from '@/pages/KennethP-test/dashboard';
+import EmployeeDashboard from '@/pages/(employee-pages)/dashboard';
 
 
 const AppRoutes = () => {
