@@ -76,8 +76,16 @@ export function LoginForm() {
         // Print the updated role from the context for debugging
         console.log('Role after context update:', userData.role);
         console.log('Role after context update:', userData.first_name);
-  
-        navigate('/dashboard'); // Navigate to the dashboard after login
+
+        if (role === 'Administrator') {
+          navigate('/dashboard');
+        } else if (role === 'Employee') {
+          navigate('/home');
+        } else {
+          navigate('/unathorize')
+        }
+
+
       }
     } catch (error) {
       if (error.response && error.response.data) {

@@ -5,7 +5,7 @@ import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import GuestListTable from "@/components/common/tables/guestListTable"; // Import your GuestTable component
 import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit, Search } from "lucide-react";
 
-const GuestList = ({ sidebarOpen, toggleSidebar }) => {
+const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
   // Dummy event logs data
   const [guestList, setGuestList] = useState([
     { id: 1, user: "John Doe", email: "john@example.com", room: "102", check_in_date: "2022-01-01 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "4" },
@@ -133,4 +133,4 @@ const GuestList = ({ sidebarOpen, toggleSidebar }) => {
         );
       };
       
-      export default GuestList;
+      export default  AdminGuestList;

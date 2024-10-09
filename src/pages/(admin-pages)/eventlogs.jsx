@@ -5,7 +5,7 @@ import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import EventsLogTable from "@/components/common/tables/eventlogstable"; // Import your GuestTable component
 import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit, Search } from "lucide-react";
 
-const EventLogs = ({ sidebarOpen, toggleSidebar }) => {
+const  AdminEventLogs = ({ sidebarOpen, toggleSidebar }) => {
   // Dummy event logs data
   const [eventLogs, setEventLogs] = useState([
     { id: 1, user: "John Doe", eventType: "Login", eventDescription: "User logged in successfully", eventDate: "2022-01-01 12:00:00" },
@@ -124,4 +124,4 @@ const EventLogs = ({ sidebarOpen, toggleSidebar }) => {
         );
       };
       
-      export default EventLogs;
+      export default  AdminEventLogs;

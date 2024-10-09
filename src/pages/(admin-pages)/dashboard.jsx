@@ -1,25 +1,85 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useMemo, useState, useEffect } from 'react';
 import './adminPages.css';
 import NavigationSide from '@/components/common/navigatin-side-top/NavigationSide';
 import NavigationTop from '@/components/common/navigatin-side-top/NavigationTop';
 import ReservationCard from '@/components/common/cards/ReservationCard';
 import { IoCalendarSharp, IoPersonSharp, IoCashSharp, IoPeopleSharp } from "react-icons/io5";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import FloorPlan from "@/assets/images/Floorplan.svg";
+import FloorPlan from '@/components/common/cards/FloorPlan';
 import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
-import { DataContext } from '@/context/contexts';
-// import { Component as CalendarComponent } from '@/components/common/calendar/Calendar';
+import { Skeleton } from '@/components/ui/skeleton';
+import CustomerTable from '@/components/common/cards/CustomerTable';
+import BookingCalendar from '@/components/common/cards/BookingCalendar';
 
+// // Lazy-loaded components
+// const CustomerTable = lazy(() => import('@/components/common/cards/CustomerTable'));
+// const BookingCalendar = lazy(() => import('@/components/common/cards/BookingCalendar'));
 
-// Lazy-loaded components
-const CustomerTable = lazy(() => import('@/components/common/cards/CustomerTable'));
-const BookingCalendar = lazy(() => import('@/components/common/cards/BookingCalendar'));
+// Skeleton components
+const FloorPlanSkeleton = () => (
+  <Card className='col-span-2 row-span-1'>
+    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+      <Skeleton className="h-6 w-40" />
+      <Skeleton className="h-10 w-[180px]" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-[300px] w-full" />
+    </CardContent>
+  </Card>
+);
 
+const BookingCalendarSkeleton = () => (
+  <Card>
+    <CardHeader>
+      <Skeleton className="h-6 w-40" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-[300px] w-full" />
+    </CardContent>
+  </Card>
+);
 
+const CustomerTableSkeleton = () => (
+  <Card className="col-span-3">
+    <CardHeader>
+      <Skeleton className="h-6 w-40" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-10 w-full mb-4" />
+      <Skeleton className="h-10 w-full mb-4" />
+      <Skeleton className="h-10 w-full mb-4" />
+      <Skeleton className="h-10 w-full mb-4" />
+      <Skeleton className="h-10 w-full" />
+    </CardContent>
+  </Card>
+);
 
+const ChartSkeleton = () => (
+  <Card>
+    <CardHeader>
+      <Skeleton className="h-6 w-40" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-48 w-full" />
+    </CardContent>
+  </Card>
+);
 
-const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
+const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const chartData = useMemo(() => [
     { month: "January", desktop: 186 },
@@ -35,10 +95,11 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
       <NavigationSide isOpen={sidebarOpen} />
       <div className="flex-1 overflow-auto">
         <NavigationTop onSidebarToggle={toggleSidebar} />
-        <main className="p-20 ">
+        <main className="p-20">
           <div className="mb-6">
             <div className="grid grid-cols-4 gap-4 row">
               <ReservationCard
+                isLoading={loading}
                 title="Total Bookings"
                 icon={IoCalendarSharp}
                 value={100}
@@ -48,6 +109,7 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 graphData={chartData}
               />
               <ReservationCard
+                isLoading={loading}
                 title="Available Rooms"
                 icon={IoPersonSharp}
                 value={20}
@@ -57,6 +119,7 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 graphData={chartData}
               />
               <ReservationCard
+                isLoading={loading}
                 title="Check In"
                 icon={IoCashSharp}
                 value={71}
@@ -66,6 +129,7 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
                 graphData={chartData}
               />
               <ReservationCard
+                isLoading={loading}
                 title="Check Out"
                 icon={IoPeopleSharp}
                 value={29}
@@ -78,71 +142,51 @@ const Dashboard = ({ sidebarOpen, toggleSidebar }) => {
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-6">
-            
+            {loading ? (
+              <FloorPlanSkeleton />
+            ) : (
+              <FloorPlan/>
+            )}
 
-            <Card className='col-span-2 row-span-1'>
-              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                <CardTitle className="text-xl font-bold">Hotel Floor Plan</CardTitle>
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Floor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="floor1">Floor One</SelectItem>
-                    <SelectItem value="floor2">Floor Two</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardHeader>
-              <CardContent>
-                <div className='bg-gray-200 h-[calc(100%-2rem)] p-10 flex items-center justify-center '>
-                  <img src={FloorPlan} alt="" />
-                </div>
-              </CardContent>
-            </Card>
 
-            <Suspense fallback={<div>Loading...</div>}>
+            {loading ? (
+              <BookingCalendarSkeleton />
+            ) : (
               <BookingCalendar />
-            </Suspense>
+            )}
 
-            <Suspense fallback={<div>Loading...</div>}>
+            {loading ? (
+              <CustomerTableSkeleton />
+            ) : (
               <div className="col-span-3">
                 <CustomerTable />
               </div>
-            </Suspense>
+            )}
+
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-            {/* Other chart placeholders */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Line Chart Placeholder</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='bg-gray-200 h-48 flex items-center justify-center'>
-                  Line Chart Placeholder
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Bar Chart Placeholder</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[200px] w-[auto] min-w-0">
-                  <BarChartComponent chartData={chartData} barColor="#494992" />
-                </div>
-              </CardContent>
-            </Card>
+            <ChartSkeleton />
+            {loading ? (
+              <ChartSkeleton />
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Bar Chart</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[200px] w-[auto] min-w-0">
+                    <BarChartComponent chartData={chartData} barColor="#494992" />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            <ChartSkeleton />
           </div>
-
-          {/* <div>
-            <CalendarComponent/>
-
-          </div> */}
         </main>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;

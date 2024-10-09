@@ -7,8 +7,6 @@ import { UserContext } from "@/context/contexts";
 
 const NavigationTop = memo(({ onSidebarToggle }) => {
   const { userData, userRole, userImg } = useContext(UserContext);
-  
-  console.log(userImg);
 
   return (
     <header className="flex items-center justify-between h-14 px-4 py-2 bg-[#0f172a] text-white sticky top-0 right-0  z-10">

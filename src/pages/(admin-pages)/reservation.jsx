@@ -5,7 +5,7 @@ import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import GuestTable from "@/components/common/tables/guesttable"; // Import your GuestTable component
 import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit, Search } from "lucide-react";
 
-const Reservation = ({ sidebarOpen, toggleSidebar }) => {
+const  AdminReservation = ({ sidebarOpen, toggleSidebar }) => {
   // Dummy reservation data
   const [reservations, setReservations] = useState([
     { id: 1, guest: "John Doe", roomName: "Room 101", roomType: "Single Bed", roomFloor: "First Floor", status: "Confirmed" },
@@ -160,4 +160,4 @@ const Reservation = ({ sidebarOpen, toggleSidebar }) => {
   );
 };
 
-export default Reservation;
+export default  AdminReservation;
