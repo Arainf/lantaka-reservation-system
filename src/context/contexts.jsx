@@ -53,6 +53,44 @@ export const UserProvider = ({ children }) => {
   );
 };
 
+
+export const AccountContext = createContext(null);
+
+
+export const AccountProvider = ({ children }) => {
+  const [accountData, setAccountData] = useState(null);
+
+  useEffect(() => {
+    // Fetch account data initially using fetch
+    const fetchAccountData = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/accounts');
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        setAccountData(data);
+      } catch (error) {
+        console.error('Failed to fetch account data:', error);
+      }
+    };
+
+    fetchAccountData(); // Call the fetch function
+
+    // Cleanup function (though not strictly needed without SSE)
+    return () => {};
+  }, []); // Empty dependency array to run only once on mount
+
+  return (
+    <AccountContext.Provider value={{ accountData }}>
+      {children}
+    </AccountContext.Provider>
+  );
+};
+
+
+
+
 export const DataContext = ({ children }) => {
   const [data, setData] = useState(null);
 
@@ -81,5 +119,7 @@ export const DataContext = ({ children }) => {
     </DataContext.Provider>
   );
 };
+
+
 
 

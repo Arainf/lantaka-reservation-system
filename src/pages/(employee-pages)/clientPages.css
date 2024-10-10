@@ -3,17 +3,18 @@
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 3px; /* Width of the scrollbar */
+      background-color: #0f172a;
     }
   
     /* Scrollbar track (the background) */
     ::-webkit-scrollbar-track {
-      background: #f1f1f1; /* Light gray background */
+      background: #0f172a; /* Light gray background */
       border-radius: 10px; /* Rounded corners for track */
     }
   
     /* Scrollbar thumb (the draggable part) */
     ::-webkit-scrollbar-thumb {
-      background: #888; /* Darker gray for the thumb */
+      background: #0f172a; /* Darker gray for the thumb */
       border-radius: 10px; /* Rounded corners for the thumb */
     }
   
@@ -24,7 +25,7 @@
   
     /* Scrollbar corner when both horizontal and vertical scrollbars appear */
     ::-webkit-scrollbar-corner {
-      background-color: #f1f1f1; /* Light gray for the scrollbar corner */
+      background-color: #0f172a; /* Light gray for the scrollbar corner */
     }
   }
   

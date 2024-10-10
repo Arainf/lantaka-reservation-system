@@ -1,7 +1,7 @@
 import React from "react";
 import "./style.css";
 
-const SecondFloor = () => {
+const SecondFloor = ({ roomColors }) => {
   return (
     <div className="w-full h-full overflow-hidden ">
       <svg
@@ -1720,7 +1720,7 @@ const SecondFloor = () => {
           <path
             id="room236a"
             className="room"
-            fill="#e8e8e8"
+             fill={roomColors["room236"] || "#e8e8e8"}
             d="M 816.7 896.6 L 1005.8 896.6 L 1005.8 1276.2 L 816.7 1276.2 Z M 816.7 896.6"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1729,7 +1729,7 @@ const SecondFloor = () => {
         <g clipPath="url(#a18c44caab)">
           <path
             id="stairsA"
-            fill="#e8e8e8"
+             fill="#e8e8e8"
             d="M 1769.6 1367.8 L 1956.2 1367.8 L 1956.2 1682.7 L 1769.6 1682.7 Z M 1769.6 1367.8"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1748,7 +1748,7 @@ const SecondFloor = () => {
           <path
             id="room202"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room202"] || "#e8e8e8"}
             d="M 4048.8 891.7 L 4236.7 891.7 L 4236.7 1277.9 L 4048.8 1277.9 Z M 4048.8 891.7"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1758,7 +1758,7 @@ const SecondFloor = () => {
           <path
             id="room204"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room204"] || "#e8e8e8"}
             d="M 3858.8 889.9 L 4046.8 889.9 L 4046.8 1276.1 L 3858.8 1276.1 Z M 3858.8 889.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1768,7 +1768,7 @@ const SecondFloor = () => {
           <path
             id="room206"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room206"] || "#e8e8e8"}
             d="M 3670.4 889.9 L 3858.4 889.9 L 3858.4 1276.1 L 3670.4 1276.1 Z M 3670.4 889.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1778,7 +1778,7 @@ const SecondFloor = () => {
           <path
             id="room208"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room208"] || "#e8e8e8"}
             d="M 3478.6 891.2 L 3666.6 891.2 L 3666.6 1277.4 L 3478.6 1277.4 Z M 3478.6 891.2"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1788,7 +1788,7 @@ const SecondFloor = () => {
           <path
             id="room216"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room216"] || "#e8e8e8"}
             d="M 2719.2 890.5 L 2907.2 890.5 L 2907.2 1276.7 L 2719.2 1276.7 Z M 2719.2 890.5"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1798,7 +1798,7 @@ const SecondFloor = () => {
           <path
             id="room218"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room218"] || "#e8e8e8"}
             d="M 2529 890.7 L 2717 890.7 L 2717 1276.9 L 2529 1276.9 Z M 2529 890.7"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1808,7 +1808,7 @@ const SecondFloor = () => {
           <path
             id="room224"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room224"] || "#e8e8e8"}
             d="M 1958.6 891.2 L 2146.5 891.2 L 2146.5 1277.4 L 1958.6 1277.4 Z M 1958.6 891.2"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1818,7 +1818,7 @@ const SecondFloor = () => {
           <path
             id="room226"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room226"] || "#e8e8e8"}
             d="M 1767.6 891.4 L 1955.6 891.4 L 1955.6 1277.6 L 1767.6 1277.6 Z M 1767.6 891.4"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1828,7 +1828,7 @@ const SecondFloor = () => {
           <path
             id="room228"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room228"] || "#e8e8e8"}
             d="M 1579.4 892.7 L 1767.4 892.7 L 1767.4 1278.9 L 1579.4 1278.9 Z M 1579.4 892.7"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1838,7 +1838,7 @@ const SecondFloor = () => {
           <path
             id="room232"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room232"] || "#e8e8e8"}
             d="M 1197.5 890.5 L 1385.4 890.5 L 1385.4 1276.7 L 1197.5 1276.7 Z M 1197.5 890.5"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1848,7 +1848,7 @@ const SecondFloor = () => {
           <path
             id="room236"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room236"] || "#e8e8e8"}
             d="M 625.7 880.9 L 816.2 880.9 L 816.2 1276.1 L 625.7 1276.1 Z M 625.7 880.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1858,7 +1858,7 @@ const SecondFloor = () => {
           <path
             id="room237"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room237"] || "#e8e8e8"}
             d="M 625.7 1367.8 L 815.4 1367.8 L 815.4 1684.2 L 625.7 1684.2 Z M 625.7 1367.8"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1868,7 +1868,7 @@ const SecondFloor = () => {
           <path
             id="room225"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room225"] || "#e8e8e8"}
             d="M 1958.7 1367.5 L 2148.4 1367.5 L 2148.4 1683.9 L 1958.7 1683.9 Z M 1958.7 1367.5"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1878,7 +1878,7 @@ const SecondFloor = () => {
           <path
             id="room217"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room217"] || "#e8e8e8"}
             d="M 2717 1367.5 L 2906.7 1367.5 L 2906.7 1683.9 L 2717 1683.9 Z M 2717 1367.5"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1888,7 +1888,7 @@ const SecondFloor = () => {
           <path
             id="room209"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room209"] || "#e8e8e8"}
             d="M 3475.8 1368.4 L 3665.5 1368.4 L 3665.5 1684.8 L 3475.8 1684.8 Z M 3475.8 1368.4"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1898,7 +1898,7 @@ const SecondFloor = () => {
           <path
             id="room229"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room229"] || "#e8e8e8"}
             d="M 1386.5 1367.5 L 1576.2 1367.5 L 1576.2 1683.9 L 1386.5 1683.9 Z M 1386.5 1367.5"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1908,7 +1908,7 @@ const SecondFloor = () => {
           <path
             id="room233"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room233"] || "#e8e8e8"}
             d="M 1007.2 1370.2 L 1197 1370.2 L 1197 1686.6 L 1007.2 1686.6 Z M 1007.2 1370.2"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1918,7 +1918,7 @@ const SecondFloor = () => {
           <path
             id="room221"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room221"] || "#e8e8e8"}
             d="M 2340.2 1369.9 L 2530 1369.9 L 2530 1686.3 L 2340.2 1686.3 Z M 2340.2 1369.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1928,7 +1928,7 @@ const SecondFloor = () => {
           <path
             id="room213"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room213"] || "#e8e8e8"}
             d="M 3098.5 1369.9 L 3288.2 1369.9 L 3288.2 1686.3 L 3098.5 1686.3 Z M 3098.5 1369.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1938,7 +1938,7 @@ const SecondFloor = () => {
           <path
             id="room205"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room205"] || "#e8e8e8"}
             d="M 3858.4 1367.8 L 4048.1 1367.8 L 4048.1 1684.2 L 3858.4 1684.2 Z M 3858.4 1367.8"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1948,7 +1948,7 @@ const SecondFloor = () => {
           <path
             id="room235"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room235"] || "#e8e8e8"}
             d="M 817.1 1366.3 L 1006.8 1366.3 L 1006.8 1682.7 L 817.1 1682.7 Z M 817.1 1366.3"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1958,7 +1958,7 @@ const SecondFloor = () => {
           <path
             id="room223"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room223"] || "#e8e8e8"}
             d="M 2150.1 1366 L 2339.8 1366 L 2339.8 1682.4 L 2150.1 1682.4 Z M 2150.1 1366"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1968,7 +1968,7 @@ const SecondFloor = () => {
           <path
             id="room215"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room215"] || "#e8e8e8"}
             d="M 2908.4 1366 L 3098.1 1366 L 3098.1 1682.4 L 2908.4 1682.4 Z M 2908.4 1366"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1978,7 +1978,7 @@ const SecondFloor = () => {
           <path
             id="room207"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room207"] || "#e8e8e8"}
             d="M 3668.7 1365.4 L 3858.4 1365.4 L 3858.4 1681.8 L 3668.7 1681.8 Z M 3668.7 1365.4"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1988,7 +1988,7 @@ const SecondFloor = () => {
           <path
             id="room227"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room227"] || "#e8e8e8"}
             d="M 1577.9 1366 L 1767.6 1366 L 1767.6 1682.4 L 1577.9 1682.4 Z M 1577.9 1366"
             fillOpacity="1"
             fillRule="nonzero"
@@ -1998,7 +1998,7 @@ const SecondFloor = () => {
           <path
             id="room231"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room231"] || "#e8e8e8"}
             d="M 1198.6 1368.7 L 1388.4 1368.7 L 1388.4 1685.1 L 1198.6 1685.1 Z M 1198.6 1368.7"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2008,7 +2008,7 @@ const SecondFloor = () => {
           <path
             id="room219"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room219"] || "#e8e8e8"}
             d="M 2531.6 1368.4 L 2721.4 1368.4 L 2721.4 1684.8 L 2531.6 1684.8 Z M 2531.6 1368.4"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2018,7 +2018,7 @@ const SecondFloor = () => {
           <path
             id="room211"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room211"] || "#e8e8e8"}
             d="M 3289.9 1368.4 L 3479.6 1368.4 L 3479.6 1684.8 L 3289.9 1684.8 Z M 3289.9 1368.4"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2028,7 +2028,7 @@ const SecondFloor = () => {
           <path
             id="room203"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room203"] || "#e8e8e8"}
             d="M 4048.8 1369.3 L 4238.5 1369.3 L 4238.5 1685.7 L 4048.8 1685.7 Z M 4048.8 1369.3"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2038,7 +2038,7 @@ const SecondFloor = () => {
           <path
             id="room201"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room201"] || "#e8e8e8"}
             d="M 4238.4 1368.4 L 4456.1 1368.4 L 4456.1 1684.7 L 4238.4 1684.7 Z M 4238.4 1368.4"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2247,7 +2247,7 @@ const SecondFloor = () => {
           <path
             id="room234"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room201"] || "#e8e8e8"}
             d="M 1007.2 889.9 L 1195.2 889.9 L 1195.2 1276.1 L 1007.2 1276.1 Z M 1007.2 889.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2385,7 +2385,7 @@ const SecondFloor = () => {
           <path
             id="room222"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room222"] || "#e8e8e8"}
             d="M 2149.3 891.2 L 2337.2 891.2 L 2337.2 1277.4 L 2149.3 1277.4 Z M 2149.3 891.2"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2395,7 +2395,7 @@ const SecondFloor = () => {
           <path
             id="room220"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room220"] || "#e8e8e8"}
             d="M 2338.9 890.5 L 2526.9 890.5 L 2526.9 1276.7 L 2338.9 1276.7 Z M 2338.9 890.5"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2405,7 +2405,7 @@ const SecondFloor = () => {
           <path
             id="room214"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room214"] || "#e8e8e8"}
             d="M 2909.7 890.7 L 3097.7 890.7 L 3097.7 1276.9 L 2909.7 1276.9 Z M 2909.7 890.7"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2415,7 +2415,7 @@ const SecondFloor = () => {
           <path
             id="room210"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room210"] || "#e8e8e8"}
             d="M 3289 890.9 L 3477 890.9 L 3477 1277.2 L 3289 1277.2 Z M 3289 890.9"
             fillOpacity="1"
             fillRule="nonzero"
@@ -2490,7 +2490,7 @@ const SecondFloor = () => {
           <path
             id="room230"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room230"] || "#e8e8e8"}
             d="M 1388.4 890 L 1576.3 890 L 1576.3 1276.2 L 1388.4 1276.2 Z M 1388.4 890"
             fillOpacity="1"
             fillRule="nonzero"
@@ -3647,7 +3647,7 @@ const SecondFloor = () => {
           <path
             id="room212"
             className="roomHover"
-            fill="#e8e8e8"
+             fill={roomColors["room201"] || "#e8e8e8"}
             d="M 3099.2 890.1 L 3287.2 890.1 L 3287.2 1276.3 L 3099.2 1276.3 Z M 3099.2 890.1"
             fillOpacity="1"
             fillRule="nonzero"

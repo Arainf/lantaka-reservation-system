@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import CustomerTable from '@/components/common/cards/CustomerTable';
 import BookingCalendar from '@/components/common/cards/BookingCalendar';
 import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
+import LantakaBg from '@/assets/images/EmployeeBg.png'
 // // Lazy-loaded components
 // const CustomerTable = lazy(() => import('@/components/common/cards/CustomerTable'));
 // const BookingCalendar = lazy(() => import('@/components/common/cards/BookingCalendar'));
@@ -90,10 +91,12 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
   ], []);
 
   return (
-    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
+    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-[#3da4ffec] ">
       <div className="flex-1 overflow-auto">
         <NavigationTop onSidebarToggle={toggleSidebar} />
+        <img src={LantakaBg} className='w-full h-screen'/>
         <main className="p-6">
+          
           <div className="flex w-full justify-between">
             <div className="flex flex-col">
               <h1 className="text-xl text-gray-400 ">Dashboard</h1>

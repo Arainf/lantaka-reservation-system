@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AppRoutes from './routes/routes';  // Import the routing setup
-import { UserProvider } from './context/contexts';
+import { UserProvider, AccountProvider } from './context/contexts';
+
 
 function App() {
 
@@ -8,7 +9,9 @@ function App() {
   return (
     <>
     <UserProvider>
-      <AppRoutes />
+      <AccountProvider>
+        <AppRoutes />
+      </AccountProvider>
     </UserProvider> 
     </>
   );

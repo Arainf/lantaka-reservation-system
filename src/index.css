@@ -44,13 +44,13 @@
 
 /* Scrollbar track (the background) */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Light gray background */
+  background: #0f172a; /* Light gray background */
   border-radius: 10px; /* Rounded corners for track */
 }
 
 /* Scrollbar thumb (the draggable part) */
 ::-webkit-scrollbar-thumb {
-  background: #888; /* Darker gray for the thumb */
+  background: #eafb00; /* Darker gray for the thumb */
   border-radius: 10px; /* Rounded corners for the thumb */
 }
 

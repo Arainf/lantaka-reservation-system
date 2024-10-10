@@ -107,7 +107,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<EmployeeDashboard toggleSidebar={toggleSidebar} />}
-            allowedRoles={['Employee', 'Administrator']}
+            allowedRoles={['Employee']}
             isDevMode={isDevMode}
           />
         }

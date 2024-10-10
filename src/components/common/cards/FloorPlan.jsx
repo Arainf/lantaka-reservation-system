@@ -1,9 +1,30 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SecondFloor from "./secondfloor";
 import './style.css';
+import { useEffect, useState } from 'react';
 
 const FloorPlan = () => {
+
+  // Random color generator for rooms (red and green)
+  const getRandomColor = () => {
+    const colors = ['#e74c3c', '#2ecc71']; // Red and Green colors
+    const roomColors = {};
+
+    for (let i = 201; i <= 236; i++) {
+      const roomId = `room${i}`;
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      roomColors[roomId] = randomColor;
+    }
+    return roomColors;
+  };
+
+  const [roomColors, setRoomColors] = useState({});
+
+  useEffect(() => {
+    const colors = getRandomColor();
+    setRoomColors(colors);
+  }, []);
 
   return (
     <Card className="w-full mx-auto">
@@ -23,27 +44,16 @@ const FloorPlan = () => {
           <div className="col-span-3 space-y-4">
             {/* Floor Plan */}
             <div>
-              <div className=" h-[500px] p-0 m-0 flex justify-center rounded-md overflow-hidden">
-                <SecondFloor className="scale-200" />
+              <div className="h-[250px] p-0 m-0 flex justify-center rounded-md overflow-hidden">
+                <div className="scale-[150%] relative bottom-0 left-0">
+                  <SecondFloor roomColors={roomColors} />
+                </div>
               </div>
             </div>
 
             {/* Additional content area */}
-            {/* <div>
-              <h3 className="text-lg font-semibold mb-2">Additional Content</h3>
-              <div className="bg-muted p-4 rounded-md">
-                <p>This area can be used for additional information or components.</p>
-              </div>
-            </div> */}
+            {/* Add other content here */}
           </div>
-
-          {/* Sidebar */}
-          {/* <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-2">Sidebar</h3>
-            <div className="bg-muted p-4 rounded-md h-[calc(100%-2rem)]">
-              <p>This is the sidebar area for additional navigation or information.</p>
-            </div>
-          </div> */}
         </div>
       </CardContent>
     </Card>

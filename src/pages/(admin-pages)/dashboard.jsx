@@ -108,13 +108,9 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
             </div>
           </div>
 
-          {loading ? (
-              <FloorPlanSkeleton />
-            ) : (
-              <FloorPlan/>
-            )}
+          
             
-          <div className="mt-6">
+          <div className="mb-6">
             <div className="grid grid-cols-4 gap-4 row">
               <ReservationCard
                 isLoading={loading}
@@ -123,7 +119,7 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={100}
                 percentageChange={20.1}
                 percentageSuffix="from last month"
-                baseColor='#06402b'
+                baseColor='#3498db'
                 graphData={chartData}
               />
               <ReservationCard
@@ -133,7 +129,7 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={20}
                 percentageChange={2.5}
                 percentageSuffix="from last month"
-                baseColor='#06402b'
+                baseColor='#27ae60 '
                 graphData={chartData}
               />
               <ReservationCard
@@ -143,7 +139,7 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={71}
                 percentageChange={15.3}
                 percentageSuffix="from last month"
-                baseColor='#EC1C24'
+                baseColor='#e74c3c'
                 graphData={chartData}
               />
               <ReservationCard
@@ -153,7 +149,7 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
                 value={29}
                 percentageChange={7.2}
                 percentageSuffix="from last month"
-                baseColor='#06402b'
+                baseColor='#f39c12'
                 graphData={chartData}
               />
             </div>
@@ -162,6 +158,13 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
           <div className="grid grid-cols-3 gap-4 mb-6">
             
 
+           {loading ? (
+              <FloorPlanSkeleton />
+            ) : (
+              <div className="col-span-2">
+                <FloorPlan/>
+              </div>
+            )}
 
             {loading ? (
               <BookingCalendarSkeleton />

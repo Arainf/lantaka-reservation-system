@@ -28,17 +28,17 @@ const AccountsRow = ({ accounts }) => {
   return (
     <tr className="bg-white border-b hover:bg-gray-100 transition duration-200 min-h-[60px]">
       <td>
-        <img src={accounts.img} className="w-10 h-10 rounded-full text-center mx-auto" />
+        <img src={accounts.imageUrl} className="w-10 h-10 rounded-full text-center mx-auto" />
       </td>
-      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.user}</td>
+      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.firstName} {accounts.lastName}</td>
       <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.role}</td>
       <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.email}</td>
       <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.username}</td>
-      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.cellphoneNo}</td>
+      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.PhoneNumber}</td>
       <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.dob}</td>
       <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.gender}</td>
-      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.createdAt}</td>
-      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.updatedAt}</td>
+      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.created_at}</td>
+      <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.updated_at}</td>
       <td className="px-4 py-5 text-sm leading-none text-neutral-700">{accounts.status}</td>
       <td className="p-4"> 
       </td>
