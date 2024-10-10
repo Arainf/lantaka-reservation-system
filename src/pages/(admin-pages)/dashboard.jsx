@@ -107,8 +107,14 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
               <DatePicker />
             </div>
           </div>
-        
-          <div className="mb-6">
+
+          {loading ? (
+              <FloorPlanSkeleton />
+            ) : (
+              <FloorPlan/>
+            )}
+            
+          <div className="mt-6">
             <div className="grid grid-cols-4 gap-4 row">
               <ReservationCard
                 isLoading={loading}
@@ -154,11 +160,7 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-6">
-            {loading ? (
-              <FloorPlanSkeleton />
-            ) : (
-              <FloorPlan/>
-            )}
+            
 
 
             {loading ? (

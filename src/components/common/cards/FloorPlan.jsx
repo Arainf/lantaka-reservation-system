@@ -1,14 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import FloorPlanImg from "@/assets/images/Floorplan.svg";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import SecondFloor from "./secondfloor";
+import './style.css';
 
 const FloorPlan = () => {
+
   return (
-    <Card className="col-span-2 row-span-1">
+    <Card className="w-full mx-auto">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xl font-bold">Hotel Floor Plan</CardTitle>
         <Select>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Select Floor" />
           </SelectTrigger>
           <SelectContent>
@@ -18,8 +19,31 @@ const FloorPlan = () => {
         </Select>
       </CardHeader>
       <CardContent>
-        <div className="bg-gray-200 h-[calc(100%-2rem)] p-10 flex items-center justify-center">
-          <img src={FloorPlanImg} alt="Hotel Floor Plan" />
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-3 space-y-4">
+            {/* Floor Plan */}
+            <div>
+              <div className=" h-[500px] p-0 m-0 flex justify-center rounded-md overflow-hidden">
+                <SecondFloor className="scale-200" />
+              </div>
+            </div>
+
+            {/* Additional content area */}
+            {/* <div>
+              <h3 className="text-lg font-semibold mb-2">Additional Content</h3>
+              <div className="bg-muted p-4 rounded-md">
+                <p>This area can be used for additional information or components.</p>
+              </div>
+            </div> */}
+          </div>
+
+          {/* Sidebar */}
+          {/* <div className="col-span-1">
+            <h3 className="text-lg font-semibold mb-2">Sidebar</h3>
+            <div className="bg-muted p-4 rounded-md h-[calc(100%-2rem)]">
+              <p>This is the sidebar area for additional navigation or information.</p>
+            </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>
