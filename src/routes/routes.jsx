@@ -19,7 +19,7 @@ import AdminDashboard from '@/pages/(admin-pages)/dashboard';
 import AdminEventLogs from '@/pages/(admin-pages)/eventlogs';
 import AdminReservation from '@/pages/(admin-pages)/reservation';
 import AdminGuestList from '@/pages/(admin-pages)/guestlist';
-
+import AdminAccounts from '@/pages/(admin-pages)/accounts';
 // employee pages import routes
 import EmployeeDashboard from '@/pages/(employee-pages)/dashboard';
 
@@ -81,6 +81,17 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<AdminEventLogs sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
+            allowedRoles={['Administrator']}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+
+<Route
+        path="/accounts"
+        element={
+          <ProtectedRoute
+            element={<AdminAccounts sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />}
             allowedRoles={['Administrator']}
             isDevMode={isDevMode}
           />

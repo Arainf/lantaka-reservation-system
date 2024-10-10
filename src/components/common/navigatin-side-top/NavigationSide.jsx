@@ -10,6 +10,7 @@ import { IoMdArrowDropdown } from "react-icons/io"; // Import dropdown arrow ico
 
 import sidebarBg from '@/assets/images/sidebar.png'; // Sidebar background image
 import './navigationside.css'; // Import CSS for styling
+import { ListCheck } from "lucide-react";
 
 // Array of navigation links for the sidebar
 const navLinks = [
@@ -32,9 +33,15 @@ const navLinks = [
     url: "/guestlist", // No URL since it's a dropdown
   },
   {
-    icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Event Logs", // Text displayed for Accounts
+    icon: <ListCheck style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
+    display: "Event ‎‎‎‎‎‎‎‎Logs", // Text displayed for Accounts
     url: "/eventlogs" // URL for Accounts
+  },
+
+  {
+    icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
+    display: "Accounts", // Text displayed for Accounts
+    url: "/accounts" // URL for Accounts
   },
   
 ];

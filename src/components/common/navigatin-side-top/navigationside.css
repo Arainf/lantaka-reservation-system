@@ -10,10 +10,10 @@
   flex-shrink: 0; /* Prevent sidebar from shrinking */
 }
  /* side bar title and logo */
-.headerStyle {
+ .headerStyle {
   display: flex;
   height: 60px; /* Set a fixed height */
-  flex-direction: column;
+  flex-direction: row;
 }
 
 .logoStyle {
@@ -21,6 +21,13 @@
   width: 2.5rem;
   object-fit: cover; /* Ensures the image fits inside without distortion */
   margin: 10px 0.5rem 0 20px;
+}
+
+.logoStyle2 {
+  height: 2.5rem;
+  width: 2.5rem;
+  object-fit: cover; /* Ensures the image fits inside without distortion */
+  margin: 10px 10px 10px 10px;
 }
 
 .title {
@@ -349,3 +356,6 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* ======= EMPLOYEE CSS AREA ======= */
