@@ -10,7 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import CustomerTable from '@/components/common/cards/CustomerTable';
 import BookingCalendar from '@/components/common/cards/BookingCalendar';
 import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
-import LantakaBg from '@/assets/images/EmployeeBg.png'
+import LantakaBg from '@/assets/images/LantakaBG_2.png'
+import {Button} from "@/components/ui/button"
 // // Lazy-loaded components
 // const CustomerTable = lazy(() => import('@/components/common/cards/CustomerTable'));
 // const BookingCalendar = lazy(() => import('@/components/common/cards/BookingCalendar'));
@@ -91,12 +92,29 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
   ], []);
 
   return (
-    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-[#3da4ffec] ">
-      <div className="flex-1 overflow-auto">
-        <NavigationTop onSidebarToggle={toggleSidebar} />
-        <img src={LantakaBg} className='w-full h-screen'/>
-        <main className="p-6">
-          
+    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-white ">
+      <div className="flex-1 overflow-auto ">
+                <NavigationTop onSidebarToggle={toggleSidebar} />
+              
+                <div className="relative">
+                      <img src={LantakaBg} className='w-full h-screen' alt="Background" />
+                      <div className="absolute top-0 left-0 pl-48 pt-24 text-3xl font-[Oswald]">
+                        <h2 className="text-[#0f172a] ">Buenas dias, Lorem!</h2>
+                        <h1 className="text-[#0f172a] font-extrabold text-9xl leading-tight leading-[1.1]">
+                          Lorem<br />Ipsum <br />Dolor
+                        </h1>
+                        <h2 className="text-[#0f172a] text-2xl mt-4">Pro deo Et Patria</h2>
+                        <h2 className="text-[#0f172a] text-2xl ">In the service of God and Country</h2>
+              
+                        <Button className="mt-4 px-6 py-3 bg-blue-900 hover:bg-yellow-700 text-white h-200px rounded-none text-lg transition-colors duration-300">
+                            View Rooms
+                          </Button>                      
+                    </div>
+                    </div>
+                
+
+            <main className="p-6">
+            
           <div className="flex w-full justify-between">
             <div className="flex flex-col">
               <h1 className="text-xl text-gray-400 ">Dashboard</h1>
