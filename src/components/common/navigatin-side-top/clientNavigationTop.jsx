@@ -31,7 +31,7 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
                 ['Add Reservation', '/projects'],
                 ['Account', '/reports'],
             ].map(([title, url]) => (
-                <a href={url} className="rounded-lg px-3 py-2 text-slate-100 font-medium hover:bg-slate-200 hover:text-slate-900">{title}</a>
+                <a href={url} className=" rounded-lg px-3 py-2 text-slate-100 font-medium hover:bg-[#FCB813] hover:text-slate-900">{title}</a>
             ))}
         </nav>
     </div>
