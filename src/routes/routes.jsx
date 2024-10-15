@@ -4,7 +4,7 @@ import LoginPage from '@/auth/login/login-page';
 
 
 // import Test Files here
-import DashboardRegistrationForm from '@/pages/Rainier-Test/RegistrationForm';
+import Rainiertest from '@/pages/Rainier-Test/rainiertest';
 
 
 
@@ -120,7 +120,7 @@ const AppRoutes = () => {
 
       {/* Test Routes */}
 
-      <Route path="/Rainiertest" element={<DashboardRegistrationForm />} />
+      <Route path="/Rainiertest" element={<Rainiertest />} />
     </Routes>
   );
 };

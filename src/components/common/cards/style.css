@@ -189,11 +189,82 @@
     transition: all 0.2s ease-in;
 }
 
+#room106{
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
 
+#room110{
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room120{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room112{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room116{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room108{
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room104{
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room118{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room102{
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#room114{
+  
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#breezahall{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#oldTalisayBar{
+  
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#gazebo{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#dinningHall{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
+#capizHall{
+
+    stroke: blue; /* Changes the stroke color */
+    transition: all 0.2s ease-in;
+}
 
 .roomHover:hover{
-    fill: skyblue;
+    fill: blue;
     transition: all 0.1s ease;
+    cursor: pointer;
 }
 
 

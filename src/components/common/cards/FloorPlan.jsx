@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SecondFloor from "./secondfloor";
+import FirstFloor from "./FirstFloor";
 import './style.css';
 import { useEffect, useState } from 'react';
 
@@ -45,8 +46,9 @@ const FloorPlan = () => {
             {/* Floor Plan */}
             <div>
               <div className="h-[250px] p-0 m-0 flex justify-center rounded-md overflow-hidden">
-                <div className="scale-[150%] relative bottom-0 left-0">
-                  <SecondFloor roomColors={roomColors} />
+                <div className="relative">
+                <FirstFloor />
+                  {/* <SecondFloor roomColors={roomColors} /> */}
                 </div>
               </div>
             </div>

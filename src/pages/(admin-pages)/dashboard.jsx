@@ -155,13 +155,13 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 grid-row-2 gap-4 mb-6">
             
 
-           {loading ? (
+          {loading ? (
               <FloorPlanSkeleton />
             ) : (
-              <div className="col-span-2">
+              <div className="col-span-3 ">
                 <FloorPlan/>
               </div>
             )}
