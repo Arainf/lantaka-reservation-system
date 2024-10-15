@@ -8,7 +8,7 @@ import LantakaBg from "../../assets/images/LantakaBG.jpg";
 const LoginPage = () => {
   return (
     <div
-      className="relative container-xl bg-cover bg-center"
+      className="relative container-xl bg-cover bg-center overflow-hidden"
       style={{ backgroundImage: `url(${LantakaBg})`, width: '100vw' }}
     >
       <div
