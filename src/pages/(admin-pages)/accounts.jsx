@@ -19,9 +19,9 @@ const Accounts = ({ sidebarOpen, toggleSidebar }) => {
   }, []);
 
   // Ensure accountData is not null before using it
-  if (!accountData) {
-    return <div>Loading account data...</div>; // You can replace this with a loading spinner
-  }
+ // if (!accountData) {
+ //  return <div>Loading account data...</div>; // You can replace this with a loading spinner
+  //}
 
   // Filter account data based on search input
   const filteredAccounts = accountData.filter((accountData) => 

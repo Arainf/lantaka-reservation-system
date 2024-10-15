@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { IoCalendarSharp } from "react-icons/io5";
+import { useEffect } from "react"
+import { IoCalendarSharp } from "react-icons/io5"
 import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
@@ -14,7 +15,11 @@ import {
 } from "@/components/ui/popover"
 
 export function DatePickerDemo() {
-  const [date, setDate] = React.useState("");
+  const [date, setDate] = React.useState("")
+
+  useEffect(() => {
+    setDate(new Date())
+  }, [])
 
   return (
     <Popover>
@@ -22,7 +27,7 @@ export function DatePickerDemo() {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
+            "w-full sm:w-[240px] justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
@@ -34,10 +39,24 @@ export function DatePickerDemo() {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={(newDate) => setDate(newDate)}
           initialFocus
+          className="rounded-md border"
         />
       </PopoverContent>
     </Popover>
   )
 }
+
+<style jsx global>{`
+  .react-calendar {
+    width: 100%;
+    max-width: 350px;
+    font-size: 0.875rem;
+  }
+  @media (max-width: 640px) {
+    .react-calendar {
+      font-size: 0.75rem;
+    }
+  }
+`}</style>
