@@ -98,13 +98,13 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
               
                 <div className="relative bg-[#0f172a]">
                       <img src={LantakaBg} className='w-full h-screen' alt="Background" />
-                      <div className="absolute top-0 left-0 pl-48 pt-24 text-3xl font-[Oswald]">
+                      <div className="absolute top-0 left-0 pl-48 pt-36 text-3xl font-[Oswald]">
                         <h2 className="text-[#0f172a] ">Buenas dias, Lorem!</h2>
-                        <h1 className="text-[#0f172a] font-extrabold text-9xl leading-tight leading-[1.1]">
-                          Lorem<br />Ipsum <br />Dolor
+                        <h1 className="text-[#0f172a] font-extrabold text-9xl leading-tight leading-[.9]">
+                          A view <br />to the <br />horizon
                         </h1>
-                        <h2 className="text-[#0f172a] text-2xl mt-4">Pro deo Et Patria</h2>
-                        <h2 className="text-[#0f172a] text-2xl ">In the service of God and Country</h2>
+                        <h2 className="text-[#0f172a] text-xl mt-4">Pro deo Et Patria</h2>
+                        <h2 className="text-[#0f172a] text-xl ">In the service of God and Country</h2>
               
                         <Button className="h-12 w-44 mt-4 px-6 py-3 bg-blue-900 text-white hover:bg-yellow-500 hover:text-black h-200px rounded-none text-lg transition-colors duration-300">
                             View Rooms
