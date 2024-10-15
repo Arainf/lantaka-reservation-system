@@ -1,8 +1,9 @@
 import React, { memo, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { calculateShade } from '@/utils/colorsUtils';
 import { Component as LineChartComponent } from "@/components/common/charts/LineChartComponent"
+import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 
 const ReservationCard = ({
   isLoading = false,
@@ -14,7 +15,7 @@ const ReservationCard = ({
   valueSuffix = "",
   percentagePrefix = "",
   percentageSuffix = "from last month",
-  baseColor = "",
+  baseColor = "#3498db",
   graphData,
 }) => {
   const shades = useMemo(() => {
@@ -30,52 +31,60 @@ const ReservationCard = ({
     return generatedShades;
   }, [baseColor]);
 
-  const backgroundColor = shades[9];
+  const backgroundColor = 'white';
   const textColor = shades[6];
-  const borderColor = shades[5];
 
   return (
     <Card 
+      className="w-full overflow-hidden"
       style={{ 
-        backgroundColor: isLoading ? 'transparent' : backgroundColor, 
-        border: isLoading ? 'none' : "solid 2px", 
-        borderColor: isLoading ? 'transparent' : borderColor, 
-        borderRadius: "5px" 
-      }} 
-      className="w-full drop-shadow-md"
+        backgroundColor: isLoading ? 'transparent' : backgroundColor,
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        border: 'none',
+      }}
     >
-      <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-        {isLoading ? (
-          <Skeleton className="h-4 w-4 rounded-full" />
-        ) : (
-          <Icon style={{ color: textColor }} className="h-4 w-4 text-muted-foreground" />
-        )}
-        <CardTitle style={{ color: '#121212' }} className="text-md ml-2 font-[Oswald] font-semibold">
-          {isLoading ? <Skeleton className="h-6 w-24" /> : title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="justify-between">
-        <div className="flex items-center justify-between">
-          <div className="flex-shrink">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
             {isLoading ? (
-              <>
-                <Skeleton className="h-12 w-[100px]" />
-                <Skeleton className="mt-2 h-4 w-[120px]" />
-              </>
+              <Skeleton className="h-10 w-10 rounded-full" />
             ) : (
-              <>
-                <div style={{ color: textColor }} className="text-5xl font-bold">
-                  {valuePrefix}{value.toLocaleString()}{valueSuffix}
-                </div>
-                <p className="text-xs mt-1 font-[Montserrat] italic text-muted-foreground absolute">
-                  {percentagePrefix}{percentageChange > 0 ? "+" : ""}{percentageChange.toFixed(1)}% {percentageSuffix}
-                </p>
-              </>
+              <div 
+                className="p-2 rounded-full"
+                style={{ backgroundColor: "#001f3f" }}
+              >
+                <Icon className="h-6 w-6 text-white" />
+              </div>
             )}
+            <h3 className="ml-3 text-lg font-semibold text-gray-700">
+              {isLoading ? <Skeleton className="h-6 w-24" /> : title}
+            </h3>
           </div>
+          {!isLoading && (
+            <div className={`flex items-center ${percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              {percentageChange >= 0 ? <ArrowUpIcon className="h-4 w-4 mr-1" /> : <ArrowDownIcon className="h-4 w-4 mr-1" />}
+              <span className="text-sm font-medium">{Math.abs(percentageChange).toFixed(1)}%</span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-end justify-between">
           <div>
             {isLoading ? (
-              <Skeleton className="h-16 w-24" />
+              <Skeleton className="h-12 w-[100px]" />
+            ) : (
+              <div className="text-3xl font-bold text-gray-900">
+                {valuePrefix}{value.toLocaleString()}{valueSuffix}
+              </div>
+            )}
+            {!isLoading && (
+              <p className="text-sm text-gray-500 mt-1">
+                {percentageSuffix}
+              </p>
+            )}
+          </div>
+          <div className="w-24 h-16">
+            {isLoading ? (
+              <Skeleton className="h-full w-full" />
             ) : (
               <LineChartComponent chartData={graphData} barColor={textColor} />
             )}
