@@ -95,9 +95,9 @@
 }
 
 .linkTextStyle {
-  display: flex;
+  display: inline-block;
   margin-left: 0.5rem;
-   font-family: 'Montserrat';
+  font-family: 'Montserrat';
 
 }
 

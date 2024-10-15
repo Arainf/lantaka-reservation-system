@@ -34,7 +34,7 @@ const navLinks = [
   },
   {
     icon: <ListCheck style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Event ‎‎‎‎‎‎‎‎Logs", // Text displayed for Accounts
+    display: "Event_Logs", // Text displayed for Accounts
     url: "/eventlogs" // URL for Accounts
   },
 
