@@ -48,6 +48,8 @@ const FloorPlan = () => {
               <div className="h-[250px] p-0 m-0 flex justify-center rounded-md overflow-hidden">
                 <div className="relative">
                 <FirstFloor />
+                <SecondFloorr />
+
                   {/* <SecondFloor roomColors={roomColors} /> */}
                 </div>
               </div>
