@@ -86,16 +86,16 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
               <span className="text-gray-500">-</span>
               <DatePicker className="text-sm font-medium" />
               <div className="flex space-x-1 ml-2">
-                <Button variant="ghost" size="icon">
+                <Button variant="outline" >
                   <IoMailOutline className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button variant="outline" >
                   <IoCloudUploadOutline className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button variant="outline" >
                   <IoDocumentTextOutline className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
+                <Button variant="outline" >
                   <IoShareSocialOutline className="h-4 w-4" />
                 </Button>
               </div>
@@ -151,7 +151,7 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
                 </CardHeader>
                 <CardContent>
                   <div className="h-[500px] w-full">
-                    <BarChartComponent chartData={occupancyData} />
+                    <BarChartComponent chartData={occupancyData} barColor="#70a7ff" />
                   </div>
                 </CardContent>
               </Card>

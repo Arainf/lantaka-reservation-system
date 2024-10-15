@@ -19,7 +19,7 @@ export function Component({ chartData, barColor }) {
             <CartesianGrid vertical={false} />
             <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)} />
             <Tooltip content={<ChartTooltipContent hideLabel />} />
-            <Bar dataKey="desktop" fill={barColor} radius={2} />
+            <Bar dataKey="occupancy" fill={barColor} radius={2} />
           </BarChart>
       </ChartContainer>
   );
