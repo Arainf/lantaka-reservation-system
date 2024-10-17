@@ -22,6 +22,7 @@ import AdminGuestList from '@/pages/(admin-pages)/guestlist';
 import AdminAccounts from '@/pages/(admin-pages)/accounts';
 // employee pages import routes
 import EmployeeDashboard from '@/pages/(employee-pages)/dashboard';
+import JoshTest from '@/pages/Josh-Test/JoshTest';
 
 
 const AppRoutes = () => {
@@ -121,6 +122,7 @@ const AppRoutes = () => {
       {/* Test Routes */}
 
       <Route path="/Rainiertest" element={<Rainiertest />} />
+      <Route path="/Joshtest" element={<JoshTest/>} />
     </Routes>
   );
 };

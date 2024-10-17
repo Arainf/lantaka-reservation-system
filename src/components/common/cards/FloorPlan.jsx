@@ -31,6 +31,8 @@ export default function FloorPlan() {
 
   return (
     <div className="container mx-auto">
+      <div className="flex flex-row">
+        <div className="mr-2">
       <Select onValueChange={setSelectedFloor} value={selectedFloor}>
         <SelectTrigger className="w-[140px] mb-4">
           <SelectValue placeholder="Select Floor" />
@@ -40,6 +42,11 @@ export default function FloorPlan() {
           <SelectItem value="floor2">Floor Two</SelectItem>
         </SelectContent>
       </Select>
+      </div>
+      <DatePicker/>
+      </div>
+
+      
     
       <Card className="w-full mx-auto">
         <CardContent>
@@ -57,24 +64,14 @@ export default function FloorPlan() {
             
             {/* Details Section */}
             <div className="col-span-1 rounded-md p-4 bg-transparent">
-              <Card className="bg-transparent">
-                <CardHeader>
-                  <h2 className="text-lg font-semibold mb-4">Room Details</h2>
-                  <DatePicker/>
+              <Card className="bg-[#e5e7eb] " style={{ boxShadow: "-1px 1px 11px 0px rgba(0, 0, 0, 0.75) inset"}}>
+                <CardHeader className="px-6 pt-6 pb-2">
+                  <h2 className="text-lg font-[Oswald] font-semibold m-0 p-0 ">Reservation Details</h2>
                 </CardHeader>
-
                 <CardContent>
-                  <div className="space-y-2">
-                    <p>Total Rooms: {selectedFloor === "floor1" ? "X" : "36"}</p>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 bg-[#e74c3c]"></div>
-                      <span>Occupied</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 bg-[#2ecc71]"></div>
-                      <span>Available</span>
-                    </div>
-                    {/* Add more details as needed */}
+                  <div className="">
+                    <div className="text-sm">Employee Name: Adrian</div>
+                    <div className="text-sm">Guest Name:</div>
                   </div>
                 </CardContent>
               </Card>
@@ -86,3 +83,13 @@ export default function FloorPlan() {
     </div>
   )
 }
+
+                    {/* <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-[#e74c3c]"></div>
+                      <span>Occupied</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-[#2ecc71]"></div>
+                      <span>Available</span>
+                    </div> */}
+                    {/* Add more details as needed */}
