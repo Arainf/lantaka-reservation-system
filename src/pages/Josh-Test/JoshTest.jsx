@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
 import Clock from '@/components/common/time/clock';
+import Sidebar from './sidebarDetails'
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1")
@@ -48,12 +49,15 @@ const JoshTest = () => {
   const handleMouseUp = () => {
     setIsGrabbing(false);
   };
+  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen)
+  }
 
   return (
     <div className="flex flex-col relative w-screen overflow-hidden h-screen bg-[#f8f6f2]">
       <NavigationTop />
-
-
       <main className="flex-1 p-4 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4" >
         {/* Main content area (1) */}
         <div
@@ -135,11 +139,26 @@ const JoshTest = () => {
 
               </div>
 
-              <Button className="w-[85%] absolute bottom-4  justify-center">View Details</Button>
+              <Button onClick={toggleSidebar}className="w-[85%] absolute bottom-4  justify-center">View Details</Button>
+              {/* Overlay */}
+              {isSidebarOpen && (
+                <div
+                  className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out"
+                  onClick={toggleSidebar}
+                />
+              )}
             </div>
           </div>
-        </div>
+        </div>    
       </main>
+      <div className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <Sidebar />
+      </div>
+
+    
     </div>
   );
 };
