@@ -1,6 +1,6 @@
 import React from 'react';
 import {X} from 'lucide-react';
-
+import Clock from '@/components/common/time/clock';
 
 const Modal = ({ isOpen, onClose, onSubmit, reservationData, handleChange }) => {
   if (!isOpen) return null;
@@ -16,6 +16,7 @@ const Modal = ({ isOpen, onClose, onSubmit, reservationData, handleChange }) => 
           <div className="pl-12 pt-12 flex flex-column w-100%">
           <h2 className="flex text-3xl font-semibold ">Add Reservation </h2>
           </div>
+          
         </div>      
       </div>
   );

@@ -25,105 +25,87 @@ const RoomDetails = ({ roomNumber, capacity, amenities }) => (
 
 const FirstFloor = () => {
   const svgRef = useRef(null); // Reference to the SVG element
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, width: 800, height: 500 }); // State for SVG viewBox dimensions
+  const [viewBox, setViewBox] = useState({ x: 800, y: -200, width: 800, height: 1400 }); // State for SVG viewBox dimensions
   const originalSize = { width: 1500, height: 962 }; // Original SVG dimensions
 
-  const MIN_ZOOM = 100; // Minimum zoom level (width/height)
-  const MAX_ZOOM = 1000; // Maximum zoom level (width/height)
+  const MIN_ZOOM = 600; // Minimum zoom level
+  const MAX_ZOOM = 1400; // Maximum zoom level
   
   // State variables for dragging functionality
   const [isDragging, setIsDragging] = useState(false); // Flag to check if dragging is active
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 }); // Last mouse position for tracking movement
 
-  useEffect(() => {
-    const svg = svgRef.current; // Get the current SVG element
+  const onWheel = (event) => {
+    event.preventDefault(); // Prevent default scrolling behavior
+    const scaleFactor = 1.15; // Define how much to zoom in/out
+    const scaleDelta = event.deltaY > 0 ? scaleFactor : 1 / scaleFactor; // Determine scale based on scroll direction
 
-    // Handle zooming when the mouse wheel is used
-    const onWheel = (event) => {
-      event.preventDefault(); // Prevent default scrolling behavior
-     
-      // Normalize the wheel delta to determine zoom direction
-      const scaleFactor = 1.15; // Define how much to zoom in/out
-      const scaleDelta = event.deltaY > 0 ? scaleFactor : 1 / scaleFactor; // Determine scale based on scroll direction
+    const svg = svgRef.current;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const startPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-      // Create an SVG point to translate mouse position
-      const point = svg.createSVGPoint();
-      point.x = event.clientX; // Get current mouse X position
-      point.y = event.clientY; // Get current mouse Y position
+    const newWidth = Math.min(Math.max(viewBox.width * scaleDelta, MIN_ZOOM), MAX_ZOOM);
+    const newHeight = Math.min(Math.max(viewBox.height * scaleDelta, MIN_ZOOM), MAX_ZOOM);
 
-      // Transform the point to get the start point in SVG coordinates
-      const startPoint = point.matrixTransform(svg.getScreenCTM().inverse());
 
-      // Calculate new width and height based on zoom
-      const newWidth = viewBox.width * scaleDelta; // Update width based on zoom
-      const newHeight = viewBox.height * scaleDelta; // Update height based on zoom
+    const newViewBox = {
+      x: startPoint.x - (startPoint.x - viewBox.x) * (newWidth / viewBox.width),
+      y: startPoint.y - (startPoint.y - viewBox.y) * (newHeight / viewBox.height),
+      width: newWidth,
+      height: newHeight,
+  };
 
-      // Create new viewBox with clamping logic for zoom limits
-      const newViewBox = {
-        x: viewBox.x, // Keep the x position unchanged
-        y: viewBox.y, // Keep the y position unchanged
-        width: Math.min(Math.max(newWidth, MIN_ZOOM), MAX_ZOOM), // Clamp width
-        height: Math.min(Math.max(newHeight, MIN_ZOOM), MAX_ZOOM), // Clamp height
-      };
-      // Animate the new viewBox using GSAP
-      gsap.to(viewBox, {
-        duration: 0.5,
-        x: newViewBox.x,
-        y: newViewBox.y,
-        width: newViewBox.width,
-        height: newViewBox.height,
-        onUpdate: () => {
-          setViewBox(newViewBox); // Update state for the viewBox
-        },
+    setViewBox(newViewBox); // Update state for the viewBox
+  };
+
+  const onMouseDown = (event) => {
+    if (event.button === 0) { // Left mouse button
+      setIsDragging(true);
+      setLastMousePos({ x: event.clientX, y: event.clientY });
+    }
+  };
+
+  const onMouseMove = (event) => {
+    if (isDragging) {
+      const dx = event.clientX - lastMousePos.x;
+      const dy = event.clientY - lastMousePos.y;
+  
+      // Calculate new position
+      setViewBox((prevViewBox) => {
+        const newX = prevViewBox.x - dx; // New X position
+        const newY = prevViewBox.y - dy; // New Y position
+  
+        // Update limits based on the viewBox dimensions
+        const minX = 0; // Minimum X limit
+        const maxX = 1500; // Adjust this to match your content width or allowable drag area
+        const minY = -200; // Minimum Y limit to allow negative dragging
+        const maxY = 400; // Adjust this to match the allowable Y movement area
+
+        // Clamp the new positions within limits
+        const clampedX = Math.min(maxX, Math.max(minX, newX));
+        const clampedY = Math.min(maxY, Math.max(minY, newY));
+  
+        return {
+          x: clampedX, // Use clamped value
+          y: clampedY, // Use clamped value
+          width: prevViewBox.width,
+          height: prevViewBox.height,
+        };
       });
-      };
-   
-    // Handle right mouse button press for dragging
-    const onMouseDown = (event) => {
-      if (event.button === 0) { // Check if right mouse button is pressed
-        setIsDragging(true); // Enable dragging
-        setLastMousePos({ x: event.clientX, y: event.clientY }); // Set initial mouse position
-      }
-    };
+  
+      // Update last mouse position
+      setLastMousePos({ x: event.clientX, y: event.clientY });
+    }
+  };
 
-    // Handle mouse movement to drag the SVG
-    const onMouseMove = (event) => {
-      if (isDragging) { // Only move if dragging is active
-        const dx = event.clientX - lastMousePos.x; // Calculate change in X
-        const dy = event.clientY - lastMousePos.y; // Calculate change in Y
+  const onMouseUp = () => {
+    setIsDragging(false); // Disable dragging
+  };
 
-        // Update viewBox position based on mouse movement
-        setViewBox((prevViewBox) => {
-          const newX = prevViewBox.x - dx; // Adjust X position
-          const newY = prevViewBox.y - dy; // Adjust Y position
-
-          // Set boundaries based on zoom level
-          const maxX = 0; // Right boundary
-          const maxY = 0; // Bottom boundary
-          const minX = -(prevViewBox.width - originalSize.width); // Left boundary
-          const minY = -(prevViewBox.height - originalSize.height); // Top boundary
-
-          // Clamp the new positions within the defined boundaries
-          const clampedX = Math.min(maxX, Math.max(minX, newX));
-          const clampedY = Math.min(maxY, Math.max(minY, newY));
-
-          return {
-            x: clampedX, // Use the clamped X position
-            y: clampedY, // Use the clamped Y position
-            width: prevViewBox.width, // Keep width constant
-            height: prevViewBox.height, // Keep height constant
-          };
-        });
-
-        // Update last mouse position
-        setLastMousePos({ x: event.clientX, y: event.clientY });
-      }
-    };
-
-    // Handle mouse button release to stop dragging
-    const onMouseUp = () => {
-      setIsDragging(false); // Disable dragging
-    };
+  useEffect(() => {
+    const svg = svgRef.current;
 
     // Prevent context menu from appearing on right-click
     svg.addEventListener('contextmenu', (event) => event.preventDefault());
@@ -145,7 +127,7 @@ const FirstFloor = () => {
 
 
 
-
+// hover area 
   const roomInfo = {
     room112: {
       roomNumber: "112",

@@ -22,7 +22,7 @@ export function DatePickerDemo() {
   }, [])
 
   return (
-    <Popover>
+    <Popover style={{backgroundColor: "#95c1ff"}}>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
@@ -30,6 +30,7 @@ export function DatePickerDemo() {
             "w-full sm:w-[240px] justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
+          style={{backgroundColor: "#95c1ff"}}
         >
           <IoCalendarSharp className="mr-2 h-4 w-4" />
           {date ? format(date, "PPP") : <span>Pick a date</span>}
@@ -42,6 +43,7 @@ export function DatePickerDemo() {
           onSelect={(newDate) => setDate(newDate)}
           initialFocus
           className="rounded-md border"
+          
         />
       </PopoverContent>
     </Popover>
