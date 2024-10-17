@@ -25,7 +25,7 @@ const RoomDetails = ({ roomNumber, capacity, amenities }) => (
 
 const FirstFloor = () => {
   const svgRef = useRef(null); // Reference to the SVG element
-  const [viewBox, setViewBox] = useState({ x: 800, y: -200, width: 800, height: 1400 }); // State for SVG viewBox dimensions
+  const [viewBox, setViewBox] = useState({ x: 700, y: -100, width: 800, height: 1400 }); // State for SVG viewBox dimensions
   const originalSize = { width: 1500, height: 962 }; // Original SVG dimensions
 
   const MIN_ZOOM = 600; // Minimum zoom level

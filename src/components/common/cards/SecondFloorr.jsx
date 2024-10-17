@@ -1,16 +1,155 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const SecondFloorr = () => {
+  const svgRef = useRef(null); // Reference to the SVG element
+  const [viewBox, setViewBox] = useState({ x: 600, y: -100, width: 200, height: 900 }); // State for SVG viewBox dimensions
+  const originalSize = { width: 1500, height: 962 }; // Original SVG dimensions
+
+  const MIN_ZOOM = 500; // Minimum zoom level
+  const MAX_ZOOM = 1400; // Maximum zoom level
+  
+  // State variables for dragging functionality
+  const [isDragging, setIsDragging] = useState(false); // Flag to check if dragging is active
+  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 }); // Last mouse position for tracking movement
+
+  const onWheel = (event) => {
+    event.preventDefault(); // Prevent default scrolling behavior
+    const scaleFactor = 1.15; // Define how much to zoom in/out
+    const scaleDelta = event.deltaY > 0 ? scaleFactor : 1 / scaleFactor; // Determine scale based on scroll direction
+
+    const svg = svgRef.current;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const startPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+
+    const newWidth = Math.min(Math.max(viewBox.width * scaleDelta, MIN_ZOOM), MAX_ZOOM);
+    const newHeight = Math.min(Math.max(viewBox.height * scaleDelta, MIN_ZOOM), MAX_ZOOM);
+
+
+    const newViewBox = {
+      x: startPoint.x - (startPoint.x - viewBox.x) * (newWidth / viewBox.width),
+      y: startPoint.y - (startPoint.y - viewBox.y) * (newHeight / viewBox.height),
+      width: newWidth,
+      height: newHeight,
+  };
+
+    setViewBox(newViewBox); // Update state for the viewBox
+  };
+
+  const onMouseDown = (event) => {
+    if (event.button === 0) { // Left mouse button
+      setIsDragging(true);
+      setLastMousePos({ x: event.clientX, y: event.clientY });
+    }
+  };
+
+  const onMouseMove = (event) => {
+    if (isDragging) {
+      const dx = event.clientX - lastMousePos.x;
+      const dy = event.clientY - lastMousePos.y;
+  
+      // Calculate new position
+      setViewBox((prevViewBox) => {
+        const newX = prevViewBox.x - dx; // New X position
+        const newY = prevViewBox.y - dy; // New Y position
+  
+        // Update limits based on the viewBox dimensions
+        const minX = 0; // Minimum X limit
+        const maxX = 1100; // Adjust this to match your content width or allowable drag area
+        const minY = -200; // Minimum Y limit to allow negative dragging
+        const maxY = 400; // Adjust this to match the allowable Y movement area
+
+        // Clamp the new positions within limits
+        const clampedX = Math.min(maxX, Math.max(minX, newX));
+        const clampedY = Math.min(maxY, Math.max(minY, newY));
+  
+        return {
+          x: clampedX, // Use clamped value
+          y: clampedY, // Use clamped value
+          width: prevViewBox.width,
+          height: prevViewBox.height,
+        };
+      });
+  
+      // Update last mouse position
+      setLastMousePos({ x: event.clientX, y: event.clientY });
+    }
+  };
+
+  const onMouseUp = () => {
+    setIsDragging(false); // Disable dragging
+  };
+
+  useEffect(() => {
+    const svg = svgRef.current;
+
+    // Prevent context menu from appearing on right-click
+    svg.addEventListener('contextmenu', (event) => event.preventDefault());
+
+    // Add event listeners for wheel and mouse events
+    svg.addEventListener('wheel', onWheel);
+    svg.addEventListener('mousedown', onMouseDown);
+    svg.addEventListener('mousemove', onMouseMove);
+    svg.addEventListener('mouseup', onMouseUp);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      svg.removeEventListener('wheel', onWheel);
+      svg.removeEventListener('mousedown', onMouseDown);
+      svg.removeEventListener('mousemove', onMouseMove);
+      svg.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDragging, lastMousePos, viewBox]); // Re-run effect when dragging state or viewBox changes
+
+
+
+// hover area 
+  const roomInfo = {
+    room112: {
+      roomNumber: "112",
+      capacity: "2 people",
+      amenities: "Queen bed, En-suite bathroom",
+    },
+    // Add more rooms as needed
+  };
+
+
+  const [hoveredRoom, setHoveredRoom] = useState(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+
+  const handleMouseEnter = (roomId, event) => {
+    setHoveredRoom(roomId);
+    setTooltipPos({ x: event.clientX, y: event.clientY });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRoom(null);
+  };
+
   return (
     <div className="relative w-full h-full overflow-hidden ">
-      <svg
-        width="1436"
-        height="586"
-        viewBox="0 0 1436 586"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        xlinkHref="http://www.w3.org/1999/xlink"
-      >
+       <svg
+          ref={svgRef}
+          width="100%"
+          height="100%"
+          viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+          id="svg"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          xlinkHref="http://www.w3.org/1999/xlink"
+          tabIndex={0} // Add this to allow the SVG to receive focus
+        >
         <g clip-path="url(#clip0_609_4790)">
           <rect width="1436" height="586" fill="white" />
           <rect
@@ -363,6 +502,18 @@ const SecondFloorr = () => {
           />
         </defs>
       </svg>
+      {/* Tooltip */}
+      {hoveredRoom && (
+          <div
+            className="absolute p-2 bg-white border rounded shadow-md"
+            style={{
+              left: tooltipPos.x + 10,
+              top: tooltipPos.y + 10,
+            }}
+          >
+            <RoomDetails {...roomInfo[hoveredRoom]} />
+          </div>
+        )}  
     </div>
   );
 };
