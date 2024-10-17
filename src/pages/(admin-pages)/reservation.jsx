@@ -4,6 +4,7 @@ import NavigationSide from "@/components/common/navigatin-side-top/NavigationSid
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
 import GuestTable from "@/components/common/tables/guesttable"; // Import your GuestTable component
 import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit, Search } from "lucide-react";
+import FloorPlan from "@/components/common/cards/FloorPlan";
 
 const  AdminReservation = ({ sidebarOpen, toggleSidebar }) => {
   // Dummy reservation data
@@ -97,6 +98,7 @@ const  AdminReservation = ({ sidebarOpen, toggleSidebar }) => {
         <main className="p-6">
           <h1 className="text-xl font-bold mb-4">Reservations Management</h1>
 
+          <FloorPlan/>
           {/* Search and Control Area */}
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center">

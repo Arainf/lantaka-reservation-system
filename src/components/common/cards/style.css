@@ -241,7 +241,7 @@
     transition: all 0.2s ease-in;
 }
 #oldTalisayBar{
-  
+    fill: #FF1B09;
     stroke: blue; /* Changes the stroke color */
     transition: all 0.2s ease-in;
 }
@@ -317,7 +317,7 @@
 }
 
 .roomHover:hover{
-    fill: blue;
+    scale: 1.0028;
     transition: all 0.1s ease;
     cursor: pointer;
 }

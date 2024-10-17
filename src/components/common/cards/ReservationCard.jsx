@@ -2,7 +2,6 @@ import React, { memo, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { calculateShade } from '@/utils/colorsUtils';
-import { Component as LineChartComponent } from "@/components/common/charts/LineChartComponent"
 import { ArrowUpIcon, ArrowDownIcon } from 'lucide-react';
 
 const ReservationCard = ({
@@ -80,13 +79,6 @@ const ReservationCard = ({
               <p className="text-sm text-gray-500 mt-1">
                 {percentageSuffix}
               </p>
-            )}
-          </div>
-          <div className="w-24 h-16">
-            {isLoading ? (
-              <Skeleton className="h-full w-full" />
-            ) : (
-              <LineChartComponent chartData={graphData} barColor={textColor} />
             )}
           </div>
         </div>

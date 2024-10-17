@@ -100,26 +100,26 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
       <div className="flex-1 overflow-auto ">
                 <NavigationTop onSidebarToggle={toggleSidebar} />
               
-                <div className="relative bg-[#0f172a]">
-                    <img src={LantakaBg} className='w-full h-screen' alt="Background" />
-                      <div className="absolute top-0 left-0 pl-48 pt-36 text-3xl font-[Oswald]">
-                        <h2 className="text-[#0f172a] ">Buenas dias, Lorem!</h2>
-                        <h1 className="text-[#0f172a] font-extrabold text-9xl leading-tight leading-[.9]">
-                          A view <br />to the <br />horizon
-                        </h1>
-                        <h2 className="text-[#0f172a] text-xl mt-4">Pro deo Et Patria</h2>
-                        <h2 className="text-[#0f172a] text-xl ">In the service of God and Country</h2>
-              
+                      <div className="relative bg-[#0f172a]">
+                        <img src={LantakaBg} className='w-full h-screen' alt="Background" />
+                        <div className="absolute top-0 left-0 pl-40 pt-20 text-3xl font-[Oswald]">
+                          <h2 className="text-[#0f172a] text-[2rem] md:text-[2.5rem] lg:text-[3rem]">Buenas dias, User!</h2>
+                          <h1 className="text-[#0f172a] font-extrabold text-[5rem] md:text-[6rem] lg:text-[9rem] leading-tight leading-[.9]">
+                            A view <br />to the <br />horizon
+                          </h1>
+                          <h2 className="text-[#0f172a] text-[1.2rem] md:text-[1.5rem] lg:text-[2rem] mt-4">Pro deo Et Patria</h2>
+                          <h2 className="text-[#0f172a] text-[1.2rem] md:text-[1.5rem] lg:text-[2rem]">In the service of God and Country</h2>
+
                           <Button 
-                            className="h-12 w-44 mt-4 px-6 py-3 bg-blue-900 text-white hover:bg-yellow-500 hover:text-black h-200px rounded-none text-lg transition-colors duration-300"
+                            className="min-h-12 min-w-44 mt-4 px-6 py-3 bg-blue-900 text-white hover:bg-yellow-500 hover:text-black h-200px rounded-none text-lg transition-colors duration-300"
                             onClick={() => {
                               setShowWhiteBackground(true);
                             }}
                           >
                             View Rooms
                           </Button>                      
-                    </div>
-               </div>
+                        </div>
+                      </div>
             <main className="p-6">
             
           <div className="flex w-full justify-between">

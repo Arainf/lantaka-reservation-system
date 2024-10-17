@@ -5,7 +5,7 @@ import LoginPage from '@/auth/login/login-page';
 
 // import Test Files here
 import Rainiertest from '@/pages/Rainier-Test/rainiertest';
-import Keantest from '@/pages/Kean-test/kean';
+import Keantest from '@/pages/Kean-test/kean'
 
 
 
@@ -23,6 +23,7 @@ import AdminGuestList from '@/pages/(admin-pages)/guestlist';
 import AdminAccounts from '@/pages/(admin-pages)/accounts';
 // employee pages import routes
 import EmployeeDashboard from '@/pages/(employee-pages)/dashboard';
+import JoshTest from '@/pages/Josh-Test/JoshTest';
 
 
 const AppRoutes = () => {
@@ -122,7 +123,8 @@ const AppRoutes = () => {
       {/* Test Routes */}
 
       <Route path="/Rainiertest" element={<Rainiertest />} />
-      <Route path="/Keantest" element={<Keantest />} />
+      <Route path="/Joshtest" element={<JoshTest/>} />
+      <Route path="/Keantest" element={<Keantest/>} />
     </Routes>
   );
 };
