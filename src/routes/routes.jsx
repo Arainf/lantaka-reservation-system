@@ -5,6 +5,7 @@ import LoginPage from '@/auth/login/login-page';
 
 // import Test Files here
 import Rainiertest from '@/pages/Rainier-Test/rainiertest';
+import Keantest from '@/pages/Kean-test/kean';
 
 
 
@@ -121,6 +122,7 @@ const AppRoutes = () => {
       {/* Test Routes */}
 
       <Route path="/Rainiertest" element={<Rainiertest />} />
+      <Route path="/Keantest" element={<Keantest />} />
     </Routes>
   );
 };
