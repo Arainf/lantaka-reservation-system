@@ -23,6 +23,7 @@ const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
   const [isGrabbing, setIsGrabbing] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1920);
+  const [resetTrigger, setResetTrigger] = useState(false); // Trigger for resetting the SVG components
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -43,7 +44,6 @@ const JoshTest = () => {
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
-      // Detect right-click
       setIsGrabbing(true);
     }
   };
@@ -51,16 +51,21 @@ const JoshTest = () => {
   const handleMouseUp = () => {
     setIsGrabbing(false);
   };
-  
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
-  }
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // Reset function to trigger resetting of FirstFloor and SecondFloorr components
+  const resetState = () => {
+    setResetTrigger((prevState) => !prevState); // Toggle the reset trigger to force the reset in child components
+  };
 
   return (
     <div className="flex flex-col relative w-screen overflow-hidden h-screen bg-[#f8f6f2]">
       <NavigationTop />
-      <main className="flex-1 p-4 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4" >
+      <main className="flex-1 p-4 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4">
         {/* Main content area (1) */}
         <div
           className={`w-[110%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
@@ -87,23 +92,27 @@ const JoshTest = () => {
               </Select>
             </div>
             <DatePicker />
+            {/* Reset button */}
+            <Button
+                      onClick={resetState} // Call reset function on click
+                      className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
+                      style={{ marginLeft: '900px', backgroundColor: '#95c1ff' }} // Set the background color and margin
+                    >
+              Reset
+            </Button>
           </div>
-          {selectedFloor === "floor1" && <FirstFloor />}
-          {selectedFloor === "floor2" && <SecondFloorr />}
+          {selectedFloor === "floor1" && <FirstFloor resetTrigger={resetTrigger} />}
+          {selectedFloor === "floor2" && <SecondFloorr resetTrigger={resetTrigger} />}
         </div>
+        
         {/* Right-side section */}
-
         <div className="w-full md:w-1/3 flex flex-col space-y-4">
-          {/* Top right area (2) */}
-
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
-
-          {/* Bottom right area (3) */}
-          <div className="flex-1 relative bg-white border overflow-hidden border-gray-200 rounded-lg ">
+          <div className="flex-1 relative bg-white border overflow-hidden border-gray-200 rounded-lg">
             <div
-              className="h-[60%]  relative top-0 bg-slate-600 w-full bg-cover"
+              className="h-[60%] relative top-0 bg-slate-600 w-full bg-cover"
               style={{ backgroundImage: `url(${Image})` }}
             >
               <div className="font-[Oswald] p-2 absolute bottom-[22%] flex flex-col font-bold text-white text-2xl">
@@ -113,29 +122,16 @@ const JoshTest = () => {
                 Double Room &#40; Sea View &#41;
               </div>
             </div>
-
             <div
               className="p-6 space-y-4 h-[54%] flex flex-col absolute bottom-0 bg-[#d9ebff] w-full rounded-tr-[40px]"
-              style={{
-                boxShadow: "-15px 20px 26px -14px rgba(0,0,0,0.3) inset",
-              }}
+              style={{ boxShadow: "-15px 20px 26px -14px rgba(0,0,0,0.3) inset" }}
             >
               <div className="flex items-center h-[85%]">
-                <div
-                  className="text-center w-[40%]"
-                  style={{
-                    scale: isLargeScreen ? "1.5" : "1", // Change font size based on screen width
-                  }}
-                >
-                  <span className="text-6xl font-bold ">2</span>
+                <div className="text-center w-[40%]" style={{ scale: isLargeScreen ? "1.5" : "1" }}>
+                  <span className="text-6xl font-bold">2</span>
                   <p className="text-xl text-gray-600">Guest</p>
                 </div>
-                <div
-                  className="space-y-2 flex-1"
-                  style={{
-                    scale: isLargeScreen ? "1.1" : "1", // Change font size based on screen width
-                  }}
-                >
+                <div className="space-y-2 flex-1" style={{ scale: isLargeScreen ? "1.1" : "1" }}>
                   <div className="flex items-center">
                     <MdOutlinePayment className="w-4 h-4 mr-2 text-blue-500" />
                     <span className="font-semibold">₱ 1000.00</span>
@@ -150,9 +146,9 @@ const JoshTest = () => {
                   </div>
                 </div>
               </div>
-
-              <Button onClick={toggleSidebar}className="w-[85%] absolute bottom-4  justify-center">View Details</Button>
-              {/* Overlay */}
+              <Button onClick={toggleSidebar} className="w-[85%] absolute bottom-4 justify-center">
+                View Details
+              </Button>
               {isSidebarOpen && (
                 <div
                   className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out"
@@ -161,16 +157,15 @@ const JoshTest = () => {
               )}
             </div>
           </div>
-        </div>    
+        </div>
       </main>
-      <div className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
+      <div
+        className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <Sidebar />
       </div>
-
-    
     </div>
   );
 };
