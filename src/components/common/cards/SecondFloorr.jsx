@@ -10,11 +10,21 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const SecondFloorr = () => {
-  const svgRef = useRef(null); // Reference to the SVG element
-  const [viewBox, setViewBox] = useState({ x: 600, y: -100, width: 200, height: 900 }); // State for SVG viewBox dimensions
-  const originalSize = { width: 1500, height: 962 }; // Original SVG dimensions
+const SecondFloorr = ({ resetTrigger }) => {
+  const svgRef = useRef(null);
+  const initialViewBox = { x: 400, y: -100, width: 700, height: 900 }; // Example initial viewBox values
+  const [viewBox, setViewBox] = useState(initialViewBox);
+  const [zoom, setZoom] = useState(1); // Example state for zoom level
+  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 }); // Example state for drag position
 
+  useEffect(() => {
+    // Reset the viewBox, zoom, and drag position to their initial state whenever the resetTrigger changes
+    if (resetTrigger) {
+      setViewBox(initialViewBox);
+      setZoom(1); // Reset zoom level
+      setDragPosition({ x: 0, y: 0 }); // Reset drag position
+    }
+  }, [resetTrigger]);
   const MIN_ZOOM = 500; // Minimum zoom level
   const MAX_ZOOM = 1400; // Maximum zoom level
   
@@ -144,6 +154,8 @@ const SecondFloorr = () => {
           width="100%"
           height="100%"
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+          style={{ transform: `scale(${zoom})`, cursor: 'grab' }} // Example usage of zoom
+
           id="svg"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
