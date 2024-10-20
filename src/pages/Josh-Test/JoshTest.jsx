@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import FirstFloor from "@/components/common/cards/FirstFloor";
 import SecondFloorr from "@/components/common/cards/SecondFloorr";
+import { Component as BigCalendar } from "@/components/common/calendar/Calendar";
 
 import Image from "@/assets/images/LantakaBg.jpg";
 import {
@@ -24,22 +25,22 @@ const JoshTest = () => {
   const [isGrabbing, setIsGrabbing] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1920);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCurrentTime(new Date());
+  //   }, 1000);
 
-    const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1920);
-    };
+  //   const handleResize = () => {
+  //     setIsLargeScreen(window.innerWidth >= 1920);
+  //   };
 
-    window.addEventListener("resize", handleResize);
+  //   window.addEventListener("resize", handleResize);
 
-    return () => {
-      clearInterval(timer);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  //   return () => {
+  //     clearInterval(timer);
+  //     window.removeEventListener("resize", handleResize);
+  //   };
+  // }, []);
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
@@ -58,12 +59,12 @@ const JoshTest = () => {
   }
 
   return (
-    <div className="flex flex-col relative w-screen overflow-hidden h-screen bg-[#f8f6f2]">
+    <div className="flex flex-col relative w-screen overflow-hidden h-auto bg-[#f8f6f2]">
       <NavigationTop />
       <main className="flex-1 p-4 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4" >
         {/* Main content area (1) */}
         <div
-          className={`w-[110%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
+          className={`w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
             isGrabbing ? "cursor-grabbing" : "cursor-grab"
           }`}
           onMouseDown={handleMouseDown}
@@ -169,8 +170,11 @@ const JoshTest = () => {
       >
         <Sidebar />
       </div>
-
-    
+      
+      {/* <div className="h-auto">
+        <BigCalendar className="w-[98%]" style={{padding: "0"}}/>
+      </div> */}
+      
     </div>
   );
 };
