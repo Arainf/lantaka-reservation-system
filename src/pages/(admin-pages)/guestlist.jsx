@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createIcons, icons } from "lucide";
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
-import GuestListTable from "@/components/common/tables/guestListTable"; // Import your GuestTable component
-import { ChevronLeft, ChevronRight, Settings, Filter, Trash2, Edit, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Settings, Filter, Search } from "lucide-react";
 
 const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
   // Dummy event logs data
@@ -28,18 +27,14 @@ const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-
-  // State to manage checkbox selection
-  const [selectedIds, setSelectedIds] = useState([]);
-
   // Initialize Lucide icons after component is mounted
   useEffect(() => {
     createIcons({ icons });
   }, []);
 
-  // Filter event logs based on search input
-  const filteredGuestList = guestList.filter((eventLog) =>
-    eventLog.user.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter guest list based on search input
+  const filteredGuestList = guestList.filter((guest) =>
+    guest.user.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
@@ -57,80 +52,114 @@ const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
     }
   };
 
-      
-        return (
-          <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
-            {/* Side navigation bar */}
-            <NavigationSide isOpen={sidebarOpen} />
-      
-            <div className="flex-1 overflow-auto">
-              {/* Top navigation bar */}
-              <NavigationTop onSidebarToggle={toggleSidebar} />
-      
-              <main className="p-6">
-                <h1 className="text-xl font-bold mb-4">Guest List</h1>
-      
-                {/* Search and Control Area */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    {/* Settings Icon */}
-                    <div className="relative mr-2">
-                      <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                        <Settings size={18} />
-                      </button>
-                    </div>
-                    <span className="mx-2 border-l border-gray-400 h-6"></span>
-                  {/* Search Input */}
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
-                    />
-                    <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-                      <Search className="text-gray-900" size={18} />
-                    </div>
-                  </div>
+  return (
+    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100 font-montserrat">
+
+      {/* Side navigation bar */}
+      <NavigationSide isOpen={sidebarOpen} />
+
+      <div className="flex-1 overflow-auto">
+        {/* Top navigation bar */}
+        <NavigationTop onSidebarToggle={toggleSidebar} />
+
+        <main className="p-6">
+          <h1 className="text-xl font-bold mb-4">Guest List</h1>
+
+          {/* Search and Control Area */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              {/* Settings Icon */}
+              <div className="relative mr-2">
+                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
+                  <Settings size={18} />
+                </button>
+              </div>
+              <span className="mx-2 border-l border-gray-400 h-6"></span>
+              {/* Search Input */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                  <Search className="text-gray-900" size={18} />
                 </div>
-      
-                  {/* Pagination and Filter Controls */}
-                  <div className="flex items-center">
-                    {/* Pagination Controls */}
-                    <span className="mr-2">{currentPage} of {totalPages}</span>
-                    <button
-                      className="bg-gray-200 p-2 rounded-lg"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft size={18} />
-                    </button>
-                    <button
-                      className="bg-gray-200 p-2 rounded-lg ml-2"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight size={18} />
-                    </button>
-                    <span className="mx-2 border-l border-gray-400 h-6"></span>
-                    <button
-                      className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center ml-2"
-                      onClick={() => {}}
-                    >
-                      <Filter size={18} />
-                    </button>
-                  </div>
-                </div>
-      
-                {/* Reservations Table Wrapper */}
-                <div className="mt-4 rounded-lg border border-gray-300 shadow-lg overflow-hidden">
-                  <GuestListTable listData={currentGuestList} /> {/* Use your GuestTable component */}
-                </div>
-              </main>
+              </div>
             </div>
-          </div>
-        );
-      };
-      
-      export default  AdminGuestList;
+
+            {/* Pagination and Filter Controls */}
+            <div className="flex items-center">
+              {/* Pagination Controls */}
+              <span className="mr-2">{currentPage} of {totalPages}</span>
+              < button
+                className="bg-gray-200 p-2 rounded-lg"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                className="bg-gray-200 p-2 rounded-lg"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                >
+                  <ChevronRight size={18} />
+                </button>
+  
+                {/* Filter Icon */}
+                <div className="relative ml-2">
+                  <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
+                    <Filter size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+  
+            {/* Guest List Table */}
+            <div className="mt-4 rounded-lg border border-gray-300 shadow-lg overflow-hidden">
+              <GuestListTable listData={currentGuestList} />
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  };
+  
+  // GuestListTable Component
+  const GuestListTable = ({ listData }) => {
+    return (
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-left">User  </th>
+              <th className="py-3 px-6 text-left">Email</th>
+              <th className="py-3 px-6 text-left">Room</th>
+              <th className="py-3 px-6 text-left">Check-in Date</th>
+              <th className="py-3 px-6 text-left">Check-out Date</th>
+              <th className="py-3 px-6 text-left">Payment Status</th>
+              <th className="py-3 px-6 text-left">No. of Guests</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-montserrat-extrabold">
+            {listData.map((guest) => (
+              <tr key={guest.id} className="border-b border-gray-300 hover:bg-gray-100">
+                <td className="py-3 px-6">{guest.user}</td>
+                <td className="py-3 px-6">{guest.email}</td>
+                <td className="py-3 px-6">{guest.room}</td>
+                <td className="py-3 px-6">{guest.check_in_date}</td>
+                <td className="py-3 px-6">{guest.check_out_date}</td>
+                <td className="py-3 px-6">{guest.payment_status}</td>
+                <td className="py-3 px-6">{guest.noGuest}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+  
+  export default AdminGuestList;
