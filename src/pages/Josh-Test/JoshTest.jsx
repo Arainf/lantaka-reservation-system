@@ -15,10 +15,16 @@ import {
 import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
 import { MdOutlinePayment } from "react-icons/md";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
-import Clock from '@/components/common/time/clock';
-import Sidebar from '../../components/common/navigatin-side-top/sidebarDetails'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
+import Clock from "@/components/common/time/clock";
+import Sidebar from "./sidebarDetails";
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -53,14 +59,13 @@ const JoshTest = () => {
       <main className="flex-1 p-4 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4">
         {/* Main content area (1) */}
         <div
-          className={`w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
+          className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
             isGrabbing ? "cursor-grabbing" : "cursor-grab"
           }`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
         >
-
           {/* Content here svgmap */}
           <div className="flex flex-row mt-5 ml-5 mb-0 p-1.5">
             <div className="mr-2">
@@ -78,22 +83,55 @@ const JoshTest = () => {
               </Select>
             </div>
             <DatePicker />
+
             {/* Reset button */}
             <Button
-                      onClick={resetState} // Call reset function on click
-                      className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
-                      style={{ marginLeft: '55%', backgroundColor: '#95c1ff' }} // Set the background color and margin
-                    >
+              onClick={resetState} // Call reset function on click
+              className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
+              style={{ marginLeft: "55%", backgroundColor: "#95c1ff" }} // Set the background color and margin
+            >
               Reset
             </Button>
           </div>
-          {selectedFloor === "floor1" && <FirstFloor resetTrigger={resetTrigger} />}
-          {selectedFloor === "floor2" && <SecondFloorr resetTrigger={resetTrigger} />}
-        </div>
-        
+
+          {selectedFloor === "floor1" && (
+            <FirstFloor resetTrigger={resetTrigger} />
+          )}
+          {selectedFloor === "floor2" && (
+            <SecondFloorr resetTrigger={resetTrigger} />
+          )}
+
+          {/* Status Boxes overlapping the SVG */}
+<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-20">
+  <div className="flex items-center">
+    <div className="bg-green-500 w-4 h-4 flex items-center justify-center text-white font-semibold rounded">
+      {/* Empty space for the box */}
+    </div>
+    <span className="text-black-500  text-sm ml-2">
+      Reserved
+    </span>
+  </div>
+  <div className="flex items-center">
+    <div className="bg-blue-500 w-4 h-4 flex items-center justify-center text-white font-semibold rounded">
+      {/* Empty space for the box */}
+    </div>
+    <span className="text-black-500  text-sm ml-2">
+      Pending
+    </span>
+  </div>
+  <div className="flex items-center">
+    <div className="bg-red-500 w-4 h-4 flex items-center justify-center text-white font-semibold rounded">
+      {/* Empty space for the box */}
+    </div>
+    <span className="text-black-500  text-sm ml-2">
+      Canceled
+    </span>
+  </div>
+</div>
+</div>
+
         {/* Right-side section */}
         <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
-          
           {/* Clock */}
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
@@ -127,10 +165,9 @@ const JoshTest = () => {
         </div>
       </main>
 
-
       <div
         className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+          isSidebarOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <Sidebar />
@@ -141,7 +178,6 @@ const JoshTest = () => {
       <div className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{padding: "0"}}/>
       </div>
-      
     </div>
   );
 };
