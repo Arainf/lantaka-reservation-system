@@ -64,7 +64,7 @@ const JoshTest = () => {
   };
 
   return (
-    <div className="flex flex-col relative w-screen overflow-hidden h-auto bg-[#f8f6f2]">
+    <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]">
       <NavigationTop />
       <main className="flex-1 p-4 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4">
         {/* Main content area (1) */}

@@ -6,6 +6,7 @@ import AccountsTable from "@/components/common/tables/accountsTable"; // Import 
 import { ChevronLeft, ChevronRight, Settings, Filter, Search } from "lucide-react";
 import { AccountContext } from "@/context/contexts";
 
+
 const Accounts = ({ sidebarOpen, toggleSidebar }) => {
   const { accountData } = useContext(AccountContext);
 
@@ -44,6 +45,7 @@ const Accounts = ({ sidebarOpen, toggleSidebar }) => {
   };
 
   return (
+    
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       {/* Side navigation bar */}
       <NavigationSide isOpen={sidebarOpen} />
