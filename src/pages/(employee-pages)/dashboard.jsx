@@ -1,230 +1,104 @@
-import { lazy, Suspense, useMemo, useState, useEffect } from 'react';
-import './clientPages.css';
-import NavigationTop from '@/components/common/navigatin-side-top/clientNavigationTop';
-import ReservationCard from '@/components/common/cards/ReservationCard';
-import { IoCalendarSharp, IoPersonSharp, IoCashSharp, IoPeopleSharp } from "react-icons/io5";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import FloorPlan from '@/components/common/cards/FloorPlan';
-import { Component as BarChartComponent } from '@/components/common/charts/BarChartComponent';
-import { Skeleton } from '@/components/ui/skeleton';
-import CustomerTable from '@/components/common/cards/CustomerTable';
-import BookingCalendar from '@/components/common/cards/BookingCalendar';
-import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
-import LantakaBg from '@/assets/images/LantakaBG_2.png'
-import {Button} from "@/components/ui/button"
-// // Lazy-loaded components
-// const CustomerTable = lazy(() => import('@/components/common/cards/CustomerTable'));
-// const BookingCalendar = lazy(() => import('@/components/common/cards/BookingCalendar'));
+import React, { useState, useEffect } from "react"
+import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop"
+import { ChevronDown } from "lucide-react"
+import OurRooms from "@/components/common/cards/rooms"
+import LantakaBG from '@/assets/images/LantakaEmployeeBG.png'
 
-// Skeleton components
-const FloorPlanSkeleton = () => (
-  <Card className='col-span-2 row-span-1'>
-    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-      <Skeleton className="h-6 w-40" />
-      <Skeleton className="h-10 w-[180px]" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-[300px] w-full" />
-    </CardContent>
-  </Card>
-);
+export default function Component() {
+  const [showRooms, setShowRooms] = useState(false)
+  const [showText, setShowText] = useState(false)
+  const [showButton, setShowButton] = useState(false)
 
-const BookingCalendarSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-[300px] w-full" />
-    </CardContent>
-  </Card>
-);
+  const handleViewRooms = () => {
+    setShowRooms(true)
+  }
 
-const CustomerTableSkeleton = () => (
-  <Card className="col-span-3">
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full" />
-    </CardContent>
-  </Card>
-);
-
-const ChartSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-48 w-full" />
-    </CardContent>
-  </Card>
-);
-
-const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
-  const [loading, setLoading] = useState(true);
-  const [showWhiteBackground, setShowWhiteBackground] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } finally {
-      setLoading(false);
-    }
+  const handleBackToHome = () => {
+    setShowRooms(false)
   }
 
   useEffect(() => {
-    fetchData();
+    const textTimer = setTimeout(() => setShowText(true), 300)
+    const buttonTimer = setTimeout(() => setShowButton(true), 1000)
+    return () => {
+      clearTimeout(textTimer)
+      clearTimeout(buttonTimer)
+    }
+  }, [])
+
+  // Disable scrolling on body when the component is mounted
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto'; // Restore scrolling when component is unmounted
+    };
   }, []);
 
-  const chartData = useMemo(() => [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
-  ], []);
-
   return (
-    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-white ">
-      {showWhiteBackground && (
-  <div className="fixed inset-0 z-50 bg-white h-screen w-screen top-0 left-0" />
-)}
-      <div className="flex-1 overflow-auto ">
-                <NavigationTop onSidebarToggle={toggleSidebar} />
-              
-                      <div className="relative bg-[#0f172a]">
-                        <img src={LantakaBg} className='w-full h-screen' alt="Background" />
-                        <div className="absolute top-0 left-0 pl-40 pt-20 text-3xl font-[Oswald]">
-                          <h2 className="text-[#0f172a] text-[2rem] md:text-[2.5rem] lg:text-[3rem]">Buenas dias, User!</h2>
-                          <h1 className="text-[#0f172a] font-extrabold text-[5rem] md:text-[6rem] lg:text-[9rem] leading-tight leading-[.9]">
-                            A view <br />to the <br />horizon
-                          </h1>
-                          <h2 className="text-[#0f172a] text-[1.2rem] md:text-[1.5rem] lg:text-[2rem] mt-4">Pro deo Et Patria</h2>
-                          <h2 className="text-[#0f172a] text-[1.2rem] md:text-[1.5rem] lg:text-[2rem]">In the service of God and Country</h2>
+    <main className="flex flex-col h-screen w-screen overflow-hidden m-0">
+      <NavigationTop />
 
-                          <Button 
-                            className="min-h-12 min-w-44 mt-4 px-6 py-3 bg-blue-900 text-white hover:bg-yellow-500 hover:text-black h-200px rounded-none text-lg transition-colors duration-300"
-                            onClick={() => {
-                              setShowWhiteBackground(true);
-                            }}
-                          >
-                            View Rooms
-                          </Button>                      
-                        </div>
-                      </div>
-            <main className="p-6">
-            
-          <div className="flex w-full justify-between">
-            <div className="flex flex-col">
-              <h1 className="text-xl text-gray-400 ">Dashboard</h1>
-              <h1 className="text-4xl font-bold mb-4">Overview</h1>
-            </div>
-            <div className="flex-shrink mt-4 flex flex-row">
-              <DatePicker className="min-w-max" />
-              <h1 className='m-2 text-center text-[1.2rem] font-[Oswald]'> to </h1>
-              <DatePicker />
-            </div>
+      <section
+        className={`relative flex flex-col w-full h-screen transition-all duration-1000 ease-in-out overflow-hidden ${
+          showRooms ? "transform -translate-y-full" : "translate-y-0"
+        }`}
+      >
+        <img
+          loading="lazy"
+          src={LantakaBG}
+          alt="Lantaka Hotel Background"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="relative flex flex-col justify-center items-center w-full h-full bg-black bg-opacity-70 px-20 max-md:px-5">
+          <div className="flex flex-col items-center w-full max-w-[687px] text-center mt-16">
+            <h1
+              className={`text-5xl tracking-[10.5px] max-md:text-4xl font-extralight text-gray-100 transition-all duration-1000 ease-out ${
+                showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+            >
+              WELCOME TO
+            </h1>
+            <h2
+              className={`mt-4 text-9xl font-medium tracking-widest leading-none max-md:text-9xl text-gray-100 transition-all duration-1000 ease-out delay-300 ${
+                showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+            >
+              <span>LANTAKA </span>
+              <span className="block">HOTEL</span>
+            </h2>
+            <p
+              className={`mt-10 text-center tracking-[2.5px] font-light text-gray-100 transition-all duration-1000 ease-out delay-600 ${
+                showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+            >
+              We Provide White Rice.
+            </p>
+            <button
+              className={`bg-blue-400 text-white font-semibold px-6 py-4 md:w-auto rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-all duration-1000 ease-out mt-10 ${
+                showButton ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
+              onClick={handleViewRooms}
+            >
+              VIEW ROOMS
+            </button>
           </div>
-        
-          <div className="mb-6">
-            <div className="grid grid-cols-4 gap-4 row">
-              <ReservationCard
-                isLoading={loading}
-                title="Total Bookings"
-                icon={IoCalendarSharp}
-                value={100}
-                percentageChange={20.1}
-                percentageSuffix="from last month"
-                baseColor='#06402b'
-                graphData={chartData}
-              />
-              <ReservationCard
-                isLoading={loading}
-                title="Available Rooms"
-                icon={IoPersonSharp}
-                value={20}
-                percentageChange={2.5}
-                percentageSuffix="from last month"
-                baseColor='#06402b'
-                graphData={chartData}
-              />
-              <ReservationCard
-                isLoading={loading}
-                title="Check In"
-                icon={IoCashSharp}
-                value={71}
-                percentageChange={15.3}
-                percentageSuffix="from last month"
-                baseColor='#EC1C24'
-                graphData={chartData}
-              />
-              <ReservationCard
-                isLoading={loading}
-                title="Check Out"
-                icon={IoPeopleSharp}
-                value={29}
-                percentageChange={7.2}
-                percentageSuffix="from last month"
-                baseColor='#06402b'
-                graphData={chartData}
-              />
-            </div>
-          </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            {loading ? (
-              <FloorPlanSkeleton />
-            ) : (
-              <FloorPlan/>
-            )}
-
-
-            {loading ? (
-              <BookingCalendarSkeleton />
-            ) : (
-              <BookingCalendar />
-            )}
-
-            {loading ? (
-              <CustomerTableSkeleton />
-            ) : (
-              <div className="col-span-3">
-                <CustomerTable />
-              </div>
-            )}
-
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-            <ChartSkeleton />
-            {loading ? (
-              <ChartSkeleton />
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Bar Chart</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[200px] w-[auto] min-w-0">
-                    <BarChartComponent chartData={chartData} barColor="#494992" />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            <ChartSkeleton />
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
-
-export default AdminDashboard;
+      <section
+        className={`absolute top-0 left-0 right-0 bottom-0 transition-all duration-1000 ease-in-out overflow-hidden ${
+          showRooms ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <OurRooms />
+        <div
+          className="mt-16 cursor-pointer flex justify-center items-center"
+          onClick={handleBackToHome}
+          aria-label="Back to Home"
+        >
+          <ChevronDown className="w-10 h-10 text-gray-400 hover:text-blue-300 transition-all duration-300" />
+        </div>
+      </section>
+    </main>
+  )
+}

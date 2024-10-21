@@ -1,5 +1,5 @@
 import React from "react"
-import LantakaBG from '../Kean-test/LantakaEmployeeBG.png'
+import LantakaBG from '@/assets/images/LantakaEmployeeBG.png'
 
 const RoomCard = ({ name, price, image }) => (
   <div className="relative overflow-hidden rounded-lg shadow-lg group">
