@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
 import Clock from '@/components/common/time/clock';
-import Sidebar from './sidebarDetails'
+import Sidebar from '../../components/common/navigatin-side-top/sidebarDetails'
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -26,22 +26,6 @@ const JoshTest = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1920);
   const [resetTrigger, setResetTrigger] = useState(false); // Trigger for resetting the SVG components
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setCurrentTime(new Date());
-  //   }, 1000);
-
-  //   const handleResize = () => {
-  //     setIsLargeScreen(window.innerWidth >= 1920);
-  //   };
-
-  //   window.addEventListener("resize", handleResize);
-
-  //   return () => {
-  //     clearInterval(timer);
-  //     window.removeEventListener("resize", handleResize);
-  //   };
-  // }, []);
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
@@ -114,9 +98,32 @@ const JoshTest = () => {
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
-          <div className="flex-1 relative bg-gray-200 border overflow-hidden border-gray-200 rounded-lg">
-           
+          
+          <div className="flex justify-center items-center py-4">
+            <h6 className="absolute bg-[#f8f6f2] px-3">Quick Actions</h6>
+            <hr className="w-full border-black" />
           </div>
+
+
+          <Button>
+            <p >Campus Ministry Office &#40;CMO&#41; Retreat</p>
+          </Button>
+          <Button>
+            <p>Internal Reservation &#40;Individual Guest&#41; </p>
+          </Button>
+          <Button>
+            <p>Internal Reservation &#40;Group&#41;</p>
+          </Button>
+          <Button>
+            <p>External Reservation &#40;Individual Guest&#41;</p>
+          </Button>
+          <Button>
+            <p>External Reservation &#40;Group&#41;</p>
+          </Button>
+          <Button>
+            <p>Other Reservations</p>
+          </Button>
+
         </div>
       </main>
 
@@ -131,7 +138,7 @@ const JoshTest = () => {
 
 
       
-      <div className="h-auto">
+      <div className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{padding: "0"}}/>
       </div>
       

@@ -53,8 +53,8 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
                 <nav className="flex space-x-2 text-base">
                     {[
                         ['Home', '/home'],
-                        ['Reservations', '/team'],
-                        ['Add Reservation', '/projects'],
+                        ['Reservations', '#calendar'],
+                        ['Add Reservation', '#calendar'],
                         ['Account', '/reports'],
                     ].map(([title, url]) => (
                         <a
