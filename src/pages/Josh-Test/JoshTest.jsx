@@ -76,6 +76,7 @@ const JoshTest = () => {
           onMouseUp={handleMouseUp}
           onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
         >
+
           {/* Content here svgmap */}
           <div className="flex flex-row mt-5 ml-5 mb-0 p-1.5">
             <div className="mr-2">
@@ -107,10 +108,15 @@ const JoshTest = () => {
         </div>
         
         {/* Right-side section */}
-        <div className="w-full md:w-1/3 flex flex-col space-y-4">
+        <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
+          
+          {/* Clock */}
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
+
+
+          {/* Design Page */}
           <div className="flex-1 relative bg-white border overflow-hidden border-gray-200 rounded-lg">
             <div
               className="h-[60%] relative top-0 bg-slate-600 w-full bg-cover"
@@ -160,6 +166,8 @@ const JoshTest = () => {
           </div>
         </div>
       </main>
+
+
       <div
         className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
@@ -167,10 +175,12 @@ const JoshTest = () => {
       >
         <Sidebar />
       </div>
+
+
       
-      {/* <div className="h-auto">
+      <div className="h-auto">
         <BigCalendar className="w-[98%]" style={{padding: "0"}}/>
-      </div> */}
+      </div>
       
     </div>
   );
