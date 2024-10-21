@@ -29,10 +29,6 @@ export default function Sidebar() {
         </Select>
       </div>
 
-      <Button variant="outline" className="mb-4 w-full justify-start">
-        <CalendarIcon className="mr-2 h-4 w-4" /> October 17th, 2024
-      </Button>
-
       <Card className="mb-4">
             <img 
             src={Image} 
@@ -70,8 +66,7 @@ export default function Sidebar() {
           </div>
         </CardContent>
       </Card>
-      
-      <Button className="w-[95%] absolute bottom-4  justify-center">Reserve</Button>
+
 
     </div>
   );
