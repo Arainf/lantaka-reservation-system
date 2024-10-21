@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/chart";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
+import { Users } from 'lucide-react';
+import Image from '@/assets/images/hotel_room.jpg';
 
 const FirstFloor = ({ resetTrigger }) => {
   const svgRef = useRef(null);
@@ -42,24 +44,40 @@ const FirstFloor = ({ resetTrigger }) => {
 
   const HoverContent = () => (
     <div
-      className="fixed bg-white shadow-lg rounded-md p-4 z-50 w-[350px]"
+      className="fixed bg-white shadow-lg rounded-md p-2 z-50 w-[350px]"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
         transform: 'translate(10px, 10px)',
       }}
     >
-      <div className='flex flex-row'>
-        <div className='w-full flex-1 h-full bg-black p-2'>
-          {/* image */}
+      <div className="flex flex-row pt-4">
+        {/* Image Section */}
+        <div className="w-[60%]">
+          <div
+            className="h-[90%] items-center bg-slate-600 w-full bg-cover rounded-lg"
+            style={{ backgroundImage: `url(${Image})` }}
+          ></div>
         </div>
-        <div className='flex flex-1 flex-col'>
-          <h4 className="font-bold text-lg mb-2">Room Details</h4>
-          <p className="text-sm mb-1"><strong>Size:</strong> 30 m²</p>
-          <p className="text-sm mb-1"><strong>Occupancy:</strong> 2 Adults</p>
-          <p className="text-sm mb-1"><strong>View:</strong> City</p>
+
+        {/* Room Details Section */}
+        <div className="w-[50%] flex flex-col justify-center p-2">
+          <h4 className="font-bold text-lg mb-2">Room 101</h4>
+          <div className="flex items-center text-sm mb-1">
+            <Users className="mr-2 h-4 w-4" />
+            <p><strong>John Smith</strong></p>
+          </div>
+          <div className="flex items-center text-sm mb-1">
+            <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
+            <span>Check-in: 05-30-24</span>
+          </div>
+          <div className="flex items-center text-sm mb-1">
+            <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
+            <span>Check-out: 05-30-24</span>
+          </div>
         </div>
       </div>
+
     </div>
   )
 
