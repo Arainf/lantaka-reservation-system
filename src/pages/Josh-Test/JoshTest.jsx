@@ -76,6 +76,7 @@ const JoshTest = () => {
           onMouseUp={handleMouseUp}
           onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
         >
+
           {/* Content here svgmap */}
           <div className="flex flex-row mt-5 ml-5 mb-0 p-1.5">
             <div className="mr-2">
@@ -97,7 +98,7 @@ const JoshTest = () => {
             <Button
                       onClick={resetState} // Call reset function on click
                       className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
-                      style={{ marginLeft: '900px', backgroundColor: '#95c1ff' }} // Set the background color and margin
+                      style={{ marginLeft: '55%', backgroundColor: '#95c1ff' }} // Set the background color and margin
                     >
               Reset
             </Button>
@@ -107,59 +108,19 @@ const JoshTest = () => {
         </div>
         
         {/* Right-side section */}
-        <div className="w-full md:w-1/3 flex flex-col space-y-4">
+        <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
+          
+          {/* Clock */}
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
-          <div className="flex-1 relative bg-white border overflow-hidden border-gray-200 rounded-lg">
-            <div
-              className="h-[60%] relative top-0 bg-slate-600 w-full bg-cover"
-              style={{ backgroundImage: `url(${Image})` }}
-            >
-              <div className="font-[Oswald] p-2 absolute bottom-[22%] flex flex-col font-bold text-white text-2xl">
-                <span className="px-2 py-1 bg-green-100 w-1/3 text-green-800 rounded-full text-xs font-semibold text-center">
-                  Confirmed
-                </span>
-                Double Room &#40; Sea View &#41;
-              </div>
-            </div>
-            <div
-              className="p-6 space-y-4 h-[54%] flex flex-col absolute bottom-0 bg-[#d9ebff] w-full rounded-tr-[40px]"
-              style={{ boxShadow: "-15px 20px 26px -14px rgba(0,0,0,0.3) inset" }}
-            >
-              <div className="flex items-center h-[85%]">
-                <div className="text-center w-[40%]" style={{ scale: isLargeScreen ? "1.5" : "1" }}>
-                  <span className="text-6xl font-bold">2</span>
-                  <p className="text-xl text-gray-600">Guest</p>
-                </div>
-                <div className="space-y-2 flex-1" style={{ scale: isLargeScreen ? "1.1" : "1" }}>
-                  <div className="flex items-center">
-                    <MdOutlinePayment className="w-4 h-4 mr-2 text-blue-500" />
-                    <span className="font-semibold">₱ 1000.00</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
-                    <span>Check-in: 05-30-24</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
-                    <span>Check-out: 05-30-24</span>
-                  </div>
-                </div>
-              </div>
-              <Button onClick={toggleSidebar} className="w-[85%] absolute bottom-4 justify-center">
-                View Details
-              </Button>
-              {isSidebarOpen && (
-                <div
-                  className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out"
-                  onClick={toggleSidebar}
-                />
-              )}
-            </div>
+          <div className="flex-1 relative bg-gray-200 border overflow-hidden border-gray-200 rounded-lg">
+           
           </div>
         </div>
       </main>
+
+
       <div
         className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
@@ -167,10 +128,12 @@ const JoshTest = () => {
       >
         <Sidebar />
       </div>
+
+
       
-      {/* <div className="h-auto">
+      <div className="h-auto">
         <BigCalendar className="w-[98%]" style={{padding: "0"}}/>
-      </div> */}
+      </div>
       
     </div>
   );
