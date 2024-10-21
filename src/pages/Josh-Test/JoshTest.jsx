@@ -97,7 +97,7 @@ const JoshTest = () => {
             <Button
                       onClick={resetState} // Call reset function on click
                       className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
-                      style={{ marginLeft: '900px', backgroundColor: '#95c1ff' }} // Set the background color and margin
+                      style={{ marginLeft: '55%', backgroundColor: '#95c1ff' }} // Set the background color and margin
                     >
               Reset
             </Button>

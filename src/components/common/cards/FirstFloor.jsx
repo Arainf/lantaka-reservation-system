@@ -30,14 +30,17 @@ const FirstFloor = ({ resetTrigger }) => {
   const [zoom, setZoom] = useState(1); // Example state for zoom level
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 }); // Example state for drag position
 
-  useEffect(() => {
-    // Reset the viewBox, zoom, and drag position to their initial state whenever the resetTrigger changes
-    if (resetTrigger) {
-      setViewBox(initialViewBox);
-      setZoom(1); // Reset zoom level
-      setDragPosition({ x: 0, y: 0 }); // Reset drag position
-    }
-  }, [resetTrigger]);
+useEffect(() => {
+  // Reset the viewBox, zoom, and drag position to their initial state whenever the resetTrigger changes
+  if (resetTrigger) {
+    setViewBox(initialViewBox);
+    setZoom(1); // Reset zoom level
+    setDragPosition({ x: 0, y: 0 }); // Reset drag position
+    setIsDragging(false); // Ensure dragging is turned off
+    setLastMousePos({ x: 0, y: 0 }); // Reset last mouse position
+  }
+}, [resetTrigger]);
+
   const MIN_ZOOM = 600; // Minimum zoom level
   const MAX_ZOOM = 1400; // Maximum zoom level
   
