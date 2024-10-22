@@ -20,6 +20,9 @@ const JoshTest = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormSidebarOpen, setIsFormSidebarOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [buttonNum, setButtonNum] = useState(null);
+
+
 
   useEffect(() => {
     const handleResize = () => setIsLargeScreen(window.innerWidth >= 1920);
@@ -109,7 +112,7 @@ const JoshTest = () => {
             <hr className="w-full border-black" />
           </div>
 
-          <Button onClick={toggleFormSidebar}>
+          <Button onClick={() => { toggleFormSidebar(); setButtonNum(1); }} >
             <p>Campus Ministry Office &#40;CMO&#41; Retreat</p>
           </Button>
           <Button onClick={toggleFormSidebar}>
@@ -149,11 +152,11 @@ const JoshTest = () => {
 
       {/* Form Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-1/5 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-1/4 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
           isFormSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <FormSidebar onClose={closeSidebar} />
+        <FormSidebar onClose={closeSidebar} presetNumber={buttonNum} />
       </div>
 
       <div className="h-auto" id="calendar">
