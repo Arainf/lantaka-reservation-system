@@ -20,6 +20,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
   useEffect(() => {
     // Reset logic here if needed
   }, [resetTrigger]);
+  
   useEffect(() => {
     const handleMouseMove = (e) => {
       setPosition({
