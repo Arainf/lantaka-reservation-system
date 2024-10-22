@@ -317,7 +317,6 @@
 }
 
 .roomHover:hover{
-    scale: 1.0028;
     transition: all 0.1s ease;
     cursor: pointer;
 }

@@ -81,14 +81,6 @@ const NavigationTop = memo(() => {
             </div>
 
             <div className="flex items-center space-x-2">
-                <div className="relative">
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                    <Input
-                        type="search"
-                        placeholder="Search..."
-                        className="w-full pl-10 pr-4 py-2 bg-[#1e293b] border-none rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
 
                 <div className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all cursor-pointer">
                     <Bell size={24} />

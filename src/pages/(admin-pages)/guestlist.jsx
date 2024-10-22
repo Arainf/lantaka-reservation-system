@@ -4,7 +4,7 @@ import NavigationSide from "@/components/common/navigatin-side-top/NavigationSid
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
 import { ChevronLeft, ChevronRight, Settings, Filter, Search } from "lucide-react";
 
-const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
+export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
   // Dummy event logs data
   const [guestList, setGuestList] = useState([
     { id: 1, user: "John Doe", email: "john@example.com", room: "102", check_in_date: "2022-01-01 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "4" },
@@ -21,7 +21,7 @@ const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
     { id: 12, user: "Daniel Hall", email: "daniel@example.com", room: "106", check_in_date: "2022-01-12 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
     { id: 13, user: "Olivia Walker", email: "olivia@example.com", room: "110", check_in_date: "2022-01-13 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "3" },
     { id: 14, user: "Benjamin Clark", email: "benjamin@example.com", room: "203", check_in_date: "2022-01-14 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-]);
+  ]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,61 +105,59 @@ const  AdminGuestList = ({ sidebarOpen, toggleSidebar }) => {
                 className="bg-gray-200 p-2 rounded-lg"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                >
-                  <ChevronRight size={18} />
+              >
+                <ChevronRight size={18} />
+              </button>
+
+              {/* Filter Icon */}
+              <div className="relative ml-2">
+                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
+                  <Filter size={18} />
                 </button>
-  
-                {/* Filter Icon */}
-                <div className="relative ml-2">
-                  <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                    <Filter size={18} />
-                  </button>
-                </div>
               </div>
             </div>
-  
-            {/* Guest List Table */}
-            <div className="mt-4 rounded-lg border border-gray-300 shadow-lg overflow-hidden">
-              <GuestListTable listData={currentGuestList} />
-            </div>
-          </main>
-        </div>
+          </div>
+
+          {/* Guest List Table */}
+          <div className="mt-4 rounded-lg border border-gray-300 shadow-lg overflow-hidden">
+            <GuestListTable listData={currentGuestList} />
+          </div>
+        </main>
       </div>
-    );
-  };
-  
-  // GuestListTable Component
-  const GuestListTable = ({ listData }) => {
-    return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">User  </th>
-              <th className="py-3 px-6 text-left">Email</th>
-              <th className="py-3 px-6 text-left">Room</th>
-              <th className="py-3 px-6 text-left">Check-in Date</th>
-              <th className="py-3 px-6 text-left">Check-out Date</th>
-              <th className="py-3 px-6 text-left">Payment Status</th>
-              <th className="py-3 px-6 text-left">No. of Guests</th>
+    </div>
+  );
+};
+
+// GuestListTable Component
+const GuestListTable = ({ listData }) => {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <th className="py-3 px-6 text-left">User  </th>
+            <th className="py-3 px-6 text-left">Email</th>
+            <th className="py-3 px-6 text-left">Room</th>
+            <th className="py-3 px-6 text-left">Check-in Date</th>
+            <th className="py-3 px-6 text-left">Check-out Date</th>
+            <th className="py-3 px-6 text-left">Payment Status</th>
+            <th className="py-3 px-6 text-left">No. of Guests</th>
+          </tr>
+        </thead>
+        <tbody className="text-gray-600 text-sm font-montserrat-extrabold">
+          {listData.map((guest) => (
+            <tr key={guest.id} className="border-b border-gray-300 hover:bg-gray-100">
+              <td className="py-3 px-6">{guest.user}</td>
+              <td className="py-3 px-6">{guest.email}</td>
+              <td className="py-3 px-6">{guest.room}</td>
+              <td className="py-3 px-6">{guest.check_in_date}</td>
+              <td className="py-3 px-6">{guest.check_out_date}</td>
+              <td className="py-3 px-6">{guest.payment_status}</td>
+              <td className="py-3 px-6">{guest.noGuest}</td>
             </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-montserrat-extrabold">
-            {listData.map((guest) => (
-              <tr key={guest.id} className="border-b border-gray-300 hover:bg-gray-100">
-                <td className="py-3 px-6">{guest.user}</td>
-                <td className="py-3 px-6">{guest.email}</td>
-                <td className="py-3 px-6">{guest.room}</td>
-                <td className="py-3 px-6">{guest.check_in_date}</td>
-                <td className="py-3 px-6">{guest.check_out_date}</td>
-                <td className="py-3 px-6">{guest.payment_status}</td>
-                <td className="py-3 px-6">{guest.noGuest}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-  
-  export default AdminGuestList;
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

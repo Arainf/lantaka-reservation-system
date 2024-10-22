@@ -1,13 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom'
-import { gsap } from 'gsap';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
