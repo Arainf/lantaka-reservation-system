@@ -7,7 +7,7 @@ import { UserContext } from "@/context/contexts";
 import logo from '@/assets/images/logo1.png';
 import Modal from '@/components/ui/modal';
 
-const NavigationTop = memo(({ onSidebarToggle }) => {
+const NavigationTop = memo(() => {
     const { userData, userRole, userImg } = useContext(UserContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reservationData, setReservationData] = useState({
@@ -31,15 +31,12 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // Handle the reservation submission logic here
         console.log('Reservation Data:', reservationData);
-        setIsModalOpen(false); // Close the modal after submission
-        // You can add further logic to send this data to your backend or handle it as needed
+        setIsModalOpen(false);
     };
 
     return (
         <header className="flex justify-between items-center h-14 px-4 py- bg-[#0f172a] text-white sticky top-0 right-0 z-10">
-            {/* First Div (Logo and Title) on the left */}
             <div className="flex items-center space-x-2">
                 <img
                     src={logo}
@@ -66,7 +63,7 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
                                     handleModalToggle();
                                 }
                             }}
-                            key={title} // Added key for mapping
+                            key={title}
                         >
                             {title}
                         </a>
@@ -80,11 +77,9 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
                         reservationData={reservationData}
                         handleChange={handleChange}
                     />
-                       
                 )}
             </div>
 
-            {/* Third Div (Search, Notifications, and User Info) on the right */}
             <div className="flex items-center space-x-2">
                 <div className="relative">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -110,11 +105,10 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
                             <p className="text-xs text-gray-400">{userRole}</p>
                         </div>
                     </div>
-        )}
-    </div>
-</header>
-
-
-  );
+                )}
+            </div>
+        </header>
+    );
 });
+
 export default NavigationTop;
