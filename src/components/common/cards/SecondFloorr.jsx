@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom'
 import { gsap } from 'gsap';
 import {
   ChartContainer,
@@ -9,13 +10,78 @@ import {
 } from "@/components/ui/chart";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
+import { Users } from 'lucide-react';
+import Image from '@/assets/images/hotel_room.jpg';
+import Sidebar from '@/components/common/navigatin-side-top/sidebarDetails'
 
 const SecondFloorr = ({ resetTrigger }) => {
   const svgRef = useRef(null);
-  const initialViewBox = { x: 400, y: -100, width: 700, height: 900 }; // Example initial viewBox values
+  const initialViewBox = { x: 700, y: -100, width: 800, height: 1400 };
+  const containerRef = useRef(null)
   const [viewBox, setViewBox] = useState(initialViewBox);
+  const [isHovering, setIsHovering] = useState(false)
   const [zoom, setZoom] = useState(1); // Example state for zoom level
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 }); // Example state for drag position
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+  useEffect(() => {
+    // Reset logic here if needed
+  }, [resetTrigger]);
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setPosition({
+        x: e.clientX,
+        y: e.clientY,
+      })
+    }
+
+    if (isHovering) {
+      window.addEventListener('mousemove', handleMouseMove)
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [isHovering])
+
+  const HoverContent = () => (
+    <div
+      className="fixed bg-white shadow-lg rounded-md p-2 z-50 w-[350px]"
+      style={{
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        transform: 'translate(10px, 10px)',
+      }}
+    >
+      <div className="flex flex-row pt-4">
+        {/* Image Section */}
+        <div className="w-[60%]">
+          <div
+            className="h-[90%] items-center bg-slate-600 w-full bg-cover rounded-lg"
+            style={{ backgroundImage: `url(${Image})` }}
+          ></div>
+        </div>
+
+        {/* Room Details Section */}
+        <div className="w-[50%] flex flex-col justify-center p-2">
+          <h4 className="font-bold text-lg mb-2">Room 101</h4>
+          <div className="flex items-center text-sm mb-1">
+            <Users className="mr-2 h-4 w-4" />
+            <p><strong>John Smith</strong></p>
+          </div>
+          <div className="flex items-center text-sm mb-1">
+            <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
+            <span>Check-in: 05-30-24</span>
+          </div>
+          <div className="flex items-center text-sm mb-1">
+            <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
+            <span>Check-out: 05-30-24</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  )
 
   useEffect(() => {
     // Reset the viewBox, zoom, and drag position to their initial state whenever the resetTrigger changes
@@ -190,6 +256,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room206"
@@ -198,6 +266,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room2010"
@@ -206,6 +276,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room214"
@@ -214,6 +286,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room218"
@@ -222,6 +296,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room222"
@@ -230,6 +306,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="rrom226"
@@ -238,6 +316,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room230"
@@ -246,6 +326,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room234"
@@ -254,6 +336,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room232"
@@ -262,6 +346,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room236"
@@ -270,6 +356,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room224"
@@ -278,6 +366,9 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+
           />
           <path
           	id="room220"
@@ -286,6 +377,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="228"
@@ -294,6 +387,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room216"
@@ -302,6 +397,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room223"
@@ -310,6 +407,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room219"
@@ -318,6 +417,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room215"
@@ -326,6 +427,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="203"
@@ -334,6 +437,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room207"
@@ -342,6 +447,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room211"
@@ -350,6 +457,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="201"
@@ -358,6 +467,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room205"
@@ -366,6 +477,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room209"
@@ -374,6 +487,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room213"
@@ -382,6 +497,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room217"
@@ -390,6 +507,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room221"
@@ -398,6 +517,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room212"
@@ -406,6 +527,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room208"
@@ -414,6 +537,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room204"
@@ -422,6 +547,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room237"
@@ -430,6 +557,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room223"
@@ -438,6 +567,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room235"
@@ -446,6 +577,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room227"
@@ -454,6 +587,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room231"
@@ -462,6 +597,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room229"
@@ -470,6 +607,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room225"
@@ -478,6 +617,8 @@ const SecondFloorr = ({ resetTrigger }) => {
             fill="white"
             fill-opacity="0.25"
             stroke="black"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           />
         </g>
         <defs>
@@ -523,9 +664,10 @@ const SecondFloorr = ({ resetTrigger }) => {
               top: tooltipPos.y + 10,
             }}
           >
-            <RoomDetails {...roomInfo[hoveredRoom]} />
           </div>
         )}  
+        {isHovering && createPortal(<HoverContent />, document.body)}
+
     </div>
   );
 };
