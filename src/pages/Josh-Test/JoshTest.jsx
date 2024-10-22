@@ -1,10 +1,19 @@
-'use client'
-
 import React, { useState, useEffect } from "react";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import FirstFloor from "@/components/common/cards/FirstFloor";
 import SecondFloorr from "@/components/common/cards/SecondFloorr";
 import { Component as BigCalendar } from "@/components/common/calendar/Calendar";
+
+import Image from "@/assets/images/LantakaBg.jpg";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+
+import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
+import { MdOutlinePayment } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,11 +25,21 @@ import {
 import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
 import Clock from "@/components/common/time/clock";
 import Sidebar from "../../components/common/navigatin-side-top/sidebarDetails";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
+import Clock from '@/components/common/time/clock';
+import Sidebar from '@/components/common/navigatin-side-top/sidebarDetails'
 import FormSidebar from '@/components/common/navigatin-side-top/sidebarReservationForm'
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
   const [isGrabbing, setIsGrabbing] = useState(false);
+<<<<<<< HEAD
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1920);
+  const [resetTrigger, setResetTrigger] = useState(false); // Trigger for resetting the SVG components
+
+=======
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -37,6 +56,7 @@ const JoshTest = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
   const handleMouseDown = (e) => {
     if (e.button === 0) {
       setIsGrabbing(true);
@@ -47,23 +67,12 @@ const JoshTest = () => {
     setIsGrabbing(false);
   };
 
-  const toggleSidebar = (roomId) => {
-    setSelectedRoom(roomId);
-    setIsSidebarOpen(true);
-    setIsFormSidebarOpen(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const toggleFormSidebar = () => {
-    setIsFormSidebarOpen(true);
-    setIsSidebarOpen(false);
-  };
-
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-    setIsFormSidebarOpen(false);
-    setSelectedRoom(null);
-  };
-
+  // Reset function to trigger resetting of FirstFloor and SecondFloorr components
   const resetState = () => {
     setResetTrigger(true); // Set resetTrigger to true
     setTimeout(() => {
@@ -82,7 +91,7 @@ const JoshTest = () => {
           }`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
-          onContextMenu={(e) => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
         >
           {/* Content here svgmap */}
           <div className="flex flex-row mt-5 ml-5 mb-0 p-1.5">
@@ -101,6 +110,10 @@ const JoshTest = () => {
               </Select>
             </div>
             <DatePicker />
+<<<<<<< HEAD
+
+=======
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
             {/* Status Boxes overlapping the SVG */}
             <div className="absolute bottom-9 left-1/3 flex flex-row mt-5 ml-5 mb-0 p-1.5 space-x-20 z-10">
               <div className="flex items-center">
@@ -132,11 +145,25 @@ const JoshTest = () => {
               Reset
             </Button>
           </div>
+<<<<<<< HEAD
+          {selectedFloor === "floor1" && (
+            <FirstFloor resetTrigger={resetTrigger} />
+          )}
+          {selectedFloor === "floor2" && (
+            <SecondFloorr resetTrigger={resetTrigger} />
+          )}
+        </div>
+
+        {/* Right-side section */}
+        <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
+          {/* Clock */}
+=======
           {selectedFloor === "floor1" && <FirstFloor resetTrigger={resetTrigger} onRoomClick={toggleSidebar} />}
           {selectedFloor === "floor2" && <SecondFloorr resetTrigger={resetTrigger} onRoomClick={toggleSidebar} />}
         </div>
         
         <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
@@ -146,27 +173,36 @@ const JoshTest = () => {
             <hr className="w-full border-black" />
           </div>
 
+<<<<<<< HEAD
+          <Button>
+=======
           <Button onClick={toggleFormSidebar}>
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
             <p>Campus Ministry Office &#40;CMO&#41; Retreat</p>
           </Button>
-          <Button onClick={toggleFormSidebar}>
+          <Button>
             <p>Internal Reservation &#40;Individual Guest&#41; </p>
           </Button>
-          <Button onClick={toggleFormSidebar}>
+          <Button>
             <p>Internal Reservation &#40;Group&#41;</p>
           </Button>
-          <Button onClick={toggleFormSidebar}>
+          <Button>
             <p>External Reservation &#40;Individual Guest&#41;</p>
           </Button>
-          <Button onClick={toggleFormSidebar}>
+          <Button>
             <p>External Reservation &#40;Group&#41;</p>
           </Button>
-          <Button onClick={toggleFormSidebar}> 
+          <Button>
             <p>Other Reservations</p>
           </Button>
         </div>
       </main>
 
+<<<<<<< HEAD
+      <div
+        className={`fixed top-0 right-0 h-full w-1/5 transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? "translate-x-0" : "translate-x-full"
+=======
       {/* Backdrop */}
       {(isSidebarOpen || isFormSidebarOpen) && (
         <div
@@ -179,11 +215,14 @@ const JoshTest = () => {
       <div
         className={`fixed top-0 right-0 h-full w-1/5 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
         }`}
       >
-        <Sidebar roomId={selectedRoom} onClose={closeSidebar} />
+        <Sidebar />
       </div>
 
+<<<<<<< HEAD
+=======
       {/* Form Sidebar */}
       <div
         className={`fixed top-0 right-0 h-full w-1/4 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
@@ -193,6 +232,7 @@ const JoshTest = () => {
         <FormSidebar onClose={closeSidebar} presetNumber={buttonNum} />
       </div>
 
+>>>>>>> 0e034dca9acb692e634a5240d8c85ccb098cd6cb
       <div className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{ padding: "0" }} />
       </div>
