@@ -16,10 +16,6 @@ import {
 import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
 import Clock from "@/components/common/time/clock";
 import Sidebar from "../../components/common/navigatin-side-top/sidebarDetails";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
-import Clock from '@/components/common/time/clock';
-import Sidebar from '@/components/common/navigatin-side-top/sidebarDetails'
 import FormSidebar from '@/components/common/navigatin-side-top/sidebarReservationForm'
 
 const JoshTest = () => {
