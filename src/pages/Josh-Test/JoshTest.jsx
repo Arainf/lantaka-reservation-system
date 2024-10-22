@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
 import Clock from '@/components/common/time/clock';
-import Sidebar from '../../components/common/navigatin-side-top/sidebarDetails'
+import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
