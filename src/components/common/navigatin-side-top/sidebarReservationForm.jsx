@@ -32,13 +32,18 @@ export default function Component() {
     // Handle form submission
   };
 
-  const greetings = ["Good Day","Atenean","I Miss You", "Welcome", "Hello", "Magis"];
+  const greetings = ["Good Day", "Atenean", "I Miss You", "Welcome", "Hello", "Magis"];
   const [currentGreeting, setCurrentGreeting] = useState(0);
+  const [opacity, setOpacity] = useState(1);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentGreeting((prevGreeting) => (prevGreeting + 1) % greetings.length);
-    }, 2000); // Change greeting every 2 seconds
+      setOpacity(0); // Start fading out
+      setTimeout(() => {
+        setCurrentGreeting((prevGreeting) => (prevGreeting + 1) % greetings.length);
+        setOpacity(1); // Fade in the new greeting
+      }, 500); // Duration of fade out
+    }, 3000); // Change greeting every 2.5 seconds
 
     return () => clearInterval(interval); // Clean up the interval on unmount
   }, []);
@@ -51,8 +56,11 @@ export default function Component() {
           alt="Relaxing view of a person in an infinity pool overlooking the ocean"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <h1 className={`text-4xl md:text-6xl font-bold text-white transition-transform duration-1000 transform rotate-0`}>
+        <div
+          className="absolute inset-0  bg-opacity-30 flex items-center justify-center"
+          style={{ opacity, transition: 'opacity 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)' }}
+        >
+          <h1 className="text-4xl md:text-6xl font-bold text-white">
             {greetings[currentGreeting]}
           </h1>
         </div>
