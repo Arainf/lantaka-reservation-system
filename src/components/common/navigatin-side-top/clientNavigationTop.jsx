@@ -36,7 +36,7 @@ const NavigationTop = memo(() => {
     };
 
     return (
-        <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-10">
+        <header className="flex justify-between items-center h-14 px-4 z-50 bg-[#0f172a] text-white sticky top-0 right-0 z-10">
         <div className="flex items-center space-x-2">
             <img
                 src={logo}

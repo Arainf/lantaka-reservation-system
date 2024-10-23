@@ -80,17 +80,17 @@ const JoshTest = () => {
       <main className="flex-1 p- sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4">
         {/* Main content area (1) */}
         <div
-          className={`relative w-[100%] h-[85vh] bg-white overflow-hidden border border-black rounded-lg ${isGrabbing ? "cursor-grabbing" : "cursor-grab"
+          className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${isGrabbing ? "cursor-grabbing" : "cursor-grab"
             }`}
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
           onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
         >
-          <div className="flex flex-row mt-2 ml-5 mb-0 p-1">
+          <div className="flex flex-row mt-1 ml-5 mb-0 p-1.5">
             <div className="mr-2">
               <Select onValueChange={setSelectedFloor} value={selectedFloor}>
                 <SelectTrigger
-                style={{ backgroundColor: "#E5E9FF" }}
+                style={{ backgroundColor: "#95c1ff" }}
               className="w-[140px]"
                 >
                   <SelectValue placeholder="Select Floor" />
@@ -102,6 +102,44 @@ const JoshTest = () => {
               </Select>
             </div>
             <DatePicker />
+            {/* Box for room/event availability */}
+            <div
+              className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0"
+              style={{
+                // Adjust background to match the dark theme
+                borderRadius: "10px", // Slightly adjust corner radius
+                width: "22%", // Set the width similar to your preference
+              }}
+            >
+              {/* Available box */}
+              <div
+                className="flex flex-col items-center justify-center"
+                style={{
+                  backgroundColor: "#8BC34A", // Green background for Available
+                  borderRadius: "10px", // Border radius to match the squares
+                  width: "100px", // Set the width/height of the squares
+                  height: "100px",
+                }}
+              >
+                <span className="text-5xl font-bold text-green-600">69</span>{" "}
+                {/* Adjust text size and color */}
+                <span className="text-lg text-green-700">Available</span>
+              </div>
+
+              {/* Reserved box */}
+              <div
+                className="flex flex-col items-center justify-center"
+                style={{
+                  backgroundColor: "#64B5F6", // Blue background for Reserved
+                  borderRadius: "10px",
+                  width: "100px",
+                  height: "100px",
+                }}
+              >
+                <span className="text-5xl font-bold text-blue-600">69</span>
+                <span className="text-lg text-blue-700">Reserve</span>
+              </div>
+            </div>
             {/* Status Boxes */}
             <div
               className="absolute bottom-0 left-0 right-0 flex flex-row justify-center items-center mt-1 p-1.5 space-x-20 z-10 w-full"
@@ -124,7 +162,7 @@ const JoshTest = () => {
             <Button
               onClick={resetState} // Call reset function on click
               className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
-              style={{ marginLeft: "55%", backgroundColor: "#95c1ff" }}
+              style={{ marginLeft: "61%", backgroundColor: "#95c1ff" }}
             >
               Reset
             </Button>
@@ -138,7 +176,7 @@ const JoshTest = () => {
         </div>
 
         <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
-          <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg ">
+          <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
 
@@ -150,19 +188,19 @@ const JoshTest = () => {
           <Button onClick={toggleFormSidebar}>
             <p>Campus Ministry Office &#40;CMO&#41; Retreat</p>
           </Button>
-          <Button>
+          <Button onClick={toggleFormSidebar}>
             <p>Internal Reservation &#40;Individual Guest&#41; </p>
           </Button>
-          <Button>
+          <Button onClick={toggleFormSidebar}>
             <p>Internal Reservation &#40;Group&#41;</p>
           </Button>
-          <Button>
+          <Button onClick={toggleFormSidebar}>
             <p>External Reservation &#40;Individual Guest&#41;</p>
           </Button>
-          <Button>
+          <Button onClick={toggleFormSidebar}>
             <p>External Reservation &#40;Group&#41;</p>
           </Button>
-          <Button>
+          <Button onClick={toggleFormSidebar}>
             <p>Other Reservations</p>
           </Button>
         </div>
@@ -176,8 +214,8 @@ const JoshTest = () => {
         ></div>
       )}
 
-      {/* Room Details Sidebar
-      <div
+      {/* Room Details Sidebar */}
+      {/* <div
         className={`fixed top-0 right-0 h-full w-1/5 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
@@ -188,10 +226,10 @@ const JoshTest = () => {
 
 
       <div
-        className={`absolute top-0 right-0 h-screen w-2/4 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-[30%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
-        <Button className={`fixed ${isFormSidebarOpen ? "left-[-6%]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
+        <Button className={`absolute ${isFormSidebarOpen ? "left-[-12%]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
           X
         </Button>
         <FormSidebar onClose={toggleFormSidebar} presetNumber={buttonNum} />
