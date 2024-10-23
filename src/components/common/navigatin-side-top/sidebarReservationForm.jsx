@@ -11,11 +11,6 @@ export default function Component() {
     defaultValues: {
       firstName: "",
       lastName: "",
-      streetAddress: "",
-      streetAddressLine2: "",
-      city: "",
-      stateProvince: "",
-      postalCode: "",
       phone: "",
       email: "",
       arrivalDate: "",
@@ -29,78 +24,88 @@ export default function Component() {
 
   const onSubmit = (data) => {
     console.log(data);
-    // Handle form submission
   };
 
-  const greetings = ["Good Day","Atenean","I Miss You", "Welcome", "Hello", "Magis"];
+  const greetings = ["Good Day", "Atenean", "I Miss You", "Welcome", "Hello", "Magis"];
   const [currentGreeting, setCurrentGreeting] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentGreeting((prevGreeting) => (prevGreeting + 1) % greetings.length);
-    }, 2000); // Change greeting every 2 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on unmount
+    }, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="w-full h-screen overflow-y-scroll bg-gray-100">
-      <div className="relative h-[300px] md:h-[250px]">
+      <div className="relative h-[300px] md:h-[250px] z-10">
         <img
           src="src/assets/images/LantakaBG.jpg"
           alt="Relaxing view of a person in an infinity pool overlooking the ocean"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <h1 className={`text-4xl md:text-6xl font-bold text-white transition-transform duration-1000 transform rotate-0`}>
+          <h1 className="text-4xl md:text-6xl font-bold text-white">
             {greetings[currentGreeting]}
           </h1>
         </div>
       </div>
+
       <div className="max-w-4xl mx-auto p-6">
         <h2 className="text-3xl font-bold text-center mb-2">Lantaka Reservation Form</h2>
         <p className="text-center mb-6 text-gray-600">Please complete the form below.</p>
         <p className="text-center mb-8 text-gray-600">Your registration will be verified prior to your arrival.</p>
+
         <Form {...form}>
-          <div>
-            <h2 className="text-lg font-semibold mb-2">Date and Time</h2>
-            <div className="flex gap-4 justify-center items-center">
-              <FormField
-                control={form.control}
-                name="arrivalDate"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Arrival Date</FormLabel>
-                    <FormControl>
-                      <DatePicker {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <span className="text-gray-500 mt-8">-</span>
-              <FormField
-                control={form.control}
-                name="departureDate"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Departure Date</FormLabel>
-                    <FormControl>
-                      <DatePicker {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6">  {/* Use consistent vertical spacing */}
+            {/* Date Section */}
             <div>
-              <h2 className="text-lg font-semibold mb-2">Full Name</h2>
+              <h2 className="text-xl font-semibold mb-4">Date and Time</h2>
+              <div className="flex gap-4 items-center">
+                  {/* Arrival Date */}
+                  <FormField
+                    control={form.control}
+                    name="arrivalDate"
+                    render={({ field }) => (
+                      <FormItem className="flex-1 w-full drop-shadow-lg"> {/* Added w-full */}
+                        <FormLabel>Arrival Date</FormLabel>
+                        <FormControl>
+                          <DatePicker {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  
+
+                  {/* Departure Date */}
+                  <FormField
+                    control={form.control}
+                    name="departureDate"
+                    render={({ field }) => (
+                      <FormItem className="flex-1 w-full drop-shadow-lg"> {/* Added w-full */}
+                        <FormLabel>Departure Date</FormLabel>
+                        <FormControl>
+                          <DatePicker {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+            </div>
+
+            {/* Guest Details */}
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Guest Details</h2>
               <div className="flex gap-4">
                 <FormField
                   control={form.control}
                   name="firstName"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="flex-1 drop-shadow-lg">
+                      <FormLabel className="flex items-center">
+                        Full Name
+                        </FormLabel>
                       <FormControl>
                         <Input placeholder="First Name" {...field} />
                       </FormControl>
@@ -111,7 +116,10 @@ export default function Component() {
                   control={form.control}
                   name="lastName"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="flex-1 drop-shadow-lg">
+                      <FormLabel className="flex items-center">
+                      Last Name
+                        </FormLabel>
                       <FormControl>
                         <Input placeholder="Last Name" {...field} />
                       </FormControl>
@@ -121,6 +129,7 @@ export default function Component() {
               </div>
             </div>
 
+            {/* Contact Information */}
             <div className="flex gap-4">
               <FormField
                 control={form.control}
@@ -132,7 +141,7 @@ export default function Component() {
                       Phone Number
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="(000) 000-0000" {...field} />
+                      <Input className="drop-shadow-lg" placeholder="Phone no." {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -147,13 +156,14 @@ export default function Component() {
                       Email
                     </FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="ex: myname@example.com" {...field} />
+                      <Input className="drop-shadow-lg" type="email" placeholder="E-mail address" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Guest Count */}
             <div className="flex gap-4">
               <FormField
                 control={form.control}
@@ -165,7 +175,7 @@ export default function Component() {
                       Number of Adults
                     </FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="ex: 2" {...field} />
+                      <Input className="drop-shadow-lg" type="number" placeholder="Enter number of adults" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -180,25 +190,26 @@ export default function Component() {
                       Number of Kids
                     </FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="ex: 2" {...field} />
+                      <Input className="drop-shadow-lg" type="number" placeholder="Enter number of kids" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Payment Method */}
             <div>
-              <h2 className="text-lg font-semibold mb-2">Payment Method</h2>
+              <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
               <FormField
                 control={form.control}
                 name="paymentMethod"
                 render={({ field }) => (
                   <FormItem>
-                    <FormControl>
+                    <FormControl className="drop-shadow-lg">
                       <select {...field} className="bg-white border rounded p-2">
-                        <option value="check">Check</option>
-                        <option value="credit-card">Credit Card</option>
                         <option value="cash">Cash</option>
+                        <option value="credit-card">Credit Card</option>
+                        <option value="check">Check</option>
                       </select>
                     </FormControl>
                   </FormItem>
@@ -206,6 +217,7 @@ export default function Component() {
               />
             </div>
 
+            {/* Special Requests */}
             <FormField
               control={form.control}
               name="specialRequest"
@@ -213,14 +225,15 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Special Requests</FormLabel>
                   <FormControl>
-                    <Input placeholder="Any special requests?" {...field} />
+                    <Input className="drop-shadow-lg" placeholder="Any special requests?" {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
 
+            {/* Submit Button */}
             <Button type="submit">Submit</Button>
-          </form>
+          </div>
         </Form>
       </div>
     </div>

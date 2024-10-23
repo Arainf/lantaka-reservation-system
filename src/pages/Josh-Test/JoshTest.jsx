@@ -24,7 +24,7 @@ import { DatePickerDemo as DatePicker } from "@/components/common/utilities/Date
 import Clock from "@/components/common/time/clock";
 import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm";
-import { X } from "lucide-react";
+import { X, ChevronRight } from "lucide-react";
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -226,12 +226,14 @@ const JoshTest = () => {
 
 
       <div
-        className={`fixed top-0 right-0 h-full w-[30%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
-        <Button className={`absolute ${isFormSidebarOpen ? "left-[-12%]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
-          X
-        </Button>
+        
+        <button className={`absolute rounded-l-lg ${isFormSidebarOpen ? "left-[-9%] , top-[5px]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
+        <ChevronRight className="h-[26px] w-4" strokeWidth={3} />
+        </button>
+        
         <FormSidebar onClose={toggleFormSidebar} presetNumber={buttonNum} />
       </div>
 
