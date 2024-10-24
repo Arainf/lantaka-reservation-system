@@ -1,82 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { Phone, Mail, Users } from 'lucide-react';
-import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
+'use client'
 
-export default function Component() {
+import React, { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar, Users, Phone, Mail } from 'lucide-react'
+import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+
+export default function ReservationForm() {
+  const [step, setStep] = useState(1)
   const form = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      email: "",
       arrivalDate: "",
       departureDate: "",
       adults: "",
       kids: "",
-      paymentMethod: "check",
+      gender: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      paymentMethod: "",
       specialRequest: "",
     },
-  });
+  })
 
   const onSubmit = (data) => {
-    console.log(data);
-  };
+    console.log(data)
+    // Handle form submission
+  }
 
-  const greetings = ["Good Day", "Atenean", "I Miss You", "Welcome", "Hello", "Magis"];
-  const [currentGreeting, setCurrentGreeting] = useState(0);
-  const [opacity, setOpacity] = useState(1);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOpacity(0); // Start fading out
-      setTimeout(() => {
-        setCurrentGreeting((prevGreeting) => (prevGreeting + 1) % greetings.length);
-        setOpacity(1); // Fade in the new greeting
-      }, 500); // Duration of fade out
-    }, 3000); // Change greeting every 2.5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on unmount
-  }, []);
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 3))
+  const prevStep = () => setStep(prev => Math.max(prev - 1, 1))
 
   return (
-    <div className="w-full h-screen overflow-y-scroll bg-gray-100">
-      <div className="relative h-[300px] md:h-[250px] z-10">
-        <img
-          src="src/assets/images/LantakaBG.jpg"
-          alt="Relaxing view of a person in an infinity pool overlooking the ocean"
-          className="w-full h-full object-cover"
-        />
-        <div
-          className="absolute inset-0  bg-opacity-30 flex items-center justify-center"
-          style={{ opacity, transition: 'opacity 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)' }}
-        >
-          <h1 className="text-4xl md:text-6xl font-bold text-white">
-            {greetings[currentGreeting]}
-          </h1>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto p-6">
-        <h2 className="text-3xl font-bold text-center mb-2">Lantaka Reservation Form</h2>
+    <div className="max-w-4xl mx-auto p-16">
+      <div className="p-6">
+        <h1 className="text-3xl font-bold text-center mb-2">Lantaka Reservation Form</h1>
         <p className="text-center mb-6 text-gray-600">Please complete the form below.</p>
         <p className="text-center mb-8 text-gray-600">Your registration will be verified prior to your arrival.</p>
 
+        <Progress value={step * 33.33} className="mb-6 bg-gray-200"/>
+
         <Form {...form}>
-          <div className="space-y-6">  {/* Use consistent vertical spacing */}
-            {/* Date Section */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Date and Time</h2>
-              <div className="flex gap-4 items-center">
-                  {/* Arrival Date */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {step === 1 && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="arrivalDate"
                     render={({ field }) => (
-                      <FormItem className="flex-1 w-full drop-shadow-lg"> {/* Added w-full */}
+                      <FormItem>
                         <FormLabel>Arrival Date</FormLabel>
                         <FormControl>
                           <DatePicker {...field} />
@@ -84,15 +64,11 @@ export default function Component() {
                       </FormItem>
                     )}
                   />
-                  
-                  
-
-                  {/* Departure Date */}
                   <FormField
                     control={form.control}
                     name="departureDate"
                     render={({ field }) => (
-                      <FormItem className="flex-1 w-full drop-shadow-lg"> {/* Added w-full */}
+                      <FormItem>
                         <FormLabel>Departure Date</FormLabel>
                         <FormControl>
                           <DatePicker {...field} />
@@ -101,150 +77,180 @@ export default function Component() {
                     )}
                   />
                 </div>
-            </div>
-
-            {/* Guest Details */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Guest Details</h2>
-              <div className="flex gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="adults"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Number of Adults</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="number" placeholder="Enter number of adults" {...field} className="pl-10" />
+                            <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="kids"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Number of Kids</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="number" placeholder="Enter number of kids" {...field} className="pl-10" />
+                            <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
-                  name="firstName"
+                  name="gender"
                   render={({ field }) => (
-                    <FormItem className="flex-1 drop-shadow-lg">
-                      <FormLabel className="flex items-center">
-                        Full Name
-                        </FormLabel>
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your name" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your last name" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>E-mail</FormLabel>
                       <FormControl>
-                        <Input placeholder="First Name" {...field} />
+                        <div className="relative">
+                          <Input type="email" placeholder="yourmail@gmail.com" {...field} className="pl-10" />
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                        </div>
                       </FormControl>
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
-                  name="lastName"
+                  name="phone"
                   render={({ field }) => (
-                    <FormItem className="flex-1 drop-shadow-lg">
-                      <FormLabel className="flex items-center">
-                      Last Name
-                        </FormLabel>
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Last Name" {...field} />
+                        <div className="relative">
+                          <Input placeholder="Phone no." {...field} className="pl-10" />
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                        </div>
                       </FormControl>
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
+              </>
+            )}
 
-            {/* Contact Information */}
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="flex items-center">
-                      <Phone className="mr-2 h-5 w-5" />
-                      Phone Number
-                    </FormLabel>
-                    <FormControl>
-                      <Input className="drop-shadow-lg" placeholder="Phone no." {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="flex items-center">
-                      <Mail className="mr-2 h-5 w-5" />
-                      Email
-                    </FormLabel>
-                    <FormControl>
-                      <Input className="drop-shadow-lg" type="email" placeholder="E-mail address" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+            {step === 3 && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="paymentMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Payment Method</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select payment method" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="cash">Cash</SelectItem>
+                          <SelectItem value="credit-card">Credit Card</SelectItem>
+                          <SelectItem value="check">Check</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="specialRequest"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Special Request</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Message" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
 
-            {/* Guest Count */}
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="adults"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="flex items-center">
-                      <Users className="mr-2 h-5 w-5" />
-                      Number of Adults
-                    </FormLabel>
-                    <FormControl>
-                      <Input className="drop-shadow-lg" type="number" placeholder="Enter number of adults" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="kids"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="flex items-center">
-                      <Users className="mr-2 h-5 w-5" />
-                      Number of Kids
-                    </FormLabel>
-                    <FormControl>
-                      <Input className="drop-shadow-lg" type="number" placeholder="Enter number of kids" {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Payment Method */}
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Payment Method</h2>
-              <FormField
-                control={form.control}
-                name="paymentMethod"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl className="drop-shadow-lg">
-                      <select {...field} className="bg-white border rounded p-2">
-                        <option value="cash">Cash</option>
-                        <option value="credit-card">Credit Card</option>
-                        <option value="check">Check</option>
-                      </select>
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Special Requests */}
-            <FormField
-              control={form.control}
-              name="specialRequest"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Special Requests</FormLabel>
-                  <FormControl>
-                    <Input className="drop-shadow-lg" placeholder="Any special requests?" {...field} />
-                  </FormControl>
-                </FormItem>
+            <div className="flex justify-between">
+              {step > 1 && (
+                <Button type="button" onClick={prevStep} variant="outline">
+                  PREV
+                </Button>
               )}
-            />
-
-            {/* Submit Button */}
-            <Button type="submit">Submit</Button>
-          </div>
+              {step < 3 ? (
+                <Button type="button" onClick={nextStep} className={step === 1 ? "ml-auto" : ""}>
+                  NEXT
+                </Button>
+              ) : (
+                <Button type="submit" className="ml-auto">
+                  SUBMIT
+                </Button>
+              )}
+            </div>
+          </form>
         </Form>
       </div>
     </div>
-  );
+  )
 }
