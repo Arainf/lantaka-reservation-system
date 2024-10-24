@@ -35,6 +35,7 @@ const JoshTest = () => {
   const [isFormSidebarOpen, setIsFormSidebarOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [buttonNum, setButtonNum] = useState(null);
+  const [buttonClicked, setButtonClicked] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsLargeScreen(window.innerWidth >= 1920);
@@ -58,7 +59,8 @@ const JoshTest = () => {
   };
 
   const toggleFormSidebar = () => {
-    setIsFormSidebarOpen(!isFormSidebarOpen);
+    // setIsFormSidebarOpen(!isFormSidebarOpen);
+    setButtonClicked(!buttonClicked); // Set buttonClicked to true
   };
 
   const closeSidebar = () => {
@@ -175,7 +177,15 @@ const JoshTest = () => {
           )}
         </div>
 
-        <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
+        <button className={`absolute rounded-l-lg ${isFormSidebarOpen ? "left-[-9%] , top-[5px]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
+        <ChevronRight className="h-[26px] w-4" strokeWidth={3} />
+        </button>
+
+        <div className={`bg-black w-full md:w-1/3 h-full ${buttonClicked ? "flex" : "hidden"} `}>
+          <FormSidebar presetNumber={buttonNum} />
+        </div>
+
+        <div className={`w-full md:w-1/3 flex-col h-auto space-y-4 ${buttonClicked ? "hidden" : "flex"}`}>
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
@@ -225,7 +235,7 @@ const JoshTest = () => {
       {/* Form Sidebar */}
 
 
-      <div
+      {/* <div
         className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
@@ -235,7 +245,7 @@ const JoshTest = () => {
         </button>
         
         <FormSidebar onClose={toggleFormSidebar} presetNumber={buttonNum} />
-      </div>
+      </div> */}
 
       <div className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{ padding: "0" }} />

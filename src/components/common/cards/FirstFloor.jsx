@@ -16,7 +16,7 @@ const HoverContent = memo(({ room, id }) => {
   console.log("HoverContent rendered" + id);
 
   return (
-    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[350px]">
+    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[400px]">
       <div className="flex flex-row pt-4">
         <div className="w-[60%]">
           <img
@@ -53,7 +53,7 @@ const HoverContentVenue = memo(({ venue, id }) => {
   console.log("HoverContent rendered" + id);
 
   return (
-    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[350px]">
+    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[400px]">
       <div className="flex flex-row pt-4">
         <div className="w-[60%]">
           <img
@@ -105,6 +105,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
   const [currentVenue, setCurrentVenue] = useState(null);
   const [hoveredVenue, setHoveredVenue] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [status, setStatus] = useState("normal");
 
   // ------------------------------------------ zoom logic.---------------------------------------------------//
 
@@ -325,7 +326,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             </mask>
             <path
               id="room116"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1593 651.5H1630.5V657H1648.5L1649 719.5H1639V747H1623V719.5H1592V672.5H1594.5V666.5H1593V651.5Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -341,7 +342,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room112"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1707 651.71H1747V657H1764V666H1762V672H1764V719H1754V747H1738V719H1707V692.11V672H1710V666H1707V651.71Z"
               fill="#938e8e"
               fillOpacity=".7"
@@ -356,7 +357,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room120"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1475.5 651.5H1514.5V657H1521H1532.5V666H1529.5V673H1532.5V719H1522.5V747H1506.5V719H1475.5V673.5V671.5V663V651.5Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -371,7 +372,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room110"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1823 651.71H1783V657H1766V666H1768V672H1766V719H1776V747H1792V719H1823V692.11V672H1820V666H1823V651.71Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -386,7 +387,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room106"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1940 651.71H1900V657H1883V666H1885V672H1883V719H1893V747H1909V719H1940V692.11V672H1937V666H1940V651.71Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -401,7 +402,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room108"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1824 651.71H1864V657H1881V666H1879V672H1881V719H1871V747H1855V719H1824V692.11V672H1827V666H1824V651.71Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -416,7 +417,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room104"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1941 651.71H1981V657H1998V666H1996V672H1998V719H1988V747H1972V719H1941V692.11V672H1944V669V666H1941V651.71Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -431,7 +432,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
             <path
               id="room102"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1999.5 651.71H2039.5V657H2056.5V666H2054.5V672H2056.5V719H2046.5V747H2030.5V719H1999.5V692.11V672H2002.5V669V666H1999.5V651.71Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -453,7 +454,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           <g filter="url(#filter1_d_619_4625)">
             <path
               id="room118"
-              className="roomHover"
+              className={`roomHover ${status}`}
               d="M1535 657H1552.5V651.5H1591V673V719L1560 719.183V747H1544.77V719.183H1535V673H1537V666H1535V657Z"
               fill="#938E8E"
               fillOpacity=".7"
@@ -474,7 +475,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           </g>
           <path
             id="room114"
-            className="roomHover"
+            className={`roomHover ${status}`}
             d="M1706.5 657V665.5H1705H1704.5V666V672V672.5H1705H1706.5V718.5H1676H1675.5V719V746.5H1660.5V719V718.5H1660H1650.5V673.5H1653H1653.5V673V666V665.5H1653H1650.5V657.5H1669H1669.5V657V652.105L1706.5 652.233V657Z"
             fill="#938E8E"
             fillOpacity=".7"
@@ -489,7 +490,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           />
           <path
             id="breezahall"
-            className="roomHover"
+            className={`roomHover ${status}`}
             d="M748 761H747.5V743H748H748.5V742.5V734.5V734H748H737.5V632.173H738H738.5V631.673V627H739H747H747.5V626.5V622H790.5V626.5V627H791H799H799.5V626.5V622H853.5V626.5V627H854H861H861.5V626.5V622H911.5V626.5V627H912H919H919.5V626.5V622H947.5V626.5V627H948H949.5V651H949H948.5V651.5V657.5V658H949H949.5L949.5 718H948H947.5V718.5V725.5V726H932.5H915H914.5V726.5V749V807.234H869.5V776V775.5H869H776.5H776V776V807.234H748.5V761.5V761H748Z"
             fill="#938E8E"
             fillOpacity=".7"
@@ -504,7 +505,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           />
           <path
             id="oldTalisayBar"
-            className="roomHover"
+            className={`roomHover ${status}`}
             d="M1501.85 63.5H1619V102.5H1577H1576.9L1576.81 102.539L1519.81 126.539L1519.61 126.622L1519.53 126.821L1504.71 165.356L1468.64 151.709L1501.85 63.5Z"
             fill="#938E8E"
             fillOpacity=".7"
@@ -526,7 +527,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           </mask>
           <path
             id="gazebo"
-            className="roomHover"
+            className={`roomHover ${status}`}
             fillRule="evenodd"
             clipRule="evenodd"
             d="M921 482.038C920.485 481.918 919.949 481.854 919.398 481.854C915.863 481.854 912.933 484.477 912.403 487.907C908.225 487.927 902.124 487.895 893.217 487.847C884.858 487.802 874.029 487.744 860 487.704V476H794V487.658H744.26C743.63 484.351 740.757 481.854 737.308 481.854C736.5 481.854 735.723 481.991 735 482.243C741.644 443.095 778.043 405.168 827.847 405.168C867.907 402.199 915.518 438.903 921 482.038Z"
@@ -547,7 +548,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           />
           <path
             id="dinningHall"
-            className="roomHover"
+            className={`roomHover ${status}`}
             d="M563.5 464.815V462.815H613.5V464.815V465.315H614H618.5V565.315H614H613.5V565.815V572.315V572.815H614H618.5V654.315L601.5 654.315L601.494 654.315L556.994 654.815L556.5 654.82V655.315V667.315H522.5H522V667.815V682.315H506V654.815V654.315H505.5H498.5H498V654.815V659.315H447.5V655.315V654.815H447H440.5H440V655.315V659.315H388.5V655.315V654.815H388H382H381.5V655.315V688.017H365.714L365.5 659.811L365.496 659.315H365H330.5V462.5H381.5V464.524V465.024H382H388.25H388.75V464.524V462.5L440 462.5V464.315V464.815H440.5H447H447.5V464.315V462.503L497.5 462.812V464.67V465.16L497.99 465.17L504.99 465.315L505.5 465.325V464.815V462.582L556.5 462.813V464.815V465.315H557H563H563.5V464.815Z"
             fill="#938E8E"
             fillOpacity=".7"
@@ -562,7 +563,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
           />
           <path
             id="capizHall"
-            className="roomHover"
+            className={`roomHover ${status}`}
             d="M1196.25 657.5H1251.8V659.112V659.612H1252.3H1257.52H1258.02V659.112V657.5H1300.5V746.5H1102.54L1068.5 717.041L1068.5 659.665H1071.12H1071.62V659.165V657.5H1127.42V658.935V659.435H1127.92H1132.98H1133.48V658.935V657.5H1188.89V659.03V659.525L1189.38 659.53L1195.74 659.585L1196.25 659.589V659.085V657.5Z"
             fill="#938E8E"
             fillOpacity=".7"
