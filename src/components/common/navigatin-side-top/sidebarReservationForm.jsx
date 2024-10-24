@@ -25,6 +25,12 @@ export default function ReservationForm() {
       phone: "",
       paymentMethod: "",
       specialRequest: "",
+      messengerAccount: "",
+      proofOfPayment: "",
+      proofOfIdentity: "",
+      designation: "",
+      address: "",
+      client: "",
     },
   })
 
@@ -33,7 +39,7 @@ export default function ReservationForm() {
     // Handle form submission
   }
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 3))
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 4))
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1))
 
   return (
@@ -43,7 +49,7 @@ export default function ReservationForm() {
         <p className="text-center mb-6 text-gray-600">Please complete the form below.</p>
         <p className="text-center mb-8 text-gray-600">Your registration will be verified prior to your arrival.</p>
 
-        <Progress value={step * 33.33} className="mb-6 bg-gray-200"/>
+        <Progress value={step * 25} className="mb-6 bg-gray-200" />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -75,13 +81,13 @@ export default function ReservationForm() {
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-5">
                   <FormField
                     control={form.control}
                     name="adults"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of Adults</FormLabel>
+                        <FormLabel>Number of Guest</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input type="number" placeholder="Enter number of adults" {...field} className="pl-10" />
@@ -91,21 +97,7 @@ export default function ReservationForm() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="kids"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Number of Kids</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input type="number" placeholder="Enter number of kids" {...field} className="pl-10" />
-                            <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  
                 </div>
                 <FormField
                   control={form.control}
@@ -196,33 +188,77 @@ export default function ReservationForm() {
               <>
                 <FormField
                   control={form.control}
-                  name="paymentMethod"
+                  name="messengerAccount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Payment Method</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select payment method" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="cash">Cash</SelectItem>
-                          <SelectItem value="credit-card">Credit Card</SelectItem>
-                          <SelectItem value="check">Check</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Messenger Account</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Messenger Username" {...field} />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
-                  name="specialRequest"
+                  name="proofOfPayment"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Special Request</FormLabel>
+                      <FormLabel>Proof of Payment</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Message" {...field} />
+                        <Input placeholder="Attach proof of payment" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="proofOfIdentity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Proof of Identity</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Attach proof of identity" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
+            {step === 4 && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="designation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Designation</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Designation or position" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Address details" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="client"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Client</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Client details" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -231,24 +267,20 @@ export default function ReservationForm() {
             )}
 
             <div className="flex justify-between">
-              {step > 1 && (
-                <Button type="button" onClick={prevStep} variant="outline">
-                  PREV
-                </Button>
-              )}
-              {step < 3 ? (
-                <Button type="button" onClick={nextStep} className={step === 1 ? "ml-auto" : ""}>
-                  NEXT
+              <Button type="button" disabled={step === 1} onClick={prevStep}>
+                Previous
+              </Button>
+              {step < 4 ? (
+                <Button type="button" onClick={nextStep}>
+                  Next
                 </Button>
               ) : (
-                <Button type="submit" className="ml-auto">
-                  SUBMIT
-                </Button>
+                <Button type="submit">Submit</Button>
               )}
             </div>
           </form>
         </Form>
       </div>
     </div>
-  )
+  );
 }

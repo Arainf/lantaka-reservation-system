@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useEffect } from "react"
 import { IoCalendarSharp } from "react-icons/io5"
 import { format } from "date-fns"
 
@@ -14,13 +13,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export function DatePickerDemo() {
-  const [date, setDate] = React.useState("")
-
-  useEffect(() => {
-    setDate(new Date())
-  }, [])
-
+// Add props for date and onDateChange
+export function DatePickerDemo({ date, onDateChange }) {
   return (
     <Popover style={{backgroundColor: "#95c1ff"}}>
       <PopoverTrigger asChild>
@@ -39,26 +33,14 @@ export function DatePickerDemo() {
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
-          selected={date}
-          onSelect={(newDate) => setDate(newDate)}
+          selected={date}  // Pass the selected date to the Calendar
+          onSelect={(newDate) => {
+            onDateChange(newDate);  // Call the parent's onDateChange function
+          }}
           initialFocus
           className="rounded-md border"
-          
         />
       </PopoverContent>
     </Popover>
   )
 }
-
-<style jsx global>{`
-  .react-calendar {
-    width: 100%;
-    max-width: 350px;
-    font-size: 0.875rem;
-  }
-  @media (max-width: 640px) {
-    .react-calendar {
-      font-size: 0.75rem;
-    }
-  }
-`}</style>

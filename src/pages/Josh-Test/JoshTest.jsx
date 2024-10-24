@@ -25,6 +25,7 @@ import Clock from "@/components/common/time/clock";
 import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm";
 import { X, ChevronRight } from "lucide-react";
+import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -36,6 +37,26 @@ const JoshTest = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [buttonNum, setButtonNum] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
+  const [date, setDate] = React.useState("")
+  const [selectedDate, setSelectedDate] = useState("")
+  const [dateTranslate, setDateTranslate] = useState("")
+
+  useEffect(() => {
+    setDate(new Date())
+    setSelectedDate(new Date())  // Update the selected date state
+  }, [])
+
+
+  console.log(selectedDate)
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date)  // Update the selected date state
+    const newDate = formatDateToYYYYMMDD(selectedDate);
+    setDateTranslate(newDate);  // Update the date translation state
+    console.log("Selected date in parent:", date)  // Log the selected date
+  }
+
+  console.log(dateTranslate)
 
   useEffect(() => {
     const handleResize = () => setIsLargeScreen(window.innerWidth >= 1920);
@@ -103,7 +124,7 @@ const JoshTest = () => {
                 </SelectContent>
               </Select>
             </div>
-            <DatePicker />
+            <DatePicker date={selectedDate} onDateChange={handleDateChange} />
             {/* Box for room/event availability */}
             <div
               className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0"
@@ -170,21 +191,35 @@ const JoshTest = () => {
             </Button>
           </div>
           {selectedFloor === "floor1" && (
-            <FirstFloor resetTrigger={resetTrigger} onRoomClick={toggleSidebar} />
+            <FirstFloor resetTrigger={resetTrigger} onRoomClick={toggleSidebar} date={dateTranslate} />
           )}
           {selectedFloor === "floor2" && (
             <SecondFloorr resetTrigger={resetTrigger} onRoomClick={toggleSidebar} />
           )}
         </div>
 
-        <button className={`absolute rounded-l-lg ${isFormSidebarOpen ? "left-[-9%] , top-[5px]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
-        <ChevronRight className="h-[26px] w-4" strokeWidth={3} />
-        </button>
-
-        <div className={`bg-black w-full md:w-1/3 h-full ${buttonClicked ? "flex" : "hidden"} `}>
-          <FormSidebar presetNumber={buttonNum} />
+        <div
+        className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+      >
+        
+        
+        
+        
+      
         </div>
-
+        <div className={`bg-[white] w-full md:w-1/3 h-full ${buttonClicked ? "flex" : "hidden"} `}>
+          <button
+            className={`absolute rounded-l-lg bg-white `}
+            variant="default"
+            size="icon"
+            onClick={toggleFormSidebar}
+          >
+            <X className="h-[26px] w-10" strokeWidth={3} />
+          </button>
+          <FormSidebar presetNumber={buttonNum} />
+        
+        </div> 
         <div className={`w-full md:w-1/3 flex-col h-auto space-y-4 ${buttonClicked ? "hidden" : "flex"}`}>
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
@@ -235,17 +270,7 @@ const JoshTest = () => {
       {/* Form Sidebar */}
 
 
-      {/* <div
-        className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-      >
-        
-        <button className={`absolute rounded-l-lg ${isFormSidebarOpen ? "left-[-9%] , top-[5px]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
-        <ChevronRight className="h-[26px] w-4" strokeWidth={3} />
-        </button>
-        
-        <FormSidebar onClose={toggleFormSidebar} presetNumber={buttonNum} />
-      </div> */}
+      
 
       <div className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{ padding: "0" }} />

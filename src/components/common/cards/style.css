@@ -343,11 +343,11 @@
     fill: #FFC107;
 }
 
-.canceled{
+.cancelled{
     fill: #DC3545;
 }
 
-.occupied{
+.completed{
     fill: #28A745;
 }
 

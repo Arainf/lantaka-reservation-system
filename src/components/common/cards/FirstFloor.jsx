@@ -82,11 +82,27 @@ const HoverContentVenue = memo(({ venue, id }) => {
   );
 });
 
-const FirstFloor = ({ resetTrigger, onRoomClick }) => {
+// // Your existing fetch function
+// const fetchAvailableVenueData = async (date) => {
+//   try {
+//     const response = await fetch(`http://localhost:5000/api/availabilityVenue/${date}`);
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     const data = await response.json();
+//     console.log("Fetched available venue data:", data); // Log the fetched data
+//     return data; // Return the data for further use if needed
+//   } catch (error) {
+//     console.error("Error fetching venue data:", error);
+//   }
+// };
+
+const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
   const svgRef = useRef(null);
+  
   const containerRef = useRef(null);
 
-  const initialViewBox = { x: 700, y: -100, width: 800, height: 1400 };
+  const initialViewBox = { x: 700, y: -50, width: 800, height: 1400 };
   const MIN_ZOOM = 600;
   const MAX_ZOOM = 1400;
 
@@ -106,6 +122,11 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
   const [hoveredVenue, setHoveredVenue] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [status, setStatus] = useState("normal");
+  const [availableVenues, setAvailableVenues] = useState([]); // Initialize as an empty array
+  const pathRefs = useRef({});
+
+  
+
 
   // ------------------------------------------ zoom logic.---------------------------------------------------//
 
@@ -235,6 +256,8 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
   }
 
 
+
+
   const fetchRoomData = async (roomId) => {
     if (roomDataCache[roomId]) {
       setCurrentRoom(roomDataCache[roomId]);
@@ -280,6 +303,62 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
     }, 10),
     []
   );
+
+  useEffect(() => {
+    const fetchAvailableVenueData = async (date) => {
+      const response = await fetch(
+        `http://localhost:5000/api/availabilityVenue/${date}`
+      );
+
+      if (!response.ok) {
+        console.error("Failed to fetch available venues:", response.statusText);
+        return; // Exit if the fetch failed
+      }
+
+      const data = await response.json();
+      console.log("Fetched available venue data:", data);
+
+      // Ensure the fetched data is an array before setting the state
+      if (Array.isArray(data)) {
+        setAvailableVenues(data);
+      } else {
+        console.error("Fetched data is not an array:", data);
+      }
+    };
+
+    fetchAvailableVenueData(date);
+  }, [date]);
+
+  useEffect(() => {
+    // Check if there are no available venues
+    if (availableVenues.length === 0) {
+      // If no venues are available, set all venue statuses to normal
+      Object.keys(pathRefs.current).forEach((venueId) => {
+        const pathElement = pathRefs.current[venueId];
+        if (pathElement) {
+          console.log(`No available venues. Setting status to normal on element with ID: ${venueId}`);
+          pathElement.className.baseVal = "normal"; // Set to normal status
+        }
+      });
+    } else {
+      // Set the status for each venue based on availableVenues
+      availableVenues.forEach((venue) => {
+        const pathElement = pathRefs.current[venue.id];
+        if (pathElement) {
+          console.log(`Setting status: ${venue.status} on element with ID: ${venue.id}`);
+          pathElement.className.baseVal = venue.status; // Assign class name
+        } else {
+          console.warn(`No elements found for ID: ${venue.id}`);
+        }
+      });
+    }
+  }, [availableVenues]);
+
+  // Function to combine refs
+  // const combinedRef = (id) => (element) => {
+  //   svgRef.current = element; // Assign the container ref
+  //   pathRefs.current[id] = element; // Assign the path ref
+  // };
 
   // console.log(tooltipPos)
 
@@ -369,6 +448,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room120")}
+              
             />
             <path
               id="room110"
@@ -489,13 +569,13 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             onClick={() => onRoomClick("Room114")}
           />
           <path
-            id="breezahall"
-            className={`roomHover ${status}`}
+            id="BreezaHall"
+            className="roomHover"
             d="M748 761H747.5V743H748H748.5V742.5V734.5V734H748H737.5V632.173H738H738.5V631.673V627H739H747H747.5V626.5V622H790.5V626.5V627H791H799H799.5V626.5V622H853.5V626.5V627H854H861H861.5V626.5V622H911.5V626.5V627H912H919H919.5V626.5V622H947.5V626.5V627H948H949.5V651H949H948.5V651.5V657.5V658H949H949.5L949.5 718H948H947.5V718.5V725.5V726H932.5H915H914.5V726.5V749V807.234H869.5V776V775.5H869H776.5H776V776V807.234H748.5V761.5V761H748Z"
             fill="#938E8E"
             fillOpacity=".7"
             stroke="black"
-            ref={containerRef}
+            ref={(el) => (pathRefs.current["BreezaHall"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
               handleFetchVenue("BreezaHall") // Pass event directly
@@ -504,13 +584,13 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             onClick={() => onRoomClick("BreezaHall")}
           />
           <path
-            id="oldTalisayBar"
+            id="OldTalisayBar"
             className={`roomHover ${status}`}
             d="M1501.85 63.5H1619V102.5H1577H1576.9L1576.81 102.539L1519.81 126.539L1519.61 126.622L1519.53 126.821L1504.71 165.356L1468.64 151.709L1501.85 63.5Z"
             fill="#938E8E"
             fillOpacity=".7"
             stroke="black"
-            ref={containerRef}
+            ref={(el) => (pathRefs.current["OldTalisayBar"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
               handleFetchVenue("OldTalisayBar") // Pass event directly
@@ -526,14 +606,14 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             />
           </mask>
           <path
-            id="gazebo"
+            id="Gazebo"
             className={`roomHover ${status}`}
             fillRule="evenodd"
             clipRule="evenodd"
             d="M921 482.038C920.485 481.918 919.949 481.854 919.398 481.854C915.863 481.854 912.933 484.477 912.403 487.907C908.225 487.927 902.124 487.895 893.217 487.847C884.858 487.802 874.029 487.744 860 487.704V476H794V487.658H744.26C743.63 484.351 740.757 481.854 737.308 481.854C736.5 481.854 735.723 481.991 735 482.243C741.644 443.095 778.043 405.168 827.847 405.168C867.907 402.199 915.518 438.903 921 482.038Z"
             fill="#938E8E"
             fillOpacity=".7"
-            ref={containerRef}
+            ref={(el) => (pathRefs.current["Gazebo"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
               handleFetchVenue("Gazebo") // Pass event directly
@@ -547,13 +627,13 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             mask="url(#path-9-inside-2_619_4625)"
           />
           <path
-            id="dinningHall"
+            id="DiningHall"
             className={`roomHover ${status}`}
             d="M563.5 464.815V462.815H613.5V464.815V465.315H614H618.5V565.315H614H613.5V565.815V572.315V572.815H614H618.5V654.315L601.5 654.315L601.494 654.315L556.994 654.815L556.5 654.82V655.315V667.315H522.5H522V667.815V682.315H506V654.815V654.315H505.5H498.5H498V654.815V659.315H447.5V655.315V654.815H447H440.5H440V655.315V659.315H388.5V655.315V654.815H388H382H381.5V655.315V688.017H365.714L365.5 659.811L365.496 659.315H365H330.5V462.5H381.5V464.524V465.024H382H388.25H388.75V464.524V462.5L440 462.5V464.315V464.815H440.5H447H447.5V464.315V462.503L497.5 462.812V464.67V465.16L497.99 465.17L504.99 465.315L505.5 465.325V464.815V462.582L556.5 462.813V464.815V465.315H557H563H563.5V464.815Z"
             fill="#938E8E"
             fillOpacity=".7"
             stroke="black"
-            ref={containerRef}
+            ref={(el) => (pathRefs.current["DiningHall"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
               handleFetchVenue("DiningHall") // Pass event directly
@@ -562,13 +642,13 @@ const FirstFloor = ({ resetTrigger, onRoomClick }) => {
             onClick={() => onRoomClick("DiningHall")}
           />
           <path
-            id="capizHall"
+            id="CapizHall"
             className={`roomHover ${status}`}
             d="M1196.25 657.5H1251.8V659.112V659.612H1252.3H1257.52H1258.02V659.112V657.5H1300.5V746.5H1102.54L1068.5 717.041L1068.5 659.665H1071.12H1071.62V659.165V657.5H1127.42V658.935V659.435H1127.92H1132.98H1133.48V658.935V657.5H1188.89V659.03V659.525L1189.38 659.53L1195.74 659.585L1196.25 659.589V659.085V657.5Z"
             fill="#938E8E"
             fillOpacity=".7"
             stroke="black"
-            ref={containerRef}
+            ref={(el) => (pathRefs.current["CapizHall"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
               handleFetchVenue("CapizHall") // Pass event directly
