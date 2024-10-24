@@ -7,6 +7,7 @@ import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
 import { Users } from "lucide-react";
 import Image from "@/assets/images/hotel_room.jpg";
 import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
+import "./style.css";
 
 const HoverContent = memo(({ room, id }) => {
   const { room_name, guest_name, check_in, check_out, image_url } = room || {};

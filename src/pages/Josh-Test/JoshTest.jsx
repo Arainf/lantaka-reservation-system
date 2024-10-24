@@ -38,12 +38,14 @@ const JoshTest = () => {
   const [buttonNum, setButtonNum] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [date, setDate] = React.useState("")
-  const [selectedDate, setSelectedDate] = useState("")
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [dateTranslate, setDateTranslate] = useState("")
+  const xnewDate = formatDateToYYYYMMDD(selectedDate);
 
   useEffect(() => {
     setDate(new Date())
-    setSelectedDate(new Date())  // Update the selected date state
+    setSelectedDate(new Date()) 
+    setDateTranslate(xnewDate) // Update the selected date state
   }, [])
 
 
