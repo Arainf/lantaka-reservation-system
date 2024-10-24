@@ -51,9 +51,9 @@ const NavigationTop = memo(() => {
                 <nav className="flex space-x-4">
                     {[
                         ['Home', '/home'],
-                        ['Reservations', '#calendar'],
-                        ['Add Reservation', '#calendar'],
-                        ['Account', '/reports'],
+                        ['Reservations', '#reservation'],
+                        ['Calendar', '#calendar'],
+                        ['Account', '/account'],
                     ].map(([title, url]) => (
                         <a
                             href={url}

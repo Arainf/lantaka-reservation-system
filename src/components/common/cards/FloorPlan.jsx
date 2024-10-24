@@ -3,8 +3,8 @@
 import { Card, CardContent , CardHeader } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState, useEffect } from 'react'
-import FirstFloor from "./FirstFloor"
-import SecondFloor from "./SecondFloor"
+import FirstFloor from "@/components/common/cards/FirstFloor";
+import SecondFloor from "@/components/common/cards/SecondFloorr";
 import { DatePickerDemo as DatePicker } from '@/components/common/utilities/DateRangePicker';
 
 export default function FloorPlan() {
@@ -55,6 +55,7 @@ export default function FloorPlan() {
               {/* Floor Plan */}
               <div className="h-[450px] flex justify-start rounded-md overflow-hidden">
                   {selectedFloor === "floor1" ? (
+                    
                     <FirstFloor />
                   ) : (
                     <SecondFloor roomColors={roomColors} />

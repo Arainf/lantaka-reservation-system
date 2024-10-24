@@ -98,9 +98,9 @@ const JoshTest = () => {
   };
 
   return (
-    <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]">
+    <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]" id="reservation">
       <NavigationTop />
-      <main className="flex-1 p- sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+      <main className="flex-1 p- sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4" >
         {/* Main content area (1) */}
         <div
           className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${isGrabbing ? "cursor-grabbing" : "cursor-grab"

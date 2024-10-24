@@ -1,60 +1,72 @@
-import React, { useState, useEffect } from "react";
-import { createIcons, icons } from "lucide";
-import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
-import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
-import { ChevronLeft, ChevronRight, Settings, Filter, Search } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { createIcons, icons } from 'lucide';
+import NavigationSide from '@/components/common/navigatin-side-top/NavigationSide';
+import NavigationTop from '@/components/common/navigatin-side-top/NavigationTop';
+import { ChevronLeft, ChevronRight, Settings, Filter, Search } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+
+const guests = [
+  { id: 1, user: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', payment_status: 'Paid', noGuest: '4' },
+  { id: 2, user: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', payment_status: 'Pending', noGuest: '3' },
+  { id: 3, user: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', payment_status: 'Cancelled', noGuest: '2' },
+  { id: 4, user: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', payment_status: 'Paid', noGuest: '1' },
+  { id: 5, user: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', payment_status: 'Pending', noGuest: '2' },
+  { id: 6, user: 'Tom Wilson', email: 'tom@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', payment_status: 'Pending', noGuest: '2' }
+];
+
+const getColorStatus = (status) => {
+  switch (status.toLowerCase()) {
+    case 'cancelled':
+      return 'bg-red-100 text-red-800';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'paid':
+      return 'bg-green-100 text-green-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 
 export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
-  // Dummy event logs data
-  const [guestList, setGuestList] = useState([
-    { id: 1, user: "John Doe", email: "john@example.com", room: "102", check_in_date: "2022-01-01 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "4" },
-    { id: 2, user: "Jane Doe", email: "jane@example.com", room: "202", check_in_date: "2022-01-02 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 3, user: "Bob Smith", email: "bob@example.com", room: "301", check_in_date: "2022-01-03 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 4, user: "Alice Johnson", email: "alice@example.com", room: "212", check_in_date: "2022-01-04 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 5, user: "Mike Brown", email: "mike@example.com", room: "223", check_in_date: "2022-01-05 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Pending", noGuest: "1" },
-    { id: 6, user: "Emily Davis", email: "emily@example.com", room: "201", check_in_date: "2022-01-06 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "5" },
-    { id: 7, user: "Sarah Taylor", email: "sarah@example.com", room: "304", check_in_date: "2022-01-07 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "3" },
-    { id: 8, user: "Kevin White", email: "kevin@example.com", room: "105", check_in_date: "2022-01-08 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 9, user: "Lisa Lee", email: "lisa@example.com", room: "208", check_in_date: "2022-01-09 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Pending", noGuest: "2" },
-    { id: 10, user: "Tom Harris", email: "tom@example.com", room: "111", check_in_date: "2022-01-10 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 11, user: "Rachel Martin", email: "rachel@example.com", room: "132", check_in_date: "2022-01-01 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "1" },
-    { id: 12, user: "Daniel Hall", email: "daniel@example.com", room: "106", check_in_date: "2022-01-12 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 13, user: "Olivia Walker", email: "olivia@example.com", room: "110", check_in_date: "2022-01-13 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "3" },
-    { id: 14, user: "Benjamin Clark", email: "benjamin@example.com", room: "203", check_in_date: "2022-01-14 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-  ]);
-
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 5;
+
+  // Filter guest list based on search input
+  const filteredGuests = guests.filter((guest) =>
+    guest.user.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredGuests.length / itemsPerPage);
+  const currentGuests = filteredGuests.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Initialize Lucide icons after component is mounted
   useEffect(() => {
     createIcons({ icons });
   }, []);
 
-  // Filter guest list based on search input
-  const filteredGuestList = guestList.filter((guest) =>
-    guest.user.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination logic
-  const totalItems = filteredGuestList.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const currentGuestList = filteredGuestList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Handle page changes
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
-
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100 font-montserrat">
-
       {/* Side navigation bar */}
       <NavigationSide isOpen={sidebarOpen} />
 
@@ -62,18 +74,16 @@ export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
         {/* Top navigation bar */}
         <NavigationTop onSidebarToggle={toggleSidebar} />
 
-        <main className="p-6">
-          <h1 className="text-xl font-bold mb-4">Guest List</h1>
+        <main className="p-6 space-y-6">
+          <h1 className="text-2xl font-bold">Guest List</h1>
 
           {/* Search and Control Area */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               {/* Settings Icon */}
-              <div className="relative mr-2">
-                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                  <Settings size={18} />
-                </button>
-              </div>
+              <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
+                <Settings size={18} />
+              </button>
               <span className="mx-2 border-l border-gray-400 h-6"></span>
               {/* Search Input */}
               <div className="relative">
@@ -90,74 +100,84 @@ export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
               </div>
             </div>
 
-            {/* Pagination and Filter Controls */}
-            <div className="flex items-center">
-              {/* Pagination Controls */}
-              <span className="mr-2">{currentPage} of {totalPages}</span>
-              < button
-                className="bg-gray-200 p-2 rounded-lg"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <button
-                className="bg-gray-200 p-2 rounded-lg"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight size={18} />
-              </button>
-
-              {/* Filter Icon */}
-              <div className="relative ml-2">
-                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                  <Filter size={18} />
-                </button>
-              </div>
-            </div>
+            {/* Filter Icon */}
+            <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
+              <Filter size={18} />
+            </button>
           </div>
 
           {/* Guest List Table */}
-          <div className="mt-4 rounded-lg border border-gray-300 shadow-lg overflow-hidden">
-            <GuestListTable listData={currentGuestList} />
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader className="bg-gray-200">
+                <TableRow>
+                  <TableHead>Guest Info</TableHead>
+                  <TableHead>Room</TableHead>
+                  <TableHead>Check-in</TableHead>
+                  <TableHead>Check-out</TableHead>
+                  <TableHead>Payment Status</TableHead>
+                  <TableHead>No. of Guests</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {currentGuests.map((guest) => (
+                  <TableRow key={guest.id}>
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 rounded-full bg-gray-200" />
+                        <div>
+                          <div className="font-medium">{guest.user}</div>
+                          <div className="text-sm text-gray-500">{guest.email}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{guest.room}</TableCell>
+                    <TableCell>{guest.check_in_date}</TableCell>
+                    <TableCell>{guest.check_out_date}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getColorStatus(
+                          guest.payment_status
+                        )}`}
+                      >
+                        {guest.payment_status}
+                      </span>
+                    </TableCell>
+                    <TableCell>{guest.noGuest}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
+
+          {/* Pagination */}
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                />
+              </PaginationItem>
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    isActive={currentPage === i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {totalPages > 5 && <PaginationEllipsis />}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </main>
       </div>
     </div>
   );
-};
-
-// GuestListTable Component
-const GuestListTable = ({ listData }) => {
-  return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-left">User  </th>
-            <th className="py-3 px-6 text-left">Email</th>
-            <th className="py-3 px-6 text-left">Room</th>
-            <th className="py-3 px-6 text-left">Check-in Date</th>
-            <th className="py-3 px-6 text-left">Check-out Date</th>
-            <th className="py-3 px-6 text-left">Payment Status</th>
-            <th className="py-3 px-6 text-left">No. of Guests</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-600 text-sm font-montserrat-extrabold">
-          {listData.map((guest) => (
-            <tr key={guest.id} className="border-b border-gray-300 hover:bg-gray-100">
-              <td className="py-3 px-6">{guest.user}</td>
-              <td className="py-3 px-6">{guest.email}</td>
-              <td className="py-3 px-6">{guest.room}</td>
-              <td className="py-3 px-6">{guest.check_in_date}</td>
-              <td className="py-3 px-6">{guest.check_out_date}</td>
-              <td className="py-3 px-6">{guest.payment_status}</td>
-              <td className="py-3 px-6">{guest.noGuest}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+}

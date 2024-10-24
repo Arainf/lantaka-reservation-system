@@ -22,19 +22,22 @@ const RoomCard = ({ name, price, image }) => (
 
 export default function OurRooms() {
   const roomData = [
-    { name: "ROOM NAME", price: "PHP 1600", image: LantakaBG },
-    { name: "ROOM NAME", price: "PHP 1600", image: LantakaBG },
-    { name: "ROOM NAME", price: "PHP 1600", image: LantakaBG }
+    { name: "Single Bedroom", price: "PHP 1600", image: LantakaBG },
+    { name: "Double Bedroom", price: "PHP 1600", image: LantakaBG },
+    { name: "Matrimonial Bedroom", price: "PHP 1600", image: LantakaBG },
+    { name: "Gazebo", price: "PHP 1600", image: LantakaBG },
+    { name: "Old Talisay Bar", price: "PHP 1600", image: LantakaBG }
+    
   ]
 
   return (
-    <section className="py-20 px-4 md:px-20 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-24 px-4 md:px-20 bg-white">
+      <div className="w-7xl mx-auto">
         <h2 className="text-5xl font-bold text-gray-900 mb-6">Our Rooms</h2>
         <p className="text-lg text-gray-600 mb-12 max-w-2xl">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex gap-8 overflow-x:auto">
           {roomData.map((room, index) => (
             <RoomCard key={index} {...room} />
           ))}
