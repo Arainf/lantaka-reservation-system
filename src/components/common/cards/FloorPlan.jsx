@@ -30,7 +30,7 @@ export default function FloorPlan() {
   }, [])
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto ">
       <div className="flex flex-row">
         <div className="mr-2">
       <Select onValueChange={setSelectedFloor} value={selectedFloor}>
@@ -43,7 +43,8 @@ export default function FloorPlan() {
         </SelectContent>
       </Select>
       </div>
-      <DatePicker/>
+      <div className="w-[280px]"><DatePicker/></div>
+      
       </div>
 
       
@@ -64,10 +65,10 @@ export default function FloorPlan() {
             </div>
             
             {/* Details Section */}
-            <div className="col-span-1 rounded-md p-4 bg-transparent">
-              <Card className="bg-[#e5e7eb] " style={{ boxShadow: "-1px 1px 11px 0px rgba(0, 0, 0, 0.75) inset"}}>
+            <div className="col-span-1 rounded-md bg-transparent">
+              <Card className="bg-[#e5e7eb] h-[450px] " style={{ boxShadow: "-1px 1px 11px 0px rgba(0, 0, 0, 0.75) inset"}}>
                 <CardHeader className="px-6 pt-6 pb-2">
-                  <h2 className="text-lg font-[Oswald] font-semibold m-0 p-0 ">Reservation Details</h2>
+                  <h2 className="text-2xl font-[Oswald] font-semibold m-0 p-0 ">Reservation Details</h2>
                 </CardHeader>
                 <CardContent>
                   <div className="">
