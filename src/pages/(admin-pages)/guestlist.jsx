@@ -1,95 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import { createIcons, icons } from 'lucide';
-import NavigationSide from '@/components/common/navigatin-side-top/NavigationSide';
-import NavigationTop from '@/components/common/navigatin-side-top/NavigationTop';
-import { ChevronLeft, ChevronRight, Settings, Filter, Search } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+'use client';
+
+import React, { useState, useEffect, useRef } from "react";
+import { createIcons, icons } from "lucide";
+import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
+import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
+import GuestTable from "@/components/common/cards/GuestTable";
+import { ChevronLeft, ChevronRight, Filter, Search, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const guests = [
-  { id: 1, user: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', payment_status: 'Paid', noGuest: '4' },
-  { id: 2, user: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', payment_status: 'Pending', noGuest: '3' },
-  { id: 3, user: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', payment_status: 'Cancelled', noGuest: '2' },
-  { id: 4, user: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', payment_status: 'Paid', noGuest: '1' },
-  { id: 5, user: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', payment_status: 'Pending', noGuest: '2' },
-  { id: 6, user: 'Tom Wilson', email: 'tom@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', payment_status: 'Pending', noGuest: '2' }
+  { id: 1, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
+  { id: 2, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
+  { id: 3, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
+  { id: 4, customer: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', status: 'Confirmed', noGuest: '1' },
+  { id: 5, customer: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' },
+  { id: 6, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
+  { id: 7, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
+  { id: 8, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
+  { id: 9, customer: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', status: 'Confirmed', noGuest: '1' },
+  { id: 10, customer: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' },
+  { id: 11, customer: 'Tom Wilson', email: 'tom@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' }
 ];
 
-const getColorStatus = (status) => {
-  switch (status.toLowerCase()) {
-    case 'cancelled':
-      return 'bg-red-100 text-red-800';
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'paid':
-      return 'bg-green-100 text-green-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => {} }) {
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [filters, setFilters] = useState({
+    room: [],
+    status: []
+  });
+  const [tempFilters, setTempFilters] = useState({
+    room: [],
+    status: []
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef(null);
 
-  // Filter guest list based on search input
-  const filteredGuests = guests.filter((guest) =>
-    guest.user.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredGuests.length / itemsPerPage);
-  const currentGuests = filteredGuests.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  // Initialize Lucide icons after component is mounted
   useEffect(() => {
     createIcons({ icons });
+
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setIsFilterOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
+  useEffect(() => {
+    setTempFilters(filters);
+  }, [filters]);
+
+  const filteredGuests = guests.filter((guest) => {
+    const matchesSearch = guest.customer.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      guest.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRoom = filters.room.length === 0 || filters.room.includes(guest.room);
+    const matchesStatus = filters.status.length === 0 || filters.status.includes(guest.status);
+    return matchesSearch && matchesRoom && matchesStatus;
+  });
+
+  const handleDelete = (id) => {
+    console.log(`Delete guest with id: ${id}`);
+  };
+
+  const handleEdit = (id) => {
+    console.log(`Edit guest with id: ${id}`);
+  };
+
+  const handleTempFilterChange = (filterType, value) => {
+    setTempFilters(prevFilters => {
+      const updatedFilter = prevFilters[filterType].includes(value)
+        ? prevFilters[filterType].filter(item => item !== value)
+        : [...prevFilters[filterType], value];
+      return { ...prevFilters, [filterType]: updatedFilter };
+    });
+  };
+
+  const applyFilters = () => {
+    setFilters(tempFilters);
+    setIsFilterOpen(false);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      room: [],
+      status: []
+    });
+    setTempFilters({
+      room: [],
+      status: []
+    });
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const rooms = [...new Set(guests.map(g => g.room))];
+  const statuses = [...new Set(guests.map(g => g.status))];
+
+  const activeFilters = [...filters.room, ...filters.status];
+
   return (
-    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100 font-montserrat">
-      {/* Side navigation bar */}
+    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       <NavigationSide isOpen={sidebarOpen} />
 
       <div className="flex-1 overflow-auto">
-        {/* Top navigation bar */}
         <NavigationTop onSidebarToggle={toggleSidebar} />
 
         <main className="p-6 space-y-6">
-          <h1 className="text-2xl font-bold">Guest List</h1>
-
-          {/* Search and Control Area */}
+          <h1 className="text-2xl font-bold">Guest List Management</h1>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              {/* Settings Icon */}
-              <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                <Settings size={18} />
-              </button>
-              <span className="mx-2 border-l border-gray-400 h-6"></span>
-              {/* Search Input */}
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
@@ -98,84 +127,84 @@ export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
                   <Search className="text-gray-900" size={18} />
                 </div>
               </div>
-            </div>
-
-            {/* Filter Icon */}
-            <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-              <Filter size={18} />
-            </button>
-          </div>
-
-          {/* Guest List Table */}
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader className="bg-gray-200">
-                <TableRow>
-                  <TableHead>Guest Info</TableHead>
-                  <TableHead>Room</TableHead>
-                  <TableHead>Check-in</TableHead>
-                  <TableHead>Check-out</TableHead>
-                  <TableHead>Payment Status</TableHead>
-                  <TableHead>No. of Guests</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentGuests.map((guest) => (
-                  <TableRow key={guest.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-full bg-gray-200" />
-                        <div>
-                          <div className="font-medium">{guest.user}</div>
-                          <div className="text-sm text-gray-500">{guest.email}</div>
-                        </div>
+              <div className="relative" ref={filterRef}>
+                <Button
+                  variant="outline"
+                  className="ml-2"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                >
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filter
+                </Button>
+                {isFilterOpen && (
+                  <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Room</div>
+                      {rooms.map((room) => (
+                        <label key={room} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                            checked={tempFilters.room.includes(room)}
+                            onChange={() => handleTempFilterChange('room', room)}
+                          />
+                          <span className="ml-2">{room}</span>
+                        </label>
+                      ))}
+                      <div className="border-t border-gray-100"></div>
+                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Status</div>
+                      {statuses.map((status) => (
+                        <label key={status} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                            checked={tempFilters.status.includes(status)}
+                            onChange={() => handleTempFilterChange('status', status)}
+                          />
+                          <span className="ml-2">{status}</span>
+                        </label>
+                      ))}
+                      <div className="border-t border-gray-100"></div>
+                      <div className="px-4 py-2">
+                        <Button onClick={applyFilters} className="w-full mb-2">
+                          Apply Filters
+                        </Button>
+                        <Button onClick={resetFilters} variant="outline" className="w-full">
+                          Reset Filters
+                        </Button>
                       </div>
-                    </TableCell>
-                    <TableCell>{guest.room}</TableCell>
-                    <TableCell>{guest.check_in_date}</TableCell>
-                    <TableCell>{guest.check_out_date}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getColorStatus(
-                          guest.payment_status
-                        )}`}
-                      >
-                        {guest.payment_status}
-                      </span>
-                    </TableCell>
-                    <TableCell>{guest.noGuest}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {(activeFilters.length > 0 || searchTerm) && (
+                <Button
+                  variant="ghost"
+                  className="ml-2"
+                  onClick={resetFilters}
+                  title="Reset all filters"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
-
-          {/* Pagination */}
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                />
-              </PaginationItem>
-              {[...Array(totalPages)].map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
-                    isActive={currentPage === i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
+          {activeFilters.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {activeFilters.map((filter) => (
+                <Badge key={filter} variant="secondary">
+                  {filter}
+                </Badge>
               ))}
-              {totalPages > 5 && <PaginationEllipsis />}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+            </div>
+          )}
+          <GuestTable
+            data={filteredGuests}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </main>
       </div>
     </div>
