@@ -3,6 +3,8 @@ import { Bar, BarChart, CartesianGrid, XAxis, Tooltip } from "recharts";
 import {
   ChartContainer,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
 } from "@/components/ui/chart";
 
 const chartConfig = {
@@ -20,6 +22,7 @@ export function Component({ chartData, barColor }) {
             <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value.slice(0, 3)} />
             <Tooltip content={<ChartTooltipContent hideLabel />} />
             <Bar dataKey="occupancy" fill={barColor} radius={2} />
+            <ChartLegend content={<ChartLegendContent />} />
           </BarChart>
       </ChartContainer>
   );

@@ -37,28 +37,33 @@ const JoshTest = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [buttonNum, setButtonNum] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
-  const [date, setDate] = React.useState("")
+  const [date, setDate] = useState("")
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dateTranslate, setDateTranslate] = useState("")
-  const xnewDate = formatDateToYYYYMMDD(selectedDate);
 
   useEffect(() => {
-    setDate(new Date())
-    setSelectedDate(new Date()) 
-    setDateTranslate(xnewDate) // Update the selected date state
-  }, [])
+    const initialDate = new Date();
+    setSelectedDate(initialDate); 
+    setDateTranslate(formatDateToYYYYMMDD(initialDate)); // Set initial translation state
+  }, []);
 
 
-  console.log(selectedDate)
+  console.log("Initial selected date:", selectedDate);
 
   const handleDateChange = (date) => {
-    setSelectedDate(date)  // Update the selected date state
-    const newDate = formatDateToYYYYMMDD(selectedDate);
-    setDateTranslate(newDate);  // Update the date translation state
-    console.log("Selected date in parent:", date)  // Log the selected date
-  }
+    // Update the selected date state
+    setSelectedDate(date); // Correctly set the selected date
 
-  console.log(dateTranslate)
+    // Format the new date and update the translation state
+    const newDate = formatDateToYYYYMMDD(date); // Format the passed date
+    setDateTranslate(newDate); // Update the date translation state
+
+    // Log the selected date and the translated date for debugging
+    console.log("Selected date in parent:", date); // Log the selected date
+    console.log("Translated date:", newDate); // Log the new formatted date
+  };
+
+  console.log("Final translated date:", dateTranslate);
 
   useEffect(() => {
     const handleResize = () => setIsLargeScreen(window.innerWidth >= 1920);
@@ -102,7 +107,7 @@ const JoshTest = () => {
   return (
     <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]" id="reservation">
       <NavigationTop />
-      <main className="flex-1 p- sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4" >
+      <main className="flex-1 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-6" >
         {/* Main content area (1) */}
         <div
           className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${isGrabbing ? "cursor-grabbing" : "cursor-grab"
@@ -111,7 +116,7 @@ const JoshTest = () => {
           onMouseUp={handleMouseUp}
           onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
         >
-          <div className="flex flex-row mt-1 ml-5 mb-0 p-1.5">
+          <div className="flex flex-row mb-0 p-1.5 bg-white">
             <div className="mr-2">
               <Select onValueChange={setSelectedFloor} value={selectedFloor}>
                 <SelectTrigger
