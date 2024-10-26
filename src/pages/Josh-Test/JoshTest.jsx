@@ -210,18 +210,23 @@ const JoshTest = () => {
         
       
         </div>
-        <div className={`bg-[white] w-full md:w-1/3 h-full ${buttonClicked ? "flex" : "hidden"} `}>
-          <button
-            className={`absolute rounded-l-lg bg-white `}
-            variant="default"
-            size="icon"
-            onClick={toggleFormSidebar}
-          >
-            <X className="h-[26px] w-10" strokeWidth={3} />
-          </button>
-          <FormSidebar presetNumber={buttonNum} />
-        
-        </div> 
+
+        <div className={`bg-transparent w-full md:w-1/3 h-full ${buttonClicked ? "flex" : "hidden"}`}>
+  <button
+    className="absolute rounded-l-lg bg-transparent flex items-center"
+    style={{
+      top: '20x',  
+      left: '1096px',
+      
+      padding: '11px',
+      cursor: 'pointer' 
+    }}
+    onClick={toggleFormSidebar}
+  >
+    <X className="h-[30px] w-8" strokeWidth={5} />
+  </button>
+  <FormSidebar presetNumber={buttonNum} />
+</div>
         <div className={`w-full md:w-1/3 flex-col h-auto space-y-4 ${buttonClicked ? "hidden" : "flex"}`}>
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
@@ -231,7 +236,7 @@ const JoshTest = () => {
             <h6 className="absolute z-10 text-gray-600 bg-[#f8f6f2] mx-6 px-5 font-bold">QUICK ACTIONS</h6>
             <hr className="w-full border-black z-0" />
           </div>
-
+                {/*Guest_Clients  */}
           <Button onClick={toggleFormSidebar}>
             <p>Campus Ministry Office &#40;CMO&#41; Retreat</p>
           </Button>
