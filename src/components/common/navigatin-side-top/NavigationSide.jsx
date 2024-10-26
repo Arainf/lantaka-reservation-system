@@ -24,7 +24,6 @@ const navLinks = [
     display: "Reservations", // Text displayed for Reservations
     icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
     url: "/reservations", // No URL since it's a dropdown
-    dropdown: true // Indicate this item is a dropdown
     
   },
   {
@@ -34,7 +33,7 @@ const navLinks = [
   },
   {
     icon: <ListCheck style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Event_Logs", // Text displayed for Accounts
+    display: "Activity", // Text displayed for Accounts
     url: "/eventlogs" // URL for Accounts
   },
 
@@ -134,7 +133,7 @@ const NavigationSide = ({ isOpen }) => {
               {item.dropdown && dropdownOpen && isOpen && (
                 <div className="dropdownMenu">
                   <NavLink to="/reservations" className="dropdownItem">Room List</NavLink>
-                  <NavLink to="/guest-details" className="dropdownItem">Venue Details</NavLink>
+                 
               </div>
             )}
            

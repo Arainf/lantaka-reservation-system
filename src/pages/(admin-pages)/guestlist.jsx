@@ -1,85 +1,124 @@
-import React, { useState, useEffect } from "react";
+'use client';
+
+import React, { useState, useEffect, useRef } from "react";
 import { createIcons, icons } from "lucide";
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
-import { ChevronLeft, ChevronRight, Settings, Filter, Search } from "lucide-react";
+import GuestTable from "@/components/common/cards/GuestTable";
+import { ChevronLeft, ChevronRight, Filter, Search, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
-  // Dummy event logs data
-  const [guestList, setGuestList] = useState([
-    { id: 1, user: "John Doe", email: "john@example.com", room: "102", check_in_date: "2022-01-01 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "4" },
-    { id: 2, user: "Jane Doe", email: "jane@example.com", room: "202", check_in_date: "2022-01-02 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 3, user: "Bob Smith", email: "bob@example.com", room: "301", check_in_date: "2022-01-03 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 4, user: "Alice Johnson", email: "alice@example.com", room: "212", check_in_date: "2022-01-04 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 5, user: "Mike Brown", email: "mike@example.com", room: "223", check_in_date: "2022-01-05 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Pending", noGuest: "1" },
-    { id: 6, user: "Emily Davis", email: "emily@example.com", room: "201", check_in_date: "2022-01-06 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "5" },
-    { id: 7, user: "Sarah Taylor", email: "sarah@example.com", room: "304", check_in_date: "2022-01-07 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "3" },
-    { id: 8, user: "Kevin White", email: "kevin@example.com", room: "105", check_in_date: "2022-01-08 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 9, user: "Lisa Lee", email: "lisa@example.com", room: "208", check_in_date: "2022-01-09 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Pending", noGuest: "2" },
-    { id: 10, user: "Tom Harris", email: "tom@example.com", room: "111", check_in_date: "2022-01-10 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 11, user: "Rachel Martin", email: "rachel@example.com", room: "132", check_in_date: "2022-01-01 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "1" },
-    { id: 12, user: "Daniel Hall", email: "daniel@example.com", room: "106", check_in_date: "2022-01-12 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-    { id: 13, user: "Olivia Walker", email: "olivia@example.com", room: "110", check_in_date: "2022-01-13 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "3" },
-    { id: 14, user: "Benjamin Clark", email: "benjamin@example.com", room: "203", check_in_date: "2022-01-14 12:00:00", check_out_date: "2022-01-01 12:00:00", payment_status: "Paid", noGuest: "2" },
-  ]);
+const guests = [
+  { id: 1, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
+  { id: 2, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
+  { id: 3, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
+  { id: 4, customer: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', status: 'Confirmed', noGuest: '1' },
+  { id: 5, customer: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' },
+  { id: 6, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
+  { id: 7, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
+  { id: 8, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
+  { id: 9, customer: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', status: 'Confirmed', noGuest: '1' },
+  { id: 10, customer: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' },
+  { id: 11, customer: 'Tom Wilson', email: 'tom@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' }
+];
 
+export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => {} }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const [filters, setFilters] = useState({
+    room: [],
+    status: []
+  });
+  const [tempFilters, setTempFilters] = useState({
+    room: [],
+    status: []
+  });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef(null);
 
-  // Initialize Lucide icons after component is mounted
   useEffect(() => {
     createIcons({ icons });
+
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setIsFilterOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
-  // Filter guest list based on search input
-  const filteredGuestList = guestList.filter((guest) =>
-    guest.user.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    setTempFilters(filters);
+  }, [filters]);
 
-  // Pagination logic
-  const totalItems = filteredGuestList.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const currentGuestList = filteredGuestList.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const filteredGuests = guests.filter((guest) => {
+    const matchesSearch = guest.customer.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      guest.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRoom = filters.room.length === 0 || filters.room.includes(guest.room);
+    const matchesStatus = filters.status.length === 0 || filters.status.includes(guest.status);
+    return matchesSearch && matchesRoom && matchesStatus;
+  });
 
-  // Handle page changes
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
+  const handleDelete = (id) => {
+    console.log(`Delete guest with id: ${id}`);
   };
 
-  return (
-    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100 font-montserrat">
+  const handleEdit = (id) => {
+    console.log(`Edit guest with id: ${id}`);
+  };
 
-      {/* Side navigation bar */}
+  const handleTempFilterChange = (filterType, value) => {
+    setTempFilters(prevFilters => {
+      const updatedFilter = prevFilters[filterType].includes(value)
+        ? prevFilters[filterType].filter(item => item !== value)
+        : [...prevFilters[filterType], value];
+      return { ...prevFilters, [filterType]: updatedFilter };
+    });
+  };
+
+  const applyFilters = () => {
+    setFilters(tempFilters);
+    setIsFilterOpen(false);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      room: [],
+      status: []
+    });
+    setTempFilters({
+      room: [],
+      status: []
+    });
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const rooms = [...new Set(guests.map(g => g.room))];
+  const statuses = [...new Set(guests.map(g => g.status))];
+
+  const activeFilters = [...filters.room, ...filters.status];
+
+  return (
+    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       <NavigationSide isOpen={sidebarOpen} />
 
       <div className="flex-1 overflow-auto">
-        {/* Top navigation bar */}
         <NavigationTop onSidebarToggle={toggleSidebar} />
 
-        <main className="p-6">
-          <h1 className="text-xl font-bold mb-4">Guest List</h1>
-
-          {/* Search and Control Area */}
+        <main className="p-6 space-y-6">
+          <h1 className="text-2xl font-bold">Guest List Management</h1>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              {/* Settings Icon */}
-              <div className="relative mr-2">
-                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                  <Settings size={18} />
-                </button>
-              </div>
-              <span className="mx-2 border-l border-gray-400 h-6"></span>
-              {/* Search Input */}
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
@@ -88,76 +127,86 @@ export default function AdminGuestList({ sidebarOpen, toggleSidebar }) {
                   <Search className="text-gray-900" size={18} />
                 </div>
               </div>
-            </div>
-
-            {/* Pagination and Filter Controls */}
-            <div className="flex items-center">
-              {/* Pagination Controls */}
-              <span className="mr-2">{currentPage} of {totalPages}</span>
-              < button
-                className="bg-gray-200 p-2 rounded-lg"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <button
-                className="bg-gray-200 p-2 rounded-lg"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight size={18} />
-              </button>
-
-              {/* Filter Icon */}
-              <div className="relative ml-2">
-                <button className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 flex items-center">
-                  <Filter size={18} />
-                </button>
+              <div className="relative" ref={filterRef}>
+                <Button
+                  variant="outline"
+                  className="ml-2"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                >
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filter
+                </Button>
+                {isFilterOpen && (
+                  <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Room</div>
+                      {rooms.map((room) => (
+                        <label key={room} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                            checked={tempFilters.room.includes(room)}
+                            onChange={() => handleTempFilterChange('room', room)}
+                          />
+                          <span className="ml-2">{room}</span>
+                        </label>
+                      ))}
+                      <div className="border-t border-gray-100"></div>
+                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Status</div>
+                      {statuses.map((status) => (
+                        <label key={status} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                            checked={tempFilters.status.includes(status)}
+                            onChange={() => handleTempFilterChange('status', status)}
+                          />
+                          <span className="ml-2">{status}</span>
+                        </label>
+                      ))}
+                      <div className="border-t border-gray-100"></div>
+                      <div className="px-4 py-2">
+                        <Button onClick={applyFilters} className="w-full mb-2">
+                          Apply Filters
+                        </Button>
+                        <Button onClick={resetFilters} variant="outline" className="w-full">
+                          Reset Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
+              {(activeFilters.length > 0 || searchTerm) && (
+                <Button
+                  variant="ghost"
+                  className="ml-2"
+                  onClick={resetFilters}
+                  title="Reset all filters"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
-
-          {/* Guest List Table */}
-          <div className="mt-4 rounded-lg border border-gray-300 shadow-lg overflow-hidden">
-            <GuestListTable listData={currentGuestList} />
-          </div>
+          {activeFilters.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {activeFilters.map((filter) => (
+                <Badge key={filter} variant="secondary">
+                  {filter}
+                </Badge>
+              ))}
+            </div>
+          )}
+          <GuestTable
+            data={filteredGuests}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </main>
       </div>
     </div>
   );
-};
-
-// GuestListTable Component
-const GuestListTable = ({ listData }) => {
-  return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-left">User  </th>
-            <th className="py-3 px-6 text-left">Email</th>
-            <th className="py-3 px-6 text-left">Room</th>
-            <th className="py-3 px-6 text-left">Check-in Date</th>
-            <th className="py-3 px-6 text-left">Check-out Date</th>
-            <th className="py-3 px-6 text-left">Payment Status</th>
-            <th className="py-3 px-6 text-left">No. of Guests</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-600 text-sm font-montserrat-extrabold">
-          {listData.map((guest) => (
-            <tr key={guest.id} className="border-b border-gray-300 hover:bg-gray-100">
-              <td className="py-3 px-6">{guest.user}</td>
-              <td className="py-3 px-6">{guest.email}</td>
-              <td className="py-3 px-6">{guest.room}</td>
-              <td className="py-3 px-6">{guest.check_in_date}</td>
-              <td className="py-3 px-6">{guest.check_out_date}</td>
-              <td className="py-3 px-6">{guest.payment_status}</td>
-              <td className="py-3 px-6">{guest.noGuest}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+}

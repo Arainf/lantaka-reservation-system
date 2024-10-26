@@ -25,6 +25,7 @@ import Clock from "@/components/common/time/clock";
 import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm";
 import { X, ChevronRight } from "lucide-react";
+import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
 
 const JoshTest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -35,6 +36,29 @@ const JoshTest = () => {
   const [isFormSidebarOpen, setIsFormSidebarOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [buttonNum, setButtonNum] = useState(null);
+  const [buttonClicked, setButtonClicked] = useState(false);
+  const [date, setDate] = React.useState("")
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dateTranslate, setDateTranslate] = useState("")
+  const xnewDate = formatDateToYYYYMMDD(selectedDate);
+
+  useEffect(() => {
+    setDate(new Date())
+    setSelectedDate(new Date()) 
+    setDateTranslate(xnewDate) // Update the selected date state
+  }, [])
+
+
+  console.log(selectedDate)
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date)  // Update the selected date state
+    const newDate = formatDateToYYYYMMDD(selectedDate);
+    setDateTranslate(newDate);  // Update the date translation state
+    console.log("Selected date in parent:", date)  // Log the selected date
+  }
+
+  console.log(dateTranslate)
 
   useEffect(() => {
     const handleResize = () => setIsLargeScreen(window.innerWidth >= 1920);
@@ -58,7 +82,8 @@ const JoshTest = () => {
   };
 
   const toggleFormSidebar = () => {
-    setIsFormSidebarOpen(!isFormSidebarOpen);
+    // setIsFormSidebarOpen(!isFormSidebarOpen);
+    setButtonClicked(!buttonClicked); // Set buttonClicked to true
   };
 
   const closeSidebar = () => {
@@ -75,9 +100,9 @@ const JoshTest = () => {
   };
 
   return (
-    <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]">
+    <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]" id="reservation">
       <NavigationTop />
-      <main className="flex-1 p- sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+      <main className="flex-1 p- sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-4" >
         {/* Main content area (1) */}
         <div
           className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${isGrabbing ? "cursor-grabbing" : "cursor-grab"
@@ -101,7 +126,7 @@ const JoshTest = () => {
                 </SelectContent>
               </Select>
             </div>
-            <DatePicker />
+            <DatePicker date={selectedDate} onDateChange={handleDateChange} />
             {/* Box for room/event availability */}
             <div
               className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0"
@@ -168,14 +193,36 @@ const JoshTest = () => {
             </Button>
           </div>
           {selectedFloor === "floor1" && (
-            <FirstFloor resetTrigger={resetTrigger} onRoomClick={toggleSidebar} />
+            <FirstFloor resetTrigger={resetTrigger} onRoomClick={toggleSidebar} date={dateTranslate} />
           )}
           {selectedFloor === "floor2" && (
             <SecondFloorr resetTrigger={resetTrigger} onRoomClick={toggleSidebar} />
           )}
         </div>
 
-        <div className="w-full md:w-1/3 flex flex-col h-auto space-y-4">
+        <div
+        className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+      >
+        
+        
+        
+        
+      
+        </div>
+        <div className={`bg-[white] w-full md:w-1/3 h-full ${buttonClicked ? "flex" : "hidden"} `}>
+          <button
+            className={`absolute rounded-l-lg bg-white `}
+            variant="default"
+            size="icon"
+            onClick={toggleFormSidebar}
+          >
+            <X className="h-[26px] w-10" strokeWidth={3} />
+          </button>
+          <FormSidebar presetNumber={buttonNum} />
+        
+        </div> 
+        <div className={`w-full md:w-1/3 flex-col h-auto space-y-4 ${buttonClicked ? "hidden" : "flex"}`}>
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
@@ -225,17 +272,7 @@ const JoshTest = () => {
       {/* Form Sidebar */}
 
 
-      <div
-        className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-      >
-        
-        <button className={`absolute rounded-l-lg ${isFormSidebarOpen ? "left-[-9%] , top-[5px]" : "left-0"}`} variant="default" size="icon" onClick={toggleFormSidebar}>
-        <ChevronRight className="h-[26px] w-4" strokeWidth={3} />
-        </button>
-        
-        <FormSidebar onClose={toggleFormSidebar} presetNumber={buttonNum} />
-      </div>
+      
 
       <div className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{ padding: "0" }} />

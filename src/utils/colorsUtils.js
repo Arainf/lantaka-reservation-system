@@ -19,3 +19,19 @@ export const calculateShade = (baseColor, amount) => {
   
     return (usePound ? "#" : "") + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
   };
+
+  export function formatDateToYYYYMMDD(date) {
+    console.log("Date type:", typeof date); // Check the type
+    console.log("Date value:", date); // Check the value
+  
+    if (!(date instanceof Date)) {
+      console.error("Provided value is not a Date object.");
+      return null; // or handle the error accordingly
+    }
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
+  }
