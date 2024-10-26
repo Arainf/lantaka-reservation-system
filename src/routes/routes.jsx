@@ -19,6 +19,7 @@ import AdminGuestList from "@/pages/(admin-pages)/guestlist";
 import AdminAccounts from "@/pages/(admin-pages)/accounts";
 // employee pages import routes
 import EmployeeDashboard from "@/pages/(employee-pages)/dashboard";
+import Reservation from "@/pages/(employee-pages)/Reservation";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
 
 
@@ -123,10 +124,20 @@ const AppRoutes = () => {
 
       {/* Admin Dashboard: Protected, but bypassable in Dev Mode */}
       <Route
-        path="/home"
+        path="/Home"
         element={
           <ProtectedRoute
             element={<EmployeeDashboard toggleSidebar={toggleSidebar} />}
+            allowedRoles={["Employee"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+      <Route
+        path="/Reservation"
+        element={
+          <ProtectedRoute
+            element={<Reservation toggleSidebar={toggleSidebar} />}
             allowedRoles={["Employee"]}
             isDevMode={isDevMode}
           />
