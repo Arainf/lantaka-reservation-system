@@ -38,11 +38,7 @@ const NavigationTop = memo(() => {
         <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-[50]">
             {/* Left Section (Logo and Title) */}
             <div className="flex items-center space-x-2 w-1/4">
-                <img
-                    src={logo}
-                    alt="Logo"
-                    className="logoStyle2"
-                />
+                <img src={logo} alt="Logo" className="logoStyle2" />
                 <h1 className="text-xl"> &lt; Lantaka Reservation System / &gt;</h1>
             </div>
 
@@ -51,13 +47,13 @@ const NavigationTop = memo(() => {
                 <nav className="flex space-x-4">
                     {[
                         ['Home', '/home'],
-                        ['Reservations', '#reservation'],
+                        ['Reservation', '/Reservation'],
                         ['Calendar', '#calendar'],
                         ['Account', '/account'],
                     ].map(([title, url]) => (
                         <a
                             href={url}
-                            className="rounded-lg px-3 py-2 text-slate-100 font-medium hover:bg-[#FCB813] hover:text-slate-900"
+                            className="clientnavtop relative text-slate-100 font-medium"
                             onClick={(event) => {
                                 if (title === 'Add Reservation') {
                                     event.preventDefault();
@@ -67,6 +63,7 @@ const NavigationTop = memo(() => {
                             key={title}
                         >
                             {title}
+                            <span className="linkTextStyle"></span>
                         </a>
                     ))}
                 </nav>

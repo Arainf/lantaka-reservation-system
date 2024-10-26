@@ -36,7 +36,7 @@ export function Component() {
     }
 
     return (
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex space-x-2">
           <Button onClick={goToToday} variant="outline">Today</Button>
           <Button onClick={goBack} variant="outline">Back</Button>
@@ -63,7 +63,7 @@ export function Component() {
   }
 
   return (
-    <div className="h-screen w-screen p-4">
+    <div className="h-[700px] w-100 p-4">
       <Calendar
         localizer={localizer}
         events={[]}

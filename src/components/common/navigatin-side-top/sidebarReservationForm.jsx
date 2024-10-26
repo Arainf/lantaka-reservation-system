@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar, Users, Phone, Mail } from 'lucide-react'
-import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker"
+import { DatePicker as DatePicker } from "@/components/common/utilities/DateRange"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 
@@ -39,41 +39,50 @@ export default function ReservationForm() {
     // Handle form submission
   }
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 4))
+  const nextStep = () => setStep(prev => Math.min(prev + 1, 3))
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1))
 
   return (
-    <div className="max-w-4xl mx-auto p-16">
-      <div className="p-6">
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="p-2">
         <h1 className="text-3xl font-bold text-center mb-2">Lantaka Reservation Form</h1>
         <p className="text-center mb-6 text-gray-600">Please complete the form below.</p>
-        <p className="text-center mb-8 text-gray-600">Your registration will be verified prior to your arrival.</p>
 
         <Progress value={step * 25} className="mb-6 bg-gray-200" />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            
             {step === 1 && (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="arrivalDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Arrival Date</FormLabel>
+              <> <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Reservation Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <DatePicker {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                        <SelectContent>
+                          <SelectItem value="Room">Room</SelectItem>
+                          <SelectItem value="Event">Event</SelectItem>
+                          <SelectItem value="Both">Both</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  
                   <FormField
                     control={form.control}
                     name="departureDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Departure Date</FormLabel>
+                        <FormLabel>Reservation Date</FormLabel>
                         <FormControl>
                           <DatePicker {...field} />
                         </FormControl>
@@ -97,29 +106,21 @@ export default function ReservationForm() {
                       </FormItem>
                     )}
                   />
-                  
-                </div>
-                <FormField
+                  <FormField
                   control={form.control}
-                  name="gender"
+                  name="designation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Gender</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select gender" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
-                          <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Designation</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Designation or position" {...field} />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
+                  
+                </div>
+                
               </>
             )}
 
@@ -151,6 +152,27 @@ export default function ReservationForm() {
                     )}
                   />
                 </div>
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="email"
@@ -198,18 +220,9 @@ export default function ReservationForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="proofOfPayment"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Proof of Payment</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Attach proof of payment" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+               
+      
+
                 <FormField
                   control={form.control}
                   name="proofOfIdentity"
@@ -222,23 +235,7 @@ export default function ReservationForm() {
                     </FormItem>
                   )}
                 />
-              </>
-            )}
 
-            {step === 4 && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="designation"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Designation</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Designation or position" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="address"
@@ -251,22 +248,12 @@ export default function ReservationForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="client"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Client</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Client details" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
               </>
             )}
 
-            <div className="flex justify-between">
+           
+
+            <div className="  flex justify-between">
               <Button type="button" disabled={step === 1} onClick={prevStep}>
                 Previous
               </Button>
@@ -278,6 +265,8 @@ export default function ReservationForm() {
                 <Button type="submit">Submit</Button>
               )}
             </div>
+            
+
           </form>
         </Form>
       </div>
