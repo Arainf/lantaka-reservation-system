@@ -18,7 +18,7 @@ import AdminReservation from "@/pages/(admin-pages)/reservation";
 import AdminGuestList from "@/pages/(admin-pages)/guestlist";
 import AdminAccounts from "@/pages/(admin-pages)/accounts";
 // employee pages import routes
-import EmployeeDashboard from "@/pages/(employee-pages)/dashboard";
+import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
 
@@ -127,7 +127,7 @@ const AppRoutes = () => {
         path="/Home"
         element={
           <ProtectedRoute
-            element={<EmployeeDashboard toggleSidebar={toggleSidebar} />}
+            element={<Home toggleSidebar={toggleSidebar} />}
             allowedRoles={["Employee"]}
             isDevMode={isDevMode}
           />

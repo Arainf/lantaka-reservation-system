@@ -6,7 +6,7 @@ import { UserContext } from "@/context/contexts";
 import logo from '@/assets/images/logo1.png';
 import Modal from '@/components/ui/modal';
 
-const NavigationTop = memo(() => {
+const NavigationTop = memo(({ handleBackToHome }) => {
     const { userData, userRole, userImg } = useContext(UserContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reservationData, setReservationData] = useState({
@@ -36,31 +36,30 @@ const NavigationTop = memo(() => {
 
     return (
         <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-[50]">
-            {/* Left Section (Logo and Title) */}
             <div className="flex items-center space-x-2 w-1/4">
                 <img src={logo} alt="Logo" className="logoStyle2" />
                 <h1 className="text-xl"> &lt; Lantaka Reservation System / &gt;</h1>
             </div>
 
-            {/* Center Section (Navigation Links) */}
             <div className="flex justify-center w-1/2">
                 <nav className="flex space-x-4">
                     {[
-                        ['Home', '/home'],
-                        ['Reservation', '/Reservation'],
-                        ['Calendar', '#calendar'],
-                        ['Account', '/account'],
-                    ].map(([title, url]) => (
+                        ['Home', 'home'],
+                        ['Reservation', 'reservation'],
+                        ['Calendar', 'calendar'],
+                        ['Account', 'account'],
+                    ].map(([title, targetId]) => (
                         <a
-                            href={url}
+                            href={`#${targetId}`}
                             className="clientnavtop relative text-slate-100 font-medium"
-                            onClick={(event) => {
-                                if (title === 'Add Reservation') {
-                                    event.preventDefault();
-                                    handleModalToggle();
-                                }
-                            }}
                             key={title}
+                            onClick={(event) => {
+                                event.preventDefault(); // Prevent default navigation
+                                if (title === 'Home') handleBackToHome(); // Close Reservation section if "Home" is clicked
+                                document.getElementById(targetId)?.scrollIntoView({
+                                    behavior: 'smooth',
+                                });
+                            }}
                         >
                             {title}
                             <span className="linkTextStyle"></span>
@@ -69,7 +68,6 @@ const NavigationTop = memo(() => {
                 </nav>
             </div>
 
-            {/* Right Section (Bell, Avatar, and User Info) */}
             <div className="flex items-center space-x-2 justify-end w-1/4">
                 <div className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all cursor-pointer">
                     <Bell size={24} />
@@ -89,7 +87,6 @@ const NavigationTop = memo(() => {
                 )}
             </div>
 
-            {/* Modal for Reservations */}
             {isModalOpen && (
                 <Modal
                     isOpen={isModalOpen}
