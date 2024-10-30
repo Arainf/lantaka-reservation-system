@@ -1,39 +1,66 @@
 import { useEffect, useRef, useState, memo, useCallback } from "react";
+import { Skeleton } from "@/components/ui/skeleton"
 import debounce from "lodash.debounce";
+import { FaCheckCircle } from "react-icons/fa";
+import { FaCircleExclamation } from "react-icons/fa6";
 import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
 import { Users } from "lucide-react";
 import "./style.css";
 
-const HoverContent = memo(({ room, id }) => {
-  const { room_name, guest_name, check_in, check_out, image_url } = room || {};
+const HoverContent = memo(({ room, id, isLoading }) => {
+  const { name, guest_name, check_in, check_out, image_url, employee } = room;
 
-  if (!room) return null;
+  if (!room && !isLoading) return null;
 
   console.log("HoverContent rendered" + id);
 
+  if (isLoading) {
+    return (
+      <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[400px] border-2 border-[#1D2E5C]">
+        <div className="flex flex-row">
+          <div className="w-[60%] relative">
+            <Skeleton className="h-[150px] w-full rounded-md bg-[#1D2E5C]" />
+            <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
+          </div>
+          <div className="w-[40%] flex flex-col pl-1 space-y-2">
+            <Skeleton className="h-6 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[400px] border-solid border-blue-500">
-      <div className="flex flex-row pt-4">
-        <div className="w-[60%]">
+    <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[420px] border-2 border-[#1D2E5C]">
+      <div className="flex flex-row ">
+        <div className="w-[60%] relative object-cover rounded-lg h-[90%]">
           <img
             src={image_url}
             alt="Room Type"
-            className="h-[90%] w-full object-cover rounded-lg"
+            className="h-[150px] m-0 p-0 w-full border-2 border-[#1D2E5C] object-cover rounded-md"
           />
+          <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
         </div>
-        <div className="w-[50%] flex flex-col justify-center p-2">
-          <h4 className="font-bold text-lg mb-2">{room_name}</h4>
-          <div className="flex text-sm mb-1">
-            <Users className="mr-2 h-4 w-4" />
-            <p><strong>{guest_name}</strong></p>
+        <div className="w-[40%] flex flex-col pl-1">
+          <div className="flex flex-1 flex-col text-[14px]">
+            <p className="m-0 p-0 text-lg"><strong>{guest_name}</strong></p> 
+            <p className="text-[8px] p-0 m-0"> &#40;GUEST&#41;</p>
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            {/* <FaCheckCircle className="w-4 h-4 mr-2 text-green-500" /> */}
+            <span>Employee: {employee}</span>
+          </div>
+          <div className="flex flex-1 items-center flex-row text-sm mb-1">
             <span>Check-in: {check_in}</span>
+            <FaCheckCircle className="w-3 h-3 ml-2 items-start text-green-500" />
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            
             <span>Check-out: {check_out}</span>
+            <FaCircleExclamation className="w-3 h-3 ml-2 items-start text-red-500" />
           </div>
         </div>
       </div>
@@ -41,42 +68,68 @@ const HoverContent = memo(({ room, id }) => {
   );
 });
 
-const HoverContentVenue = memo(({ venue, id }) => {
-  const { venue_name, guest_name, check_in, check_out, image_url } = venue || {};
+const HoverContentVenue = memo(({ venue, id, isLoading }) => {
+  const { name, guest_name, check_in, check_out, image_url, employee } = venue || {};
 
-  if (!venue) return null;
+  if (!venue && !isLoading) return null;
 
   console.log("HoverContent rendered" + id);
 
+  if (isLoading) {
+    return (
+      <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[420px] border-2 border-[#1D2E5C]">
+        <div className="flex flex-row">
+          <div className="w-[60%] relative">
+            <Skeleton className="h-[150px] w-full rounded-md bg-[#1D2E5C]" />
+            <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
+          </div>
+          <div className="w-[40%] flex flex-col pl-1 space-y-2">
+            <Skeleton className="h-6 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[400px]">
-      <div className="flex flex-row pt-4">
-        <div className="w-[60%]">
+    <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[400px] border-2 border-[#1D2E5C]">
+      <div className="flex flex-row ">
+        <div className="w-[60%] relative object-cover rounded-lg h-[90%]">
           <img
             src={image_url}
             alt="Room Type"
-            className="h-[90%] w-full object-cover rounded-lg"
+            className="h-[150px] m-0 p-0 w-full border-2 border-[#1D2E5C] object-cover rounded-md"
           />
+          <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
         </div>
-        <div className="w-[50%] flex flex-col justify-center p-2">
-          <h4 className="font-bold text-lg mb-2">{venue_name}</h4>
-          <div className="flex items-center text-sm mb-1">
-            <Users className="mr-2 h-4 w-4" />
-            <p><strong>{guest_name}</strong></p>
+        <div className="w-[40%] flex flex-col pl-1">
+          <div className="flex flex-1 flex-col text-[14px]">
+            <p className="m-0 p-0"><strong>{guest_name}</strong></p> 
+            <p className="text-[8px] p-0 m-0"> &#40;GUEST&#41;</p>
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            {/* <FaCheckCircle className="w-4 h-4 mr-2 text-green-500" /> */}
+            <span>Employee: {employee}</span>
+          </div>
+          <div className="flex flex-1 items-center flex-row text-sm mb-1">
             <span>Check-in: {check_in}</span>
+            <FaCheckCircle className="w-3 h-3 ml-2 items-start text-green-500" />
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            
             <span>Check-out: {check_out}</span>
+            <FaCircleExclamation className="w-3 h-3 ml-2 items-start text-red-500" />
           </div>
         </div>
       </div>
     </div>
   );
 });
+
+
 
 // // Your existing fetch function
 // const fetchAvailableVenueData = async (date) => {
@@ -103,6 +156,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
   const MAX_ZOOM = 1400;
 
   const [viewBox, setViewBox] = useState(initialViewBox);
+  const [isLoadingRoom, setIsLoadingRoom] = useState('false');
   const [zoom, setZoom] = useState(1);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -258,9 +312,11 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
     const cache = type === 'rooms' ? roomDataCache : venueDataCache;
     const setCache = type === 'rooms' ? setRoomDataCache : setVenueDataCache;
     const setCurrent = type === 'rooms' ? setCurrentRoom : setCurrentVenue;
+    setIsLoadingRoom(true);
   
     if (cache[id]) {
       setCurrent(cache[id]);
+      setTimeout(() => setIsLoadingRoom(false), 1000);
       return;
     }
   
@@ -272,7 +328,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
   
     setCache((prevCache) => ({ ...prevCache, [id]: data }));
     setCurrent(data);
-  };
+    
+    setTimeout(() => setIsLoadingRoom(false), 1000);
+};
+
   
 
 
@@ -762,7 +821,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             zIndex: '500',
           }}
         >
-          <HoverContent room={currentRoom} id={hoveredRoom} />
+          <HoverContent room={currentRoom} id={hoveredRoom} isLoading={isLoadingRoom} />
         </div>
       )}
 
@@ -776,7 +835,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             zIndex: '500',
           }}
         >
-          <HoverContentVenue venue={currentVenue} id={hoveredVenue} />
+          <HoverContentVenue venue={currentVenue} id={hoveredVenue} isLoading={isLoadingRoom} />
         </div>
       )}
 

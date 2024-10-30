@@ -1,21 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar, Users, Phone, Mail } from 'lucide-react'
+import { Phone, Mail } from 'lucide-react'
 import { DatePicker as DatePicker } from "@/components/common/utilities/DateRange"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 
 export default function ReservationForm() {
   const [step, setStep] = useState(1)
+  const [available, setAvailable] = useState('')
+
   const form = useForm({
     defaultValues: {
-      arrivalDate: "",
-      departureDate: "",
+      reservationType: "",
+      dateRange: "",
       adults: "",
       kids: "",
       gender: "",
@@ -39,13 +41,33 @@ export default function ReservationForm() {
     // Handle form submission
   }
 
+  const callAvailable = () => {
+  useEffect(() => {
+    fetchAvailable()
+    }, [])
+  }
+
+  const fetchAvailable = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/availability")
+      const data = await response.json()
+      setAvailable(data)
+    } catch (error) {
+      console.error('Error fetching available:', error)
+    }
+  }
+
+  console.log(available);
+
+
+
   const nextStep = () => setStep(prev => Math.min(prev + 1, 3))
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1))
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="p-2">
-        <h1 className="text-3xl font-bold text-center mb-2">Lantaka Reservation Form</h1>
+        <h1 className="text-3xl font-bold text-center mb-2">Reservation Form</h1>
         <p className="text-center mb-6 text-gray-600">Please complete the form below.</p>
 
         <Progress value={step * 25} className="mb-6 bg-gray-200" />
@@ -54,9 +76,10 @@ export default function ReservationForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             
             {step === 1 && (
-              <> <FormField
+              <> 
+                <FormField
                   control={form.control}
-                  name="gender"
+                  name="reservationType"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Reservation Type</FormLabel>
@@ -75,11 +98,9 @@ export default function ReservationForm() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  
                   <FormField
                     control={form.control}
-                    name="departureDate"
+                    name="dateRange"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Reservation Date</FormLabel>
@@ -89,8 +110,12 @@ export default function ReservationForm() {
                       </FormItem>
                     )}
                   />
-                </div>
-                <div className="grid grid-cols-1 gap-5">
+                  <Button variant={"default"} onClick={callAvailable}>
+                    Check Availability
+                  </Button>
+
+                  
+                {/* <div className="grid grid-cols-1 gap-5">
                   <FormField
                     control={form.control}
                     name="adults"
@@ -119,7 +144,7 @@ export default function ReservationForm() {
                   )}
                 />
                   
-                </div>
+                </div> */}
                 
               </>
             )}

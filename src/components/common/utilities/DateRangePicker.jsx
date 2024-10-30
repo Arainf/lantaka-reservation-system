@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/popover"
 
 // Add props for date and onDateChange
-export function DatePickerDemo({ date, onDateChange }) {
+export function DatePickerDemo({ date, onDateChange, state }) {
   return (
     <Popover style={{backgroundColor: "#95c1ff"}}>
       <PopoverTrigger asChild>
@@ -25,6 +25,7 @@ export function DatePickerDemo({ date, onDateChange }) {
             !date && "text-muted-foreground"
           )}
           style={{backgroundColor: "#95c1ff"}}
+          disabled={state === true}
         >
           <IoCalendarSharp className="mr-2 h-4 w-4" />
           {date ? format(date, "PPP") : <span>Calendar</span>}
