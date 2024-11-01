@@ -57,14 +57,18 @@ export default function Component() {
           <div className="flex flex-col items-center w-full max-w-[687px] text-center mt-16">
             <h1
               className={`text-5xl tracking-[10.5px] max-md:text-4xl font-extralight text-gray-100 transition-all duration-1000 ease-out ${
-                showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                showText
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
               }`}
             >
               WELCOME TO
             </h1>
             <h2
               className={`mt-4 text-9xl font-medium tracking-widest leading-none max-md:text-9xl text-gray-100 transition-all duration-1000 ease-out delay-300 ${
-                showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                showText
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
               }`}
             >
               <span>LANTAKA </span>
@@ -72,21 +76,33 @@ export default function Component() {
             </h2>
             <p
               className={`mt-10 text-center tracking-[2.5px] font-light text-gray-100 transition-all duration-1000 ease-out delay-600 ${
-                showText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                showText
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
               }`}
             >
               Pro Deo et Patria
             </p>
             <div
               className={`relative inline-flex items-center justify-start px-6 py-4 mb-2 text-white bg-transparent border border-transparent rounded-lg group transition-all duration-300 ease-in-out ${
-                showButton ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                showButton
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
               }`}
-              onClick={ReservationSection}
             >
-              <span className="mr-2 transition-colors duration-300">
+              <span
+                className="mr-2 transition-colors duration-300 cursor-pointer block  text-white text-lg  py-3 px-5 rounded shadow "
+                onClick={() => {
+                  const reservationSection =
+                    document.getElementById("reservation");
+                  if (reservationSection) {
+                    reservationSection.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
                 Reservation
               </span>
-              <span className="absolute left-1 bottom-0 w-0 h-0 transition-all duration-300 bg-yellow-500 group-hover:w-[105px] group-hover:h-1" />
+              <span className="absolute left-1 bottom-4 w-0 h-0 transition-all duration-300 bg-yellow-500 group-hover:w-[160px]  group-hover:h-1" />
             </div>
           </div>
         </div>

@@ -232,7 +232,9 @@ export function Component() {
   )
 
   return (
-    <div className="h-[700px] w-full p-4">
+    <div 
+    className="h-[700px] w-full p-4"
+    >
       <Calendar
         localizer={localizer}
         events={events}

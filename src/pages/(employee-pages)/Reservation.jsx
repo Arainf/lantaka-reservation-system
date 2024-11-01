@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import FirstFloor from "@/components/common/cards/FirstFloor";
 import SecondFloorr from "@/components/common/cards/SecondFloorr";
 import { Component as BigCalendar } from "@/components/common/calendar/Calendar";
+
 import {
   Card,
   CardContent,
@@ -301,9 +302,10 @@ const Reservation = () => {
 
       {/* Form Sidebar */}
 
-      <div className="h-auto" id="calendar">
+      <section className="h-auto" id="calendar">
         <BigCalendar className="w-[98%]" style={{ padding: "0" }} />
-      </div>
+      </section>
+      
     </div>
   );
 };
