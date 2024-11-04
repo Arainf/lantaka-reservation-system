@@ -1,142 +1,85 @@
-import { useMemo, useState, useEffect } from "react";
-import "./adminPages.css";
-import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
-import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
-import ReservationCard from "@/components/common/cards/ReservationCard";
-import {
-  IoCalendarSharp,
-  IoBedSharp,
-  IoCashSharp,
-  IoPersonSharp,
-  IoMailOutline,
-  IoCloudUploadOutline,
-  IoDocumentTextOutline,
-  IoShareSocialOutline,
-} from "react-icons/io5";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Component as BarChartComponent } from "@/components/common/charts/BarChartComponent";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
-import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
-import { Button } from "@/components/ui/button";
-import { Component as LineChartComponent } from "@/components/common/charts/LineChartComponent";
-import { Component as PieChartComponent } from "@/components/common/charts/PieChartComponent";
-import Footer from "@/components/common/footer/Footer";
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Calendar, Mail, Upload, FileText, Share2 } from "lucide-react"
+import ReservationCard from "@/components/common/cards/ReservationCard"
+import { Component as RevenueChartComponent } from "@/components/common/charts/LineChartComponent";
+import { Component as OccupancyChartComponent } from "@/components/common/charts/BarChartComponent";
+import { Component as PieChartComponent } from "@/components/common/charts/PieChartComponent"
+import { Component as StackedChartComponent } from "@/components/common/charts/StackedChartComponent"
+import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
+import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
+import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker"
+import Footer from "@/components/common/footer/Footer"
 
-const CustomerTableSkeleton = () => (
-  <Card className="col-span-3">
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full mb-4" />
-      <Skeleton className="h-10 w-full" />
-    </CardContent>
-  </Card>
-);
-
-const ChartSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-6 w-40" />
-    </CardHeader>
-    <CardContent>
-      <Skeleton className="h-48 w-full" />
-    </CardContent>
-  </Card>
-);
-
-const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
-  const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState("04/12/2023 - 04/01/2024");
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-    } finally {
-      setLoading(false);
-    }
-  };
+const AdminDashboard = () => {
+  const [loading, setLoading] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const timer = setTimeout(() => setLoading(false), 2000)
+    return () => clearTimeout(timer)
+  }, [])
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen)
 
-  const occupancyData = useMemo(
-    () => [
-      { month: "Jan", occupancy: 65, revenue: 15000 },
-      { month: "Feb", occupancy: 70, revenue: 17000 },
-      { month: "Mar", occupancy: 75, revenue: 18500 },
-      { month: "Apr", occupancy: 80, revenue: 20000 },
-      { month: "May", occupancy: 85, revenue: 22000 },
-      { month: "Jun", occupancy: 90, revenue: 24000 },
-      { month: "Jul", occupancy: 95, revenue: 26000 },
-      { month: "Aug", occupancy: 100, revenue: 28000 },
-      { month: "Sep", occupancy: 90, revenue: 24000 },
-      { month: "Oct", occupancy: 85, revenue: 22000 },
-      { month: "Nov", occupancy: 80, revenue: 20000 },
-      { month: "Dec", occupancy: 75, revenue: 18500 },
-    ],
-    []
-  );
+  const occupancyData = [
+    { month: "Jan", occupancy: 65 },
+    { month: "Feb", occupancy: 70 },
+    { month: "Mar", occupancy: 75 },
+    { month: "Apr", occupancy: 80 },
+    { month: "May", occupancy: 85 },
+    { month: "Jun", occupancy: 90 },
+    { month: "Jul", occupancy: 95 },
+    { month: "Aug", occupancy: 100 },
+    { month: "Sep", occupancy: 90 },
+    { month: "Oct", occupancy: 85 },
+    { month: "Nov", occupancy: 80 },
+    { month: "Dec", occupancy: 75 },
+  ]
 
-  const employeePerformance = [
-    { name: "John", reservations: 50, efficiency: 95 },
-    { name: "Jane", reservations: 45, efficiency: 92 },
-    { name: "Bob", reservations: 40, efficiency: 88 },
-    { name: "Alice", reservations: 55, efficiency: 97 },
-  ];
+  const visitorData = [
+    { name: "Venue", value: 400 },
+    { name: "Room", value: 300 },
+    { name: "Other", value: 62 },
+  ]
+
+  const revenueData = [
+    { month: "Jan", revenue: 10000 },
+    { month: "Feb", revenue: 12000 },
+    { month: "Mar", revenue: 11000 },
+    { month: "Apr", revenue: 15000 },
+    { month: "May", revenue: 18000 },
+    { month: "Jun", revenue: 24000 },
+    { month: "Jul", revenue: 22000 },
+    { month: "Aug", revenue: 19000 },
+    { month: "Sep", revenue: 17000 },
+    { month: "Oct", revenue: 16000 },
+    { month: "Nov", revenue: 20000 },
+    { month: "Dec", revenue: 22000 },
+  ]
 
   return (
-    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-[#f8f6f2]">
+    <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       <NavigationSide isOpen={sidebarOpen} />
       <div className="flex-1 overflow-auto">
         <NavigationTop onSidebarToggle={toggleSidebar} />
         <main className="p-6">
-          <div className="flex w-full justify-between items-center mb-6">
-            <div className="flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <div>
               <h1 className="text-xl text-gray-400">Home / Dashboard</h1>
-              <h2 className="text-3xl font-bold">
-                Welcome back, Hotel Manager!
-              </h2>
-              <p className="text-gray-500">
-                Here's what's happening with your hotel today.
-              </p>
+              <h2 className="text-3xl font-bold">Welcome back, Hotel Manager!</h2>
+              <p className="text-gray-500">Here's what's happening with your hotel today.</p>
             </div>
             <div className="flex items-center space-x-2 bg-white rounded-md shadow-sm p-2">
-              <DatePicker className="text-sm font-medium" />
+              <DatePicker />
               <span className="text-gray-500">-</span>
-              <DatePicker className="text-sm font-medium" />
+              <DatePicker />
               <div className="flex space-x-1 ml-2">
-                <Button variant="outline">
-                  <IoMailOutline className="h-4 w-4" />
-                </Button>
-                <Button variant="outline">
-                  <IoCloudUploadOutline className="h-4 w-4" />
-                </Button>
-                <Button variant="outline">
-                  <IoDocumentTextOutline className="h-4 w-4" />
-                </Button>
-                <Button variant="outline">
-                  <IoShareSocialOutline className="h-4 w-4" />
-                </Button>
+                <Button variant="outline" size="icon"><Mail className="h-4 w-4" /></Button>
+                <Button variant="outline" size="icon"><Upload className="h-4 w-4" /></Button>
+                <Button variant="outline" size="icon"><FileText className="h-4 w-4" /></Button>
+                <Button variant="outline" size="icon"><Share2 className="h-4 w-4" /></Button>
               </div>
             </div>
           </div>
@@ -145,134 +88,64 @@ const AdminDashboard = ({ sidebarOpen, toggleSidebar }) => {
             <ReservationCard
               isLoading={loading}
               title="TOTAL BOOKINGS"
-              icon={IoCalendarSharp}
+              icon={Calendar}
               value={152}
-              percentageChange={8}
-              percentageSuffix="from last week"
+              percentageChange={8.5}
+              percentageSuffix="Up from last week"
               baseColor="#001f3f"
             />
             <ReservationCard
               isLoading={loading}
               title="AVAILABLE ROOMS"
-              icon={IoBedSharp}
+              icon={Calendar}
               value={24}
-              percentageChange={-15}
-              percentageSuffix="from yesterday"
+              percentageChange={1.3}
+              percentageSuffix="Up from past week"
               baseColor="#001f3f"
             />
             <ReservationCard
               isLoading={loading}
               title="REVENUE"
-              icon={IoCashSharp}
+              icon={Calendar}
               value={28750}
-              percentageChange={12}
-              percentageSuffix="from last month"
+              percentageChange={-4.3}
+              percentageSuffix="Down from yesterday"
               baseColor="#001f3f"
             />
             <ReservationCard
               isLoading={loading}
               title="GUESTS"
-              icon={IoPersonSharp}
+              icon={Calendar}
               value={89}
-              percentageChange={5}
-              percentageSuffix="currently checked in"
+              percentageChange={1.8}
+              percentageSuffix="Up from yesterday"
               baseColor="#001f3f"
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            {loading ? (
-              <ChartSkeleton />
-            ) : (
-              <Card className="col-span-2">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">
-                    Occupancy & Revenue
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[500px] w-full">
-                    <BarChartComponent
-                      chartData={occupancyData}
-                      barColor="#70a7ff"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  Room Type Distribution
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Single Rooms</span>
-                    <span>30%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Double Rooms</span>
-                    <span>40%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Suites</span>
-                    <span>20%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Deluxe Rooms</span>
-                    <span>10%</span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardContent>
-                <LineChartComponent
-                  chartData={occupancyData}
-                  barColor="#70a7ff"
-                />
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-2">
+              <OccupancyChartComponent data={occupancyData} isLoading={loading} />
+            </div>
+            <div>
+              <PieChartComponent data={visitorData} isLoading={loading}/>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <PieChartComponent />
-            {/* <Card className="col-span-2">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Recent Bookings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CustomerTable />
-              </CardContent>
-            </Card> */}
-            <Card className="col-span-2">
-              <CardHeader>
-                <CardTitle>Employee Performance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {employeePerformance.map((employee) => (
-                    <div key={employee.name} className="flex items-center">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{employee.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {employee.reservations} reservations
-                        </p>
-                      </div>
-                      <div className="ml-auto font-medium">
-                        {employee.efficiency}% efficiency
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-2">
+              <RevenueChartComponent data={revenueData} isLoading={loading} />
+            </div>
+            <div>
+              <StackedChartComponent isLoading={loading} />
+            </div>
           </div>
-          <Footer/>
+
+          <Footer />
         </main>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminDashboard;
+export default AdminDashboard
