@@ -113,7 +113,7 @@ const Joshtest = () => {
               </Select>
             </div>
             <DatePicker date={selectedDate} onDateChange={handleDateChange} state={buttonClicked} />
-            <div className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0" style={{ borderRadius: "10px", width: "22%" }}>
+            {/* <div className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0" style={{ borderRadius: "10px", width: "22%" }}>
               <div className="flex flex-col items-center justify-center" style={{ backgroundColor: "#8BC34A", borderRadius: "10px", width: "100px", height: "100px" }}>
                 <span className="text-5xl font-bold text-green-600">69</span>
                 <span className="text-lg text-green-700">Available</span>
@@ -122,7 +122,7 @@ const Joshtest = () => {
                 <span className="text-5xl font-bold text-blue-600">69</span>
                 <span className="text-lg text-blue-700">Reserve</span>
               </div>
-            </div>
+            </div> */}
             <div className="absolute bottom-0 pr-3 flex flex-col items-end z-10 w-full">
               <div className="flex items-center">
                 <span className="text-black-500 text-[10px] mr-1">Reserved</span>

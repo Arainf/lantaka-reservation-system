@@ -55,8 +55,8 @@ export function Component() {
         reservation: event.reservationid,
         id: event.id,
         title: `${event.id} - ${event.guests}`,
-        start: moment(`${event.dateStart}T${event.checkIn}`).toDate(),
-        end: moment(`${event.dateEnd}T${event.checkOut}`).toDate(),
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
         allDay: false,
         resource: {
           employee: event.employee,
@@ -242,7 +242,7 @@ export function Component() {
         selectable
         onSelectEvent={handleSelectEvent}
         components={{
-          // toolbar: CustomToolbar,
+          toolbar: CustomToolbar,
           agenda: {
             event: CustomAgendaEvent,
           },
