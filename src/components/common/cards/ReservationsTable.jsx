@@ -34,6 +34,7 @@ export default function CustomerTable({ data }) {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+ 
   };
 
   const totalPages = Math.ceil(dataSet.length / itemsPerPage);
@@ -78,7 +79,10 @@ export default function CustomerTable({ data }) {
                   <TableCell className="text-center py-4">
                     <div className="flex justify-center space-x-2">
                       <Button variant="link">
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4" 
+                        
+                        
+                        />
                       </Button>
                       <Button variant="destructive">
                         <Trash2 className="h-4 w-4" />
