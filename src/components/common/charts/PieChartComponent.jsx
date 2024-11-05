@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
 import { calculateShade } from '@/utils/colorsUtils';
-
 import {
   Card,
   CardContent,
@@ -12,45 +11,46 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartLegend,
   ChartLegendContent,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const description = "A donut chart with text"
+export const description = "A donut chart with text";
 
-const baseColor = "#001f3f"
+const baseColor = "#001f3f";
 
 const generateShades = () => {
-  const numberOfShades = 5
-  const step = 40
-  const generatedShades = []
+  const numberOfShades = 5;
+  const step = 40;
+  const generatedShades = [];
 
   for (let i = -numberOfShades; i <= numberOfShades; i++) {
-    const shade = calculateShade(baseColor, i * step)
-    generatedShades.push(shade)
+    const shade = calculateShade(baseColor, i * step);
+    generatedShades.push(shade);
   }
 
-  return generatedShades
-}
+  return generatedShades;
+};
 
 // Generate the shades once and store them in a constant
-const shades = generateShades()
+const shades = generateShades();
 
 // Access specific shades from the generated array
-const firstShade = shades[6]  // Accessing the appropriate index
-const secondShade = shades[7]
-const thirdShade = shades[8]
+const firstShade = shades[6];  // Accessing the appropriate index
+const secondShade = shades[7];
+const thirdShade = shades[8];
 
 const chartData = [
   { name: "Venue", visitors: 275, fill: firstShade },
   { name: "Room", visitors: 200, fill: secondShade },
   { name: "Other", visitors: 287, fill: thirdShade },
-]
+];
 
 const chartConfig = {
   visitors: {
@@ -68,15 +68,23 @@ const chartConfig = {
     label: "Other",
     color: "hsl(var(--chart-3))",
   },
-}
+};
 
-export function Component() {
+export function Component({ isLoading }) {
   const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
-  }, [])
+    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card className="flex flex-col">
+        <Skeleton className="h-[400px] w-full" />
+      </Card>
+    );
+  }
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>Visitors</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
@@ -123,7 +131,7 @@ export function Component() {
                           Visitors
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -133,7 +141,6 @@ export function Component() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        
         <div className="flex items-center gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
@@ -142,5 +149,5 @@ export function Component() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }
