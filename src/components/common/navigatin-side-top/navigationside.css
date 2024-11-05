@@ -264,6 +264,51 @@
   color: #FCB813;
 }
 
+
+
+.clientnavtop {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
+  justify-content: flex-start;
+  text-decoration: none;
+  color: white;
+  position: relative;
+  /* transition: all 0.3s ease; */
+  position: relative;
+  display: inline-block; /* To allow padding around the text */
+}
+
+.clientnavtop::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%; /* Center the line under the link */
+  width: 0; /* Start with no width */
+  height: 2px; /* Line height */
+  background-color: #FCB813; /* Line color */
+  transition: width 0.3s ease, left 0.3s ease; /* Smooth transition */
+}
+
+.clientnavtop:hover::after {
+  width: 100%; /* Expand to full width on hover */
+  left: 0; /* Align to the left */
+}
+
+.clientnavtop:hover {
+  color: #FCB813; /* Change text color on hover */
+}
+
+.clientnavtop:hover .linkTextStyle {
+  color: #FCB813; /* If you have any span/text that needs to change color */
+}
+
+.clientnavtop:hover svg {
+  color: #FCB813; /* Change SVG color on hover if applicable */
+}
+
 /* =================================================================== */
 /* Spinner */
 

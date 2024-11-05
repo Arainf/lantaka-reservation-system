@@ -1,44 +1,66 @@
 import { useEffect, useRef, useState, memo, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { Skeleton } from "@/components/ui/skeleton"
 import debounce from "lodash.debounce";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FaCheckCircle } from "react-icons/fa";
+import { FaCircleExclamation } from "react-icons/fa6";
 import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
 import { Users } from "lucide-react";
-import Image from "@/assets/images/hotel_room.jpg";
-import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 import "./style.css";
 
-const HoverContent = memo(({ room, id }) => {
-  const { room_name, guest_name, check_in, check_out, image_url } = room || {};
+const HoverContent = memo(({ room, id, isLoading }) => {
+  const { name, guest_name, check_in, check_out, image_url, employee } = room;
 
-  if (!room) return null;
+  if (!room && !isLoading) return null;
 
   console.log("HoverContent rendered" + id);
 
+  if (isLoading) {
+    return (
+      <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[400px] border-2 border-[#1D2E5C]">
+        <div className="flex flex-row">
+          <div className="w-[60%] relative">
+            <Skeleton className="h-[150px] w-full rounded-md bg-[#1D2E5C]" />
+            <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
+          </div>
+          <div className="w-[40%] flex flex-col pl-1 space-y-2">
+            <Skeleton className="h-6 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[400px]">
-      <div className="flex flex-row pt-4">
-        <div className="w-[60%]">
+    <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[420px] border-2 border-[#1D2E5C]">
+      <div className="flex flex-row ">
+        <div className="w-[60%] relative object-cover rounded-lg h-[90%]">
           <img
             src={image_url}
             alt="Room Type"
-            className="h-[90%] w-full object-cover rounded-lg"
+            className="h-[150px] m-0 p-0 w-full border-2 border-[#1D2E5C] object-cover rounded-md"
           />
+          <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
         </div>
-        <div className="w-[50%] flex flex-col justify-center p-2">
-          <h4 className="font-bold text-lg mb-2">{room_name}</h4>
-          <div className="flex items-center text-sm mb-1">
-            <Users className="mr-2 h-4 w-4" />
-            <p><strong>{guest_name}</strong></p>
+        <div className="w-[40%] flex flex-col pl-1">
+          <div className="flex flex-1 flex-col text-[14px]">
+            <p className="m-0 p-0 text-lg"><strong>{guest_name}</strong></p> 
+            <p className="text-[8px] p-0 m-0"> &#40;GUEST&#41;</p>
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            {/* <FaCheckCircle className="w-4 h-4 mr-2 text-green-500" /> */}
+            <span>Employee: {employee}</span>
+          </div>
+          <div className="flex flex-1 items-center flex-row text-sm mb-1">
             <span>Check-in: {check_in}</span>
+            <FaCheckCircle className="w-3 h-3 ml-2 items-start text-green-500" />
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            
             <span>Check-out: {check_out}</span>
+            <FaCircleExclamation className="w-3 h-3 ml-2 items-start text-red-500" />
           </div>
         </div>
       </div>
@@ -46,42 +68,68 @@ const HoverContent = memo(({ room, id }) => {
   );
 });
 
-const HoverContentVenue = memo(({ venue, id }) => {
-  const { venue_name, guest_name, check_in, check_out, image_url } = venue || {};
+const HoverContentVenue = memo(({ venue, id, isLoading }) => {
+  const { name, guest_name, check_in, check_out, image_url, employee } = venue || {};
 
-  if (!venue) return null;
+  if (!venue && !isLoading) return null;
 
   console.log("HoverContent rendered" + id);
 
+  if (isLoading) {
+    return (
+      <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[420px] border-2 border-[#1D2E5C]">
+        <div className="flex flex-row">
+          <div className="w-[60%] relative">
+            <Skeleton className="h-[150px] w-full rounded-md bg-[#1D2E5C]" />
+            <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
+          </div>
+          <div className="w-[40%] flex flex-col pl-1 space-y-2">
+            <Skeleton className="h-6 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+            <Skeleton className="h-4 flex-1 w-full bg-[#1D2E5C]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed bg-white shadow-lg rounded-md p-2 z-[100] w-[400px]">
-      <div className="flex flex-row pt-4">
-        <div className="w-[60%]">
+    <div className="fixed bg-[#F7F9FF] shadow-lg p-1 rounded-md overflow-hidden z-[100] w-[400px] border-2 border-[#1D2E5C]">
+      <div className="flex flex-row ">
+        <div className="w-[60%] relative object-cover rounded-lg h-[90%]">
           <img
             src={image_url}
             alt="Room Type"
-            className="h-[90%] w-full object-cover rounded-lg"
+            className="h-[150px] m-0 p-0 w-full border-2 border-[#1D2E5C] object-cover rounded-md"
           />
+          <h4 className="font-bold bg-[#1D2E5C] text-[#F7F9FF] drop-shadow-lg absolute bottom-[-20px] pr-2 pt-1 pb-3 pl-3 left-[-10px] rounded-tr-lg text-lg mb-2">{name}</h4>
         </div>
-        <div className="w-[50%] flex flex-col justify-center p-2">
-          <h4 className="font-bold text-lg mb-2">{venue_name}</h4>
-          <div className="flex items-center text-sm mb-1">
-            <Users className="mr-2 h-4 w-4" />
-            <p><strong>{guest_name}</strong></p>
+        <div className="w-[40%] flex flex-col pl-1">
+          <div className="flex flex-1 flex-col text-[14px]">
+            <p className="m-0 p-0"><strong>{guest_name}</strong></p> 
+            <p className="text-[8px] p-0 m-0"> &#40;GUEST&#41;</p>
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarCheck className="w-4 h-4 mr-2 text-green-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            {/* <FaCheckCircle className="w-4 h-4 mr-2 text-green-500" /> */}
+            <span>Employee: {employee}</span>
+          </div>
+          <div className="flex flex-1 items-center flex-row text-sm mb-1">
             <span>Check-in: {check_in}</span>
+            <FaCheckCircle className="w-3 h-3 ml-2 items-start text-green-500" />
           </div>
-          <div className="flex items-center text-sm mb-1">
-            <FaCalendarTimes className="w-4 h-4 mr-2 text-red-500" />
+          <div className="flex flex-1 items-center text-sm mb-1">
+            
             <span>Check-out: {check_out}</span>
+            <FaCircleExclamation className="w-3 h-3 ml-2 items-start text-red-500" />
           </div>
         </div>
       </div>
     </div>
   );
 });
+
+
 
 // // Your existing fetch function
 // const fetchAvailableVenueData = async (date) => {
@@ -108,6 +156,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
   const MAX_ZOOM = 1400;
 
   const [viewBox, setViewBox] = useState(initialViewBox);
+  const [isLoadingRoom, setIsLoadingRoom] = useState('false');
   const [zoom, setZoom] = useState(1);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -203,7 +252,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
 
       setViewBox((prev) => ({
         x: Math.min(1500, Math.max(0, prev.x - dx)),
-        y: Math.min(400, Math.max(-200, prev.y - dy)),
+        y: Math.min(600, Math.max(-200, prev.y - dy)),
         width: prev.width,
         height: prev.height,
       }));
@@ -233,8 +282,8 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
 
   // ------------------------------------------ zoom logic.---------------------------------------------------//
 
-  const handleFetch = (roomId) => {
-    debouncedFetchRoomData(roomId);
+  const handleFetch = (roomId, date) => {
+    debouncedFetchRoomData(roomId, date);
     setHoveredRoom(roomId);
   }
 
@@ -251,82 +300,81 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
     setIsHoveringVenue(false);
   };
 
-  const handleFetchVenue = (venueId) => {
-    debouncedFetchVenueData(venueId);
+  const handleFetchVenue = (venueId, date) => {
+    debouncedFetchVenueData(venueId, date);
     setHoveredVenue(venueId);
   }
 
 
 
 
-  const fetchRoomData = async (roomId) => {
-    if (roomDataCache[roomId]) {
-      setCurrentRoom(roomDataCache[roomId]);
+  const fetchData = async (type, id, date) => {
+    const cache = type === 'rooms' ? roomDataCache : venueDataCache;
+    const setCache = type === 'rooms' ? setRoomDataCache : setVenueDataCache;
+    const setCurrent = type === 'rooms' ? setCurrentRoom : setCurrentVenue;
+    setIsLoadingRoom(true);
+  
+    if (cache[id]) {
+      setCurrent(cache[id]);
+      setTimeout(() => setIsLoadingRoom(false), 1000);
       return;
     }
-
-    console.log(`Fetching room data for ${roomId}`);
-
-    const response = await fetch(`http://localhost:5000/api/rooms/${roomId}`);
+  
+    console.log(`Fetching ${type} data for ${id}`);
+  
+    const response = await fetch(`http://localhost:5000/api/details/${type}/${id}?date=${date}`);
     const data = await response.json();
-    console.log("Fetched room data:", data); // Add this line
-    setRoomDataCache((prevCache) => ({ ...prevCache, [roomId]: data }));
-    setCurrentRoom(data);
-  };
+    console.log(`Fetched ${type} data:`, data);
+  
+    setCache((prevCache) => ({ ...prevCache, [id]: data }));
+    setCurrent(data);
+    
+    setTimeout(() => setIsLoadingRoom(false), 1000);
+};
 
-  const fetchVenueData = async (venueId) => {
-    // Implement fetching venue data here
-    if (venueDataCache[venueId]) {
-      setCurrentVenue(venueDataCache[venueId]);
-      return;
-    }
-
-    console.log(`Fetching venue data for ${venueId}`);
-
-    const response = await fetch(`http://localhost:5000/api/venues/${venueId}`);
-    const data = await response.json();
-    console.log("Fetched venue data:", data); // Add this line
-    setVenueDataCache((prevCache) => ({ ...prevCache, [venueId]: data }));
-    setCurrentVenue(data);
-  };
+  
 
 
   const debouncedFetchRoomData = useCallback(
-    debounce((roomId) => {
-      fetchRoomData(roomId);
+    debounce((roomId, date) => {
+      fetchData("rooms", roomId, date);
     }, 10),
     []
   );
 
   const debouncedFetchVenueData = useCallback(
-    debounce((venueId) => {
-      fetchVenueData(venueId);
+    debounce((venueId, date) => {
+      fetchData("venues", venueId, date);
     }, 10),
     []
   );
 
   useEffect(() => {
     const fetchAvailableVenueData = async (date) => {
-      const response = await fetch(
-        `http://localhost:5000/api/availabilityVenue/${date}`
-      );
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/reservationStatus/${date}`
+        );
 
-      if (!response.ok) {
-        console.error("Failed to fetch available venues:", response.statusText);
-        return; // Exit if the fetch failed
-      }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      const data = await response.json();
-      console.log("Fetched available venue data:", data);
+        const data = await response.json();
+        console.log("Fetched available venue data:", data);
 
-      // Ensure the fetched data is an array before setting the state
-      if (Array.isArray(data)) {
-        setAvailableVenues(data);
-      } else {
-        console.error("Fetched data is not an array:", data);
+        // Ensure the fetched data is an array before setting the state
+        if (Array.isArray(data)) {
+          setAvailableVenues(data);
+        } else {
+          console.error("Fetched data is not an array:", data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch available venues:", error);
       }
     };
 
+    // Fetch data whenever the date prop changes
     fetchAvailableVenueData(date);
   }, [date]);
 
@@ -337,7 +385,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
       Object.keys(pathRefs.current).forEach((venueId) => {
         const pathElement = pathRefs.current[venueId];
         if (pathElement) {
-          console.log(`No available venues. Setting status to normal on element with ID: ${venueId}`);
+          console.log(`No available venues. Set ting status to normal on element with ID: ${venueId}`);
           pathElement.className.baseVal = "normal"; // Set to normal status
         }
       });
@@ -355,13 +403,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
     }
   }, [availableVenues]);
 
-  // Function to combine refs
-  // const combinedRef = (id) => (element) => {
-  //   svgRef.current = element; // Assign the container ref
-  //   pathRefs.current[id] = element; // Assign the path ref
-  // };
 
-  // console.log(tooltipPos)
 
   return (
     <div className="relative w-full h-full overflow-hidden ">
@@ -411,10 +453,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room116"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room116");
+                handleFetch("Room116", date);
                 // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
@@ -427,10 +469,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938e8e"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room112"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room112") // Pass event directly
+                handleFetch("Room112", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room112")}
@@ -442,10 +484,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room120"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room120") // Pass event directly
+                handleFetch("Room120", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room120")}
@@ -458,10 +500,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room110"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room110") // Pass event directly
+                handleFetch("Room110", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room110")}
@@ -473,10 +515,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room106"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room106") // Pass event directly
+                handleFetch("Room106", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room106")}
@@ -488,10 +530,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room108"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room108") // Pass event directly
+                handleFetch("Room108", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room108")}
@@ -503,10 +545,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room104"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room104") // Pass event directly
+                handleFetch("Room104", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room104")}
@@ -518,10 +560,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room102"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room102") // Pass event directly
+                handleFetch("Room102", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room102")}
@@ -540,10 +582,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
               fill="#938E8E"
               fillOpacity=".7"
               shapeRendering="crispEdges"
-              ref={containerRef}
+              ref={(el) => (pathRefs.current["Room118"] = el)}
               onMouseEnter={(e) => {
                 handleMouseEnter(e);
-                handleFetch("Room118") // Pass event directly
+                handleFetch("Room118", date) // Pass event directly
               }}
               onMouseLeave={handleMouseLeave} // Ensure this invokes the function
               onClick={() => onRoomClick("Room118")}
@@ -561,10 +603,10 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             fill="#938E8E"
             fillOpacity=".7"
             stroke="black"
-            ref={containerRef}
+            ref={(el) => (pathRefs.current["Room114"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
-              handleFetch("Room114") // Pass event directly
+              handleFetch("Room114", date) // Pass event directly
             }}
             onMouseLeave={handleMouseLeave} // Ensure this invokes the function
             onClick={() => onRoomClick("Room114")}
@@ -579,7 +621,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             ref={(el) => (pathRefs.current["BreezaHall"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
-              handleFetchVenue("BreezaHall") // Pass event directly
+              handleFetchVenue("BreezaHall" , date) // Pass event directly
             }}
             onMouseLeave={handleMouseLeave} // Ensure this invokes the function
             onClick={() => onRoomClick("BreezaHall")}
@@ -594,7 +636,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             ref={(el) => (pathRefs.current["OldTalisayBar"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
-              handleFetchVenue("OldTalisayBar") // Pass event directly
+              handleFetchVenue("OldTalisayBar", date) // Pass event directly
             }}
             onMouseLeave={handleMouseLeave} // Ensure this invokes the function
             onClick={() => onRoomClick("OldTalisayBar")}
@@ -617,7 +659,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             ref={(el) => (pathRefs.current["Gazebo"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
-              handleFetchVenue("Gazebo") // Pass event directly
+              handleFetchVenue("Gazebo" ,date) // Pass event directly
             }}
             onMouseLeave={handleMouseLeave} // Ensure this invokes the function
             onClick={() => onRoomClick("Gazebo")}
@@ -637,7 +679,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             ref={(el) => (pathRefs.current["DiningHall"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
-              handleFetchVenue("DiningHall") // Pass event directly
+              handleFetchVenue("DiningHall", date) // Pass event directly
             }}
             onMouseLeave={handleMouseLeave} // Ensure this invokes the function
             onClick={() => onRoomClick("DiningHall")}
@@ -652,7 +694,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             ref={(el) => (pathRefs.current["CapizHall"] = el)}
             onMouseEnter={(e) => {
               handleMouseEnter(e);
-              handleFetchVenue("CapizHall") // Pass event directly
+              handleFetchVenue("CapizHall", date) // Pass event directly
             }}
             onMouseLeave={handleMouseLeave} // Ensure this invokes the function
             onClick={() => onRoomClick("CapizHall")}
@@ -779,7 +821,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             zIndex: '500',
           }}
         >
-          <HoverContent room={currentRoom} id={hoveredRoom} />
+          <HoverContent room={currentRoom} id={hoveredRoom} isLoading={isLoadingRoom} />
         </div>
       )}
 
@@ -793,7 +835,7 @@ const FirstFloor = ({ resetTrigger, onRoomClick, date }) => {
             zIndex: '500',
           }}
         >
-          <HoverContentVenue venue={currentVenue} id={hoveredVenue} />
+          <HoverContentVenue venue={currentVenue} id={hoveredVenue} isLoading={isLoadingRoom} />
         </div>
       )}
 

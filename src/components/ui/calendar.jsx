@@ -1,9 +1,9 @@
-import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import * as React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 function Calendar({
   className,
@@ -37,15 +37,15 @@ function Calendar({
           buttonVariants({ variant: "ghost" }),
           "w-full h-full p-0 font-normal text-gray-700 hover:bg-blue-100 hover:text-blue-600" // Softer hover effect and blue highlight for hover state
         ),
-        day_range_end: "day-range-end",
+        day_range_end: "day-range-end bg-blue-100 text-black", // Light blue for selected range end
         day_selected:
-          "bg-blue-600 text-white hover:bg-blue-700 hover:text-white focus:bg-blue-600 focus:text-white", // Blue background for selected day, with white text
+          "bg-blue-300 text-black hover:bg-blue-200 focus:bg-blue-200", // Change to bg-blue-100 for selected day with black text 
         day_today: "bg-yellow-100 text-yellow-800", // Accent for today's date with soft yellow
         day_outside:
           "day-outside text-gray-400 opacity-50 aria-selected:bg-blue-50 aria-selected:text-gray-500", // Lighter color for days outside the current month
         day_disabled: "text-gray-300 opacity-50", // Disabled days styled with a lighter gray
         day_range_middle:
-          "aria-selected:bg-blue-100 aria-selected:text-blue-600", // Light blue for selected range in the middle
+          "aria-selected:bg-blue-100 aria-selected:text-black", // Light blue for selected range in the middle with black text
         day_hidden: "invisible",
         ...classNames,
       }}
@@ -55,8 +55,9 @@ function Calendar({
       }}
       {...props}
     />
-  )
+  );
 }
-Calendar.displayName = "Calendar"
 
-export { Calendar }
+Calendar.displayName = "Calendar";
+
+export { Calendar };
