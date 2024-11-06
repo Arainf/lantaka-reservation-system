@@ -1,8 +1,10 @@
-import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Edit, Trash2 } from 'lucide-react';
+"use client"
+
+import React, { useState } from 'react'
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Edit, Trash2 } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -10,29 +12,58 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-function GuestTable({ data, onDelete, onEdit, currentPage, setCurrentPage }) {
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-
-  const currentData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+export default function GuestTableWithModal({ data = [], onDelete = () => {}, onEdit = () => {}, currentPage = 1, setCurrentPage = () => {} }) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingGuest, setEditingGuest] = useState(null)
+  const itemsPerPage = 8
+  const totalPages = Math.ceil(data.length / itemsPerPage)
+  const currentData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'confirmed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800'
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
+
+  const handleEditClick = (guest) => {
+    setEditingGuest(guest)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingGuest(null)
+  }
+
+  const handleSaveChanges = () => {
+    onEdit(editingGuest.id, editingGuest)
+    handleCloseModal()
+  }
 
   return (
     <Card className="w-full">
@@ -71,7 +102,7 @@ function GuestTable({ data, onDelete, onEdit, currentPage, setCurrentPage }) {
                   </TableCell>
                   <TableCell className="text-center py-4">
                     <div className="flex justify-center space-x-2">
-                      <Button variant="link" onClick={() => onEdit(item.id)}>
+                      <Button variant="link" onClick={() => handleEditClick(item)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="destructive" onClick={() => onDelete(item.id)}>
@@ -84,44 +115,145 @@ function GuestTable({ data, onDelete, onEdit, currentPage, setCurrentPage }) {
             </TableBody>
           </Table>
 
-          {/* Pagination Controls */}
           <div className="flex justify-center items-center space-x-4 my-4 text-[#0f172a]">
             <Button
               variant="outline"
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
-              <ChevronLeft />
+              <ChevronLeft className="mr-2 h-4 w-4" />
               Previous
             </Button>
             {[...Array(totalPages)].map((_, i) => (
-               <Button
-               key={i}
-               variant={currentPage === i + 1 ? "primary" : "outline"}
-               onClick={() => setCurrentPage(i + 1)}
-               className={`transition-all duration-300 ${
-                 currentPage === i + 1
-                   ? 'shadow-[0_0_10px_3px_rgba(59,130,246,0.5)] text-[#0f172a] bg-[#fcb813]'
-                   : ' bg-[#0f172a] text-primary-foreground'
-               }`}
-             >
-               {i + 1}
-             </Button>
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? "primary" : "outline"}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`transition-all duration-300 ${
+                  currentPage === i + 1
+                    ? 'shadow-[0_0_10px_3px_rgba(59,130,246,0.5)] text-[#0f172a] bg-[#fcb813]'
+                    : ' bg-[#0f172a] text-primary-foreground'
+                }`}
+              >
+                {i + 1}
+              </Button>
             ))}
             <Button
               variant="outline"
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="transition-all duration-300"
             >
               Next
-              <ChevronRight />
+              <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
-}
 
-export default GuestTable;
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Guest Information</DialogTitle>
+          </DialogHeader>
+          {editingGuest && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name
+                </Label>
+                <Input
+                  id="name"
+                  value={editingGuest.customer}
+                  onChange={(e) => setEditingGuest({...editingGuest, customer: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  value={editingGuest.email}
+                  onChange={(e) => setEditingGuest({...editingGuest, email: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="room" className="text-right">
+                  Room
+                </Label>
+                <Input
+                  id="room"
+                  value={editingGuest.room}
+                  onChange={(e) => setEditingGuest({...editingGuest, room: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="check-in" className="text-right">
+                  Check-in
+                </Label>
+                <Input
+                  id="check-in"
+                  type="datetime-local"
+                  value={editingGuest.check_in_date}
+                  onChange={(e) => setEditingGuest({...editingGuest, check_in_date: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="check-out" className="text-right">
+                  Check-out
+                </Label>
+                <Input
+                  id="check-out"
+                  type="datetime-local"
+                  value={editingGuest.check_out_date}
+                  onChange={(e) => setEditingGuest({...editingGuest, check_out_date: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="guests" className="text-right">
+                  No. of Guests
+                </Label>
+                <Input
+                  id="guests"
+                  type="number"
+                  value={editingGuest.noGuest}
+                  onChange={(e) => setEditingGuest({...editingGuest, noGuest: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="status" className="text-right">
+                  Status
+                </Label>
+                <Select
+                  value={editingGuest.status}
+                  onValueChange={(value) => setEditingGuest({...editingGuest, status: value})}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Confirmed">Confirmed</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveChanges}>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  )
+}

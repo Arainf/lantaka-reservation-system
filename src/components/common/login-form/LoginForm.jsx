@@ -30,7 +30,7 @@ const loginSchema = z.object({
 export function LoginForm() {
   // State for backend error message
   const [backendError, setBackendError] = useState(null);
-  const { setUserRole, setUserData, setUserImg } = useContext(UserContext); // Get setUserRole from context
+  const { setUserRole, setUserData } = useContext(UserContext); // Get setUserRole from context
   const navigate = useNavigate(); // Initialize useNavigate
 
   // Set up the form with react-hook-form and zodResolver for validation
@@ -45,7 +45,7 @@ export function LoginForm() {
   // Define the onSubmit handler
   const onSubmit = async (values) => {
     try {
-      const response = await axios.post('http://192.168.68.101:5000/login', {
+      const response = await axios.post('http://localhost:5000/login', {
         username: values.username,
         password: values.password,
       });
@@ -62,7 +62,6 @@ export function LoginForm() {
         // Store role and userData in localStorage
         localStorage.setItem('account_id', account_id);
         localStorage.setItem('userRole', role);
-        localStorage.setItem('userImg', imageUrl);
         localStorage.setItem('userData', JSON.stringify(userData));
   
         // Print stored role in localStorage for validation
@@ -71,7 +70,6 @@ export function LoginForm() {
         // Update UserContext with the role and userData
         setUserRole(role);
         setUserData(userData);
-        setUserImg(imageUrl);
         
         // Print the updated role from the context for debugging
         console.log('Role after context update:', userData.role);

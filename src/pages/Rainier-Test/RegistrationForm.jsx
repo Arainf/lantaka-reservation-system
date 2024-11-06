@@ -43,8 +43,7 @@ const formSchema = z.object({
   }),
   gender: z.enum(["male", "female"], {
     required_error: "Please select a gender.",
-  }),
-  profileImageFile: z.instanceof(File).optional(),
+  })
 })
 function DashboardRegistrationForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -59,7 +58,6 @@ function DashboardRegistrationForm() {
       password: "",
       phone: "",
       dob: null,
-      profileImageFile: null,
     },
   });
   async function onSubmit(values) {
@@ -259,30 +257,6 @@ function DashboardRegistrationForm() {
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formMethods.control}
-                name="profileImageFile"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Profile Image</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        accept="image/png,image/jpeg,image/jpg"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) {
-                            onChange(file)
-                          }
-                        }}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Upload a profile image (optional)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -3,7 +3,7 @@ import NavigationTop from "@/components/common/navigatin-side-top/clientNavigati
 import { ChevronDown } from "lucide-react";
 import OurRooms from "@/components/common/cards/rooms";
 import LantakaBG from "@/assets/images/LantakaEmployeeBG.png";
-import Reservation from "./Reservation";
+import Reservation from "./HeroSection";
 
 export default function Component() {
   const [showReservation, setShowReservation] = useState(false);

@@ -1,12 +1,12 @@
 import React from "react";
-import logoImage from "@/assets/images/logo1.png";
+import Slogo from "@/assets/images/SchoolLogo.png";
 
 function LostInMetaverse() {
   return (
     <main className="flex items-center justify-center w-screen h-screen font-medium text-white bg-blue-800 shadow-[0px_15px_90px_rgba(0,0,0,0.25)] relative">
       {/* Centered background image */}
       <BackgroundImage 
-        src={logoImage} 
+        src={Slogo} 
         alt="Logo" 
       />
       <section className="relative z-10 flex flex-col items-center justify-center text-center px-10 py-0">
