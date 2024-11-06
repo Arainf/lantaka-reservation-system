@@ -26,7 +26,7 @@ export function DatePicker({ value, onChange, className }) {
   }
 
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("flex items-center justify-between gap-2 ", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -34,7 +34,7 @@ export function DatePicker({ value, onChange, className }) {
             variant="outline"
             className={cn(
               "w-[300px] justify-start text-left font-normal transition-colors duration-200 ease-in-out",
-              !date && "text-muted-foreground",
+              !date && "text-muted-foreground", className
             )}
             style={{
               backgroundColor: "#95c1ff",
@@ -61,7 +61,7 @@ export function DatePicker({ value, onChange, className }) {
             defaultMonth={date?.from}
             selected={date}
             onSelect={handleDateChange} // Use the callback here
-            numberOfMonths={2}
+            numberOfMonths={1}
             className="border-blue-500 text-black hover:border-blue-700"
           />
         </PopoverContent>

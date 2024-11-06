@@ -4,7 +4,7 @@ import LoginPage from "@/auth/login/login-page";
 import { AccountProvider } from "@/context/contexts";
 
 // import Test Files here
-import Rainiertest from "@/pages/Rainier-Test/rainiertest";
+import DashboardRegistrationForm from "@/pages/Rainier-Test/RegistrationForm";
 
 import { Component as BarChartComponent } from "@/components/common/charts/BarChartComponent";
 import { UserContext } from "@/context/contexts";
@@ -149,7 +149,7 @@ const AppRoutes = () => {
 
       {/* Test Routes */}
 
-      <Route path="/Rainiertest" element={<Rainiertest />} />
+      <Route path="/Rainiertest" element={<DashboardRegistrationForm />} />
       <Route path="/Joshtest" element={<JoshTest />} />
     </Routes>
   );

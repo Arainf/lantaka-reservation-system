@@ -24,8 +24,8 @@
 }
 
 .logoStyle2 {
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 5rem;
+  width: 23rem;
   object-fit: cover; /* Ensures the image fits inside without distortion */
   margin: 10px 10px 10px 10px;
 }

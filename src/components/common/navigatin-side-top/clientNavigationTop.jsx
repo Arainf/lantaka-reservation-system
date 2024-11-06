@@ -1,13 +1,15 @@
 import { memo, useState, useContext } from "react";
+import { Link } from "react-router-dom"; // Import Link
 import { Bell } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import './navigationside.css';
 import { UserContext } from "@/context/contexts";
-import logo from '@/assets/images/logo1.png';
+import Slogo from '@/assets/images/SchoolLogo.png';
+import Hlogo from '@/assets/images/HorizontalLogo.png';
 import Modal from '@/components/ui/modal';
 
 const NavigationTop = memo(({ handleBackToHome }) => {
-    const { userData, userRole, userImg } = useContext(UserContext);
+    const { userData, userRole } = useContext(UserContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reservationData, setReservationData] = useState({
         name: '',
@@ -37,33 +39,25 @@ const NavigationTop = memo(({ handleBackToHome }) => {
     return (
         <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-[50]">
             <div className="flex items-center space-x-2 w-1/4">
-                <img src={logo} alt="Logo" className="logoStyle2" />
-                <h1 className="text-xl"> &lt; Lantaka Reservation System / &gt;</h1>
+                <img src={Hlogo} alt="Logo" className="logoStyle2" />
             </div>
 
             <div className="flex justify-center w-1/2">
                 <nav className="flex space-x-4">
                     {[
                         ['Home', 'home'],
-                        ['Reservation', 'reservation'],
+                        ['Reservation', 'Reservation'],
                         ['Calendar', 'calendar'],
                         ['Account', 'account'],
-                    ].map(([title, targetId]) => (
-                        <a
-                            href={`#${targetId}`}
+                    ].map(([title, path]) => (
+                        <Link
+                            to={`/${path}`}
                             className="clientnavtop relative text-slate-100 font-medium"
                             key={title}
-                            onClick={(event) => {
-                                event.preventDefault(); // Prevent default navigation
-                                if (title === 'Home') handleBackToHome(); // Close Reservation section if "Home" is clicked
-                                document.getElementById(targetId)?.scrollIntoView({
-                                    behavior: 'smooth',
-                                });
-                            }}
                         >
                             {title}
                             <span className="linkTextStyle"></span>
-                        </a>
+                        </Link>
                     ))}
                 </nav>
             </div>
@@ -75,10 +69,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
 
                 {userData && (
                     <div className="flex items-center space-x-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={userImg} alt={userData.first_name} />
-                            <AvatarFallback>{userData.first_name[0]}{userData.last_name[0]}</AvatarFallback>
-                        </Avatar>
+                        <img src={Slogo} alt="LOGO" className="h-8 w-8"/>
                         <div className="text-sm">
                             <p className="font-medium">Welcome, {userData.first_name}!</p>
                             <p className="text-xs text-gray-400">{userRole}</p>

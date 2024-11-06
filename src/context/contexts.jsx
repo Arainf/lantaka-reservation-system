@@ -5,13 +5,11 @@ export const UserContext = createContext(null);
 export const UserProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [userImg, setUserImg] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
     const storedUserData = localStorage.getItem('userData');
-    const storedUserImg = localStorage.getItem('userImg');
 
     let parsedUserData = null;
     if (storedUserData) {
@@ -20,10 +18,6 @@ export const UserProvider = ({ children }) => {
       } catch (error) {
         console.error('Failed to parse user data from localStorage:', error);
       }
-    }
-
-    if (storedUserImg) {
-      setUserImg(storedUserImg);
     }
 
     if (storedRole) {
@@ -38,8 +32,8 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   const value = useMemo(
-    () => ({ userRole, userData, userImg, setUserRole, setUserData, setUserImg, loading }),
-    [userRole, userData, userImg]
+    () => ({ userRole, userData, setUserRole, setUserData, loading }),
+    [userRole, userData]
   );
 
   if (loading) {

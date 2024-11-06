@@ -16,6 +16,8 @@ import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm";
 import { X, ChevronRight } from "lucide-react";
 import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 
 const Joshtest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -216,10 +218,14 @@ const Joshtest = () => {
       )}
 
       <div className="self-center h-[80vh] w-[90vw] p-5" id="calendar">
-        <BigCalendar
+        {/* <BigCalendar
           style={{ padding: "0" }}
           onChange={handleCalendarChange}
           value={calendarValue}
+        /> */}
+        <FullCalendar
+          plugins={[ dayGridPlugin ]}
+          initialView="dayGridMonth"
         />
       </div>
     </div>

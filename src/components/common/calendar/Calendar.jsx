@@ -51,28 +51,32 @@ export function Component() {
   const fetchEvents = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/reservationCalendar')
-      const formattedEvents = response.data.map(event => ({
-        reservation: event.reservationid,
-        id: event.id,
-        title: `${event.id} - ${event.guests}`,
-        start: startDate.toISOString(),
-        end: endDate.toISOString(),
-        allDay: false,
-        resource: {
-          employee: event.employee,
-          guests: event.guests,
-          type: event.type,
-          status: event.status,
-        },
-      }))
-
-      
+      const formattedEvents = response.data.map(event => {
+        const startDate = moment(`${event.dateStart}T${event.checkIn}`, "YYYY-MM-DDTHH:mm").toDate();
+        const endDate = moment(`${event.dateEnd}T${event.checkOut}`, "YYYY-MM-DDTHH:mm").toDate();
+        return {
+          reservation: event.reservationid,
+          id: event.id,
+          title: `${event.id} - ${event.guests}`,
+          start: startDate,
+          end: endDate,
+          allDay: false, // Ensures the event is not marked as all-day
+          resource: {
+            employee: event.employee,
+            guests: event.guests,
+            type: event.type,
+            status: event.status,
+          },
+        }
+      })
+  
       setEvents(formattedEvents)
       console.log('Fetched events:', formattedEvents)
     } catch (error) {
       console.error('Error fetching events:', error)
     }
   }
+  
 
   const handleSelectEvent = (event) => {
     setSelectedEvent(event)
