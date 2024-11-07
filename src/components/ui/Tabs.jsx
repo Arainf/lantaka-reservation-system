@@ -8,7 +8,7 @@ export function Tabs({ children, defaultValue, className }) {
 
   return (
     <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className={className}>{children}</div>
+      <div className={`${className} w-full`}>{children}</div>
     </TabsContext.Provider>
   );
 }
