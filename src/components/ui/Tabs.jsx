@@ -21,8 +21,8 @@ export function TabsTrigger({
   value,
   children,
   className,
-  activeClass = 'bg-white text-black',
-  inactiveClass = 'bg-gray-200 text-gray-700',
+  activeClass = 'text-black',
+  inactiveClass = 'text-gray-700',
 }) {
   const { activeTab, setActiveTab } = useContext(TabsContext);
 
