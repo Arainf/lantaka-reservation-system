@@ -159,7 +159,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
-                  Name
+                  Name:
                 </Label>
                 <Input
                   id="name"
@@ -170,7 +170,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="email" className="text-right">
-                  Email
+                  Email:
                 </Label>
                 <Input
                   id="email"
@@ -181,7 +181,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="room" className="text-right">
-                  Room
+                  Room:
                 </Label>
                 <Input
                   id="room"
@@ -192,7 +192,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="check-in" className="text-right">
-                  Check-in
+                  Check-in:
                 </Label>
                 <Input
                   id="check-in"
@@ -204,7 +204,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="check-out" className="text-right">
-                  Check-out
+                  Check-out:
                 </Label>
                 <Input
                   id="check-out"
@@ -216,7 +216,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="guests" className="text-right">
-                  No. of Guests
+                  No. of Guests:
                 </Label>
                 <Input
                   id="guests"
@@ -228,7 +228,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="status" className="text-right">
-                  Status
+                  Status:
                 </Label>
                 <Select
                   value={editingGuest.status}
