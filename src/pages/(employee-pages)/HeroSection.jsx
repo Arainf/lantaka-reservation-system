@@ -1,313 +1,269 @@
-import React, { useState, useEffect } from "react";
-import FirstFloor from "@/components/common/cards/FirstFloor";
-import SecondFloorr from "@/components/common/cards/SecondFloorr";
-import { Component as BigCalendar } from "@/components/common/calendar/Calendar";
+'use client'
 
+import React, { useState, useEffect } from "react"
+import FirstFloor from "@/components/common/cards/FirstFloor"
+import SecondFloorr from "@/components/common/cards/SecondFloorr"
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
-} from "@/components/ui/card";
-import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
-import { MdOutlinePayment } from "react-icons/md";
-import { Button } from "@/components/ui/button";
+  CardTitle,
+} from "@/components/ui/card"
+import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa"
+import { MdOutlinePayment } from "react-icons/md"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-// import { DatePicker } from "@/components/common/utilities/DateRange";
-import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
+} from "@/components/ui/select"
+import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker"
 import Clock from "@/components/common/time/clock";
-import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
-import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm";
-import { X } from "lucide-react";
-import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
-import Home from "./Home";
+import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm"
+import { X, Plus } from "lucide-react"
+import { formatDateToYYYYMMDD } from "@/utils/colorsUtils"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { useNavigate} from 'react-router-dom'
+import { useReservations, useRoomVenueProvider } from "@/context/contexts"
+
 
 const Reservation = () => {
-  const [selectedFloor, setSelectedFloor] = useState("floor1");
-  const [isGrabbing, setIsGrabbing] = useState(false);
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
-  const [resetTrigger, setResetTrigger] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isFormSidebarOpen, setIsFormSidebarOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [buttonNum, setButtonNum] = useState(null);
-  const [buttonClicked, setButtonClicked] = useState(false);
-  const [date, setDate] = React.useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [dateTranslate, setDateTranslate] = useState("");
-  const xnewDate = formatDateToYYYYMMDD(selectedDate);
-  const [showRooms, setShowRooms] = useState(false);
-  const [showText, setShowText] = useState(false);
-  const [showButton, setShowButton] = useState(false);
+  const { bookingSummary } = useReservations()
+  
+  const [selectedFloor, setSelectedFloor] = useState("floor1")
+  const [isGrabbing, setIsGrabbing] = useState(false)
+  const [resetTrigger, setResetTrigger] = useState(false)
+  const [buttonClicked, setButtonClicked] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [dateTranslate, setDateTranslate] = useState("")
+  const [calendarKey, setCalendarKey] = useState(0)
+  const [isFancyMode, setIsFancyMode] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const textTimer = setTimeout(() => setShowText(true), 300);
-    const buttonTimer = setTimeout(() => setShowButton(true), 1000);
-    return () => {
-      clearTimeout(textTimer);
-      clearTimeout(buttonTimer);
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
-  useEffect(() => {
-    setDate(new Date());
-    setSelectedDate(new Date());
-    setDateTranslate(xnewDate);
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1920);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const initialDate = new Date()
+    setSelectedDate(initialDate)
+    setDateTranslate(formatDateToYYYYMMDD(initialDate))
+  }, [])
 
   const handleDateChange = (date) => {
-    setSelectedDate(date);
-    const newDate = formatDateToYYYYMMDD(date);
-    setDateTranslate(newDate);
-  };
+    setSelectedDate(date)
+    const newDate = formatDateToYYYYMMDD(date)
+    setDateTranslate(newDate)
+  }
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
-      setIsGrabbing(true);
+      setIsGrabbing(true)
     }
-  };
+  }
 
   const handleMouseUp = () => {
-    setIsGrabbing(false);
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+    setIsGrabbing(false)
+  }
 
   const toggleFormSidebar = () => {
-    setButtonClicked(!buttonClicked);
-  };
+    setButtonClicked(!buttonClicked)
+  }
 
   const resetState = () => {
-    setResetTrigger(true);
+    setResetTrigger(true)
     setTimeout(() => {
-      setResetTrigger(false);
-    }, 0);
-  };
+      setResetTrigger(false)
+    }, 0)
+  }
 
   return (
-
-    <div
-      className="flex flex-col relative w-screen overflow-x-hiddeh-screen bg-[#f8f6f2]"
-      id="reservation"
-    >
-   
-      <div className="flex items-center justify-between h-14 px-4 py-2 bg-transparent text-white sticky top-0 right-0 z-10" />
-
-      <main className="flex-1 p-6 flex flex-col h-screen space-y-4 md:flex-row md:space-y-0 md:space-x-4">
-        {/* Main content area (1) */}
-        <div
-          className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
-            isGrabbing ? "cursor-grabbing" : "cursor-grab"
-          }`}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onContextMenu={(e) => e.preventDefault()} // Prevent right-click context menu
-        >
-          <div className="flex flex-row mt-1 ml-5 mb-0 p-1.5">
-            <div className="mr-2">
-              <Select onValueChange={setSelectedFloor} value={selectedFloor}>
-                <SelectTrigger
-                  style={{ backgroundColor: "#95c1ff" }}
-                  className="w-[140px]"
+    <div className="relative flex flex-col h-screen w-screen overflow-y-auto bg-background" id="reservation">
+      <main className="flex flex-col md:flex-row h-full">
+        <div className="flex flex-col md:w-2/3 h-screen  p-4 space-y-4 ">
+          <Card className="flex h-screen  flex-col flex-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle>Floor Plan</CardTitle>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="fancy-mode">Fancy Mode</Label>
+                <Switch
+                  id="fancy-mode"
+                  checked={isFancyMode}
+                  onCheckedChange={setIsFancyMode}
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-row items-center space-x-2 mb-4">
+                <Select onValueChange={setSelectedFloor} value={selectedFloor}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Select Floor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="floor1">Floor One</SelectItem>
+                    <SelectItem value="floor2">Floor Two</SelectItem>
+                  </SelectContent>
+                </Select>
+                <DatePicker date={selectedDate} onDateChange={handleDateChange} state={buttonClicked} />
+                <Button
+                  onClick={resetState}
+                  className="ml-auto"
+                  variant="outline"
                 >
-                  <SelectValue placeholder="Select Floor" />
-                </SelectTrigger>
-                <SelectContent style={{ backgroundColor: "#95c1ff" }}>
-                  <SelectItem value="floor1">Floor One</SelectItem>
-                  <SelectItem value="floor2">Floor Two</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <DatePicker date={selectedDate} onDateChange={handleDateChange} />
-            {/* Box for room/event availability */}
-            <div
-              className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0"
-              style={{
-                // Adjust background to match the dark theme
-                borderRadius: "10px", // Slightly adjust corner radius
-                width: "22%", // Set the width similar to your preference
-              }}
-            >
-              {/* Available box */}
+                  Reset
+                </Button>
+              </div>
               <div
-                className="flex flex-col items-center justify-center"
-                style={{
-                  backgroundColor: "#8BC34A", // Green background for Available
-                  borderRadius: "10px", // Border radius to match the squares
-                  width: "100px", // Set the width/height of the squares
-                  height: "100px",
-                }}
+                className={`relative w-full h-[60vh] overflow-hidden bg-white border border-gray-200 rounded-lg ${
+                  isGrabbing ? "cursor-grabbing" : "cursor-grab"
+                }`}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onContextMenu={(e) => e.preventDefault()}
               >
-                <span className="text-5xl font-bold text-green-600">69</span>{" "}
-                {/* Adjust text size and color */}
-                <span className="text-lg text-green-700">Available</span>
+                {isFancyMode ? (
+                  selectedFloor === "floor1" ? (
+                    <FirstFloor key={calendarKey} resetTrigger={resetTrigger} onRoomClick={toggleFormSidebar} date={dateTranslate} />
+                  ) : (
+                    <SecondFloorr key={calendarKey} resetTrigger={resetTrigger} onRoomClick={toggleFormSidebar} />
+                  )
+                ) : (
+                  <SimplifiedFloorPlan floor={selectedFloor} />
+                )}
+                <LegendOverlay />
               </div>
-
-              {/* Reserved box */}
-              <div
-                className="flex flex-col items-center justify-center"
-                style={{
-                  backgroundColor: "#64B5F6", // Blue background for Reserved
-                  borderRadius: "10px",
-                  width: "100px",
-                  height: "100px",
-                }}
-              >
-                <span className="text-5xl font-bold text-blue-600">69</span>
-                <span className="text-lg text-blue-700">Reserve</span>
-              </div>
-            </div>
-            {/* Status Boxes */}
-            <div
-              className="absolute bottom-0 left-0 right-0 flex flex-row justify-center items-center mt-1 p-1.5 space-x-20 z-10 w-full"
-              style={{ backgroundColor: "#95c1ff" }}
-            >
-              <div className="flex items-center">
-                <div className="bg-green-500 border border-black w-4 h-4 flex items-center justify-center text-white rounded"></div>
-                <span className="text-black-500 text-sm ml-2">Reserved</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-blue-500 border border-black w-4 h-4 flex items-center justify-center text-white rounded"></div>
-                <span className="text-black-500 text-sm ml-2">Pending</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-red-500 border border-black w-4 h-4 flex items-center justify-center text-white rounded"></div>
-                <span className="text-black-500 text-sm ml-2">Canceled</span>
-              </div>
-            </div>
-            {/* Reset button */}
-            <Button
-              onClick={resetState} // Call reset function on click
-              className="px-3 py-1 text-black rounded hover:bg-blue-600 opacity-90"
-              style={{ marginLeft: "61%", backgroundColor: "#95c1ff" }}
-            >
-              Reset
-            </Button>
-          </div>
-          {selectedFloor === "floor1" && (
-            <FirstFloor
-              resetTrigger={resetTrigger}
-              onRoomClick={toggleSidebar}
-              date={dateTranslate}
-            />
-          )}
-          {selectedFloor === "floor2" && (
-            <SecondFloorr
-              resetTrigger={resetTrigger}
-              onRoomClick={toggleSidebar}
-            />
-          )}
+            </CardContent>
+          </Card>
         </div>
 
-        <div
-          className={`fixed top-0 right-0 h-full w-[35%] bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
-            isFormSidebarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        ></div>
+        <div className="flex flex-col  md:w-1/3 h-auto p-6 space-y-3 overflow-y-auto border-l">
+          <Card>
+            <CardContent className="p-0">
+              <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
+                <Clock />
+              </div>
+            </CardContent>
+          </Card>
+          
 
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-2">
+              <Button className="w-full justify-start" onClick={() => navigate("/Reservation")}>
+                <Plus className="mr-2 h-4 w-4" /> New Reservation
+              </Button>
+              <Button className="w-full justify-start" variant="outline">
+                <FaCalendarCheck className="mr-2 h-4 w-4" /> Check-in Guest
+              </Button>
+              <Button className="w-full justify-start" variant="outline">
+                <FaCalendarTimes className="mr-2 h-4 w-4" /> Check-out Guest
+              </Button>
+              <Button className="w-full justify-start" variant="outline">
+                <MdOutlinePayment className="mr-2 h-4 w-4" /> Process Payment
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-4">
+            <CardHeader>
+              <CardTitle>Booking Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  {/* {bookingSummary.total} */}
+                  <div className="text-2xl font-bold">{bookingSummary.total}</div>
+                  <div className="text-sm text-muted-foreground">Total</div>
+                </div>
+                <div>
+                  {/* {bookingSummary.rooms} */}
+                  <div className="text-2xl font-bold">{bookingSummary.rooms}</div>
+                  <div className="text-sm text-muted-foreground">Rooms</div>
+                </div>
+                <div>
+                  {/* {bookingSummary.venues} */}
+                  <div className="text-2xl font-bold">{bookingSummary.venues}</div>
+                  <div className="text-sm text-muted-foreground">Venues</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          
+        </div>
+      </main>
+      
+      {buttonClicked && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+          <div className="w-full max-w-md bg-background">
+            <div className="flex justify-end p-4">
+              <Button variant="ghost" onClick={toggleFormSidebar}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <FormSidebar />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const SimplifiedFloorPlan = ({ floor }) => {
+  // Get available rooms from context
+  const { availableRooms, fetchEverythingAvailable } = useRoomVenueProvider();
+
+  useEffect(() => {
+    // Check if the data is already fetched or not
+    if (availableRooms.double_rooms.length === 0) {
+      fetchEverythingAvailable();
+    }
+  }, [availableRooms, fetchEverythingAvailable]);
+
+  // Combine all available rooms and venues into one array
+  const allRooms = [
+    ...availableRooms.double_rooms,
+    ...availableRooms.triple_rooms,
+    ...availableRooms.matrimonial_rooms,
+    ...availableRooms.venues_holder
+  ];
+
+  return (
+    <div className="grid grid-cols-4 gap-4 p-4">
+      {allRooms.map((room) => (
         <div
-          className={`bg-transparent w-full md:w-1/3 h-full ${
-            buttonClicked ? "flex" : "hidden"
+          key={room.id}
+          className={`aspect-square rounded-md flex items-center justify-center text-sm font-medium ${
+            room.is_available
+              ? room.type === 'venue'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-green-100 text-green-800'
+              : 'bg-gray-300 text-gray-700 line-through' // For unavailable rooms/venues
           }`}
         >
-          <button
-            className="absolute rounded-l-lg bg-transparent flex items-center"
-            style={{
-              top: "5.8%", // Use a percentage for vertical positioning
-              left: "75%", // Use a percentage for horizontal positioning
-              padding: "0.5rem", // Use rem for padding
-              cursor: "pointer",
-              transform: "translateX(-50%)", // Center horizontally based on its own width
-            }}
-            onClick={toggleFormSidebar}
-          >
-            <X className="h-[30px] w-8" strokeWidth={5} />
-          </button>
-
-          <FormSidebar presetNumber={buttonNum} />
+          {room.id}
         </div>
-          <div
-            className={`w-full md:w-1/3 flex-col h-auto space-y-4 ${
-              buttonClicked ? "hidden" : "flex"
-            }`}
-          >
-            <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
-              <Clock />
-            </div>
-
-            <div className="flex justify-center items-center py-7">
-              <h6 className="absolute z-10 text-gray-600 bg-[#f8f6f2] mx-6 px-5 font-bold">
-                QUICK ACTIONS
-              </h6>
-              <hr className="w-full border-black z-0" />
-            </div>
-            {/*Guest_Clients  */}
-            <Button onClick={toggleFormSidebar}>
-              <p>Campus Ministry Office &#40;CMO&#41; Retreat</p>
-            </Button>
-            <Button onClick={toggleFormSidebar}>
-              <p>Internal Reservation &#40;Individual Guest&#41; </p>
-            </Button>
-            <Button onClick={toggleFormSidebar}>
-              <p>Internal Reservation &#40;Group&#41;</p>
-            </Button>
-            <Button onClick={toggleFormSidebar}>
-              <p>External Reservation &#40;Individual Guest&#41;</p>
-            </Button>
-            <Button onClick={toggleFormSidebar}>
-              <p>External Reservation &#40;Group&#41;</p>
-            </Button>
-            <Button onClick={toggleFormSidebar}>
-              <p>Other Reservations</p>
-            </Button>
-          </div>
-      </main>
-      {/* Backdrop */}
-      {(isSidebarOpen || isFormSidebarOpen) && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
-          onClick={toggleSidebar}
-        ></div>
-      )}
-
-      {/* Room Details Sidebar */}
-      {/* <div
-        className={`fixed top-0 right-0 h-full w-1/5 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-      >
-        <Sidebar />
-      </div> */}
-
-      {/* Form Sidebar */}
-
-      <section className="h-auto" id="calendar">
-        <BigCalendar className="w-[98%]" style={{ padding: "0" }} />
-      </section>
-      
+      ))}
     </div>
   );
 };
 
-export default Reservation;
+const LegendOverlay = () => (
+  <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-2 rounded-md shadow-sm">
+    <LegendItem color="#6F42C1" label="Reserved" />
+    <LegendItem color="#FFC107" label="Pending" />
+    <LegendItem color="#DC3545" label="Canceled" />
+    <LegendItem color="#28A745" label="Occupied" />
+    <LegendItem color="#87A5EF" label="Normal" />
+  </div>
+)
+
+const LegendItem = ({ color, label }) => (
+  <div className="flex items-center mb-1">
+    <div className={`w-3 h-3 mr-1 border border-gray-300`} style={{ backgroundColor: color }}></div>
+    <span className="text-xs text-gray-600">{label}</span>
+  </div>
+)
+
+export default Reservation

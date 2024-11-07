@@ -45,20 +45,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useNavigate} from 'react-router-dom'
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { useRoomVenueProvider } from "@/context/contexts";
 
 
 
 export default function Component() {
-  const [selectedDate, setSelectedDate] = useState("");
+  const {
+    availableRooms,
+    fetchEverythingAvailable,
+    fetchAvailable,
+    isFetching,
+  } = useRoomVenueProvider();
   const [step, setStep] = useState(1);
   const [showResults, setShowResults] = useState(true);
   const [reservationType, setReservationType] = useState("");
-  const [availableRooms, setAvailableRooms] = useState({
-    double_rooms: [],
-    triple_rooms: [],
-    matrimonial_rooms: [],
-    venues_holder: [],
-  });
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false)
@@ -69,7 +69,6 @@ export default function Component() {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  
   
   const form = useForm({
     defaultValues: {
@@ -151,6 +150,15 @@ export default function Component() {
   const review = () => {
     setIsConfirmationOpen(true)
   }
+
+  // Initial fetch
+  useEffect(() => {
+    if (availableRooms.double_rooms.length === 0 && availableRooms.venues_holder.length === 0) {
+      fetchEverythingAvailable();
+    }
+  }, [availableRooms]);
+  
+
   
   const handleConfirmSubmit = async () => {
     setIsSubmitting(true)
@@ -198,80 +206,10 @@ export default function Component() {
       setIsSubmitting(false)
     }
   }
-    // You might want to show a success message or redirect the user
-  // Fetch available rooms based on the selected date range
-const fetchAvailable = async (dateRangeRoom, dateRangeVenue) => {
-  try {
-    const { from, to } = dateRangeRoom || dateRangeVenue;
-    if (!from || !to) return;
 
-    const formattedFrom = formatDateToYYYYMMDD(from);
-    const formattedTo = formatDateToYYYYMMDD(to);
-
-    console.log("Fetching available rooms from:", formattedFrom, "to:", formattedTo); // Log the formatted dates
-
-    const response = await fetch(
-      `http://localhost:5000/api/availableRooms/${formattedFrom}/${formattedTo}/${reservationType}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const availableData = await response.json();
-    console.log("Available data received:", availableData); // Log the received data
-
-    // Directly update availableRooms using the fetched data with room_status as is_available
-    setAvailableRooms({
-      double_rooms: availableData.double_rooms,
-      triple_rooms: availableData.triple_rooms,
-      matrimonial_rooms: availableData.matrimonial_rooms,
-      venues_holder: availableData.venues_holder,
-    });
-
-    console.log("Updated available rooms:", {
-      double_rooms: availableData.double_rooms,
-      triple_rooms: availableData.triple_rooms,
-      matrimonial_rooms: availableData.matrimonial_rooms,
-      venues_holder: availableData.venues_holder,
-    }); // Log the updated rooms
-  } catch (error) {
-    console.error("Error fetching available rooms:", error);
-  }
-};
-
-  
-  // Fetch all available rooms when the component mounts
-  const fetchEverythingAvailable = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/everythingAvailable");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-  
-      // Initialize available rooms with room_status directly used as is_available
-      setAvailableRooms({
-        double_rooms: data.double_rooms.map(room => ({ ...room, is_available: room.room_status })),
-        triple_rooms: data.triple_rooms.map(room => ({ ...room, is_available: room.room_status })),
-        matrimonial_rooms: data.matrimonial_rooms.map(room => ({ ...room, is_available: room.room_status })),
-        venues_holder: data.venues_holder.map(room => ({ ...room, is_available: room.room_status })),
-      });
-  
-      console.log("available rooms:", JSON.stringify(availableRooms, null, 2));
-    } catch (error) {
-      console.error("Error fetching everything available:", error);
-    }
-  };
-  
-  // Call fetchEverythingAvailable on mount
-  useEffect(() => {
-    fetchEverythingAvailable();
-  }, []);
-  
   // Main function to call availability check
-  const callAvailable = (dateRangeRoom, dateRangeVenue ) => {
-    fetchAvailable(dateRangeRoom, dateRangeVenue);
+  const callAvailable = (dateRangeRoom, dateRangeVenue) => {
+    fetchAvailable(dateRangeRoom, dateRangeVenue, reservationType);
     setShowResults(true);
   };
   
@@ -473,7 +411,7 @@ const fetchAvailable = async (dateRangeRoom, dateRangeVenue) => {
                                       onClick={() =>
                                         callAvailable(
                                           form.getValues("dateRangeRoom"),
-                                          form.getValues("reservationType")
+                                          " "
                                         )
                                       }
                                     >
@@ -506,7 +444,7 @@ const fetchAvailable = async (dateRangeRoom, dateRangeVenue) => {
                                       onClick={() =>
                                         callAvailable(
                                           form.getValues("dateRangeVenue"),
-                                          form.getValues("reservationType")
+                                          "venue"
                                         )
                                       }
                                     >

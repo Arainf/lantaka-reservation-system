@@ -155,6 +155,16 @@ const AppRoutes = () => {
           />
         }
       />
+       <Route
+        path="/Account"
+        element={
+          <ProtectedRoute
+            element={<Account />}
+            allowedRoles={["Employee"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
 
       {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorize />} />
