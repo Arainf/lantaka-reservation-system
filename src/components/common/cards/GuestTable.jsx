@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Edit, Trash2 } from 'lucide-react'
+import Slogo from '@/assets/images/SchoolLogo.png'
 import {
   Table,
   TableBody,
@@ -85,7 +86,7 @@ export default function GuestTableWithModal({ data = [], onDelete = () => {}, on
               {currentData.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="flex items-center space-x-3 py-4">
-                    <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                    <img src={Slogo} alt="" className='h-8 w-8'/>
                     <div>
                       <div className="font-medium">{item.customer}</div>
                       <div className="text-sm text-gray-500">{item.email}</div>

@@ -1,9 +1,9 @@
 import { memo, useState, useContext } from "react"; 
 import { Bell, Menu, Search, Bed, Calendar, CheckCircle } from 'lucide-react'; 
 import { Input } from "@/components/ui/input"; 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; 
 import './navigationside.css'; 
 import { UserContext } from "@/context/contexts";
+import Slogo from '@/assets/images/SchoolLogo.png';
 
 const NavigationTop = memo(({ onSidebarToggle }) => { 
   const { userData, userRole, userImg } = useContext(UserContext);
@@ -62,10 +62,7 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
         </div>
         {userData && (
           <div className="flex items-center space-x-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={userImg} alt={userData.first_name} />
-              <AvatarFallback>{userData.first_name[0]}{userData.last_name[0]}</AvatarFallback>
-            </Avatar>
+            <img src={Slogo} alt="LOGO" className="h-8 w-8"/>
             <div className="text-sm">
               <p className="font-medium">Welcome, {userData.first_name}!</p>
               <p className="text-xs text-gray-400">{userRole}</p>

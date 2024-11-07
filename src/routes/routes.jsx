@@ -22,6 +22,7 @@ import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
 import Account from "@/pages/(employee-pages)/Account";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
+import Calendar from "@/pages/(employee-pages)/Calendar";
 
 const AppRoutes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,7 +31,7 @@ const AppRoutes = () => {
   const { userRole, userData } = useContext(UserContext);
 
   console.log(userRole);
-  const isDevMode = true; // Set this to true to disable route protection for developers
+  const isDevMode = false; // Set this to true to disable route protection for developers
 
   const toggleSidebar = () => {
     setSidebarOpen((prevState) => !prevState);
@@ -145,17 +146,15 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/Account"
+        path="/Calendar"
         element={
           <ProtectedRoute
-            element={<Account toggleSidebar={toggleSidebar} />}
+            element={<Calendar />}
             allowedRoles={["Employee"]}
             isDevMode={isDevMode}
           />
         }
       />
-      
-      
 
       {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorize />} />
