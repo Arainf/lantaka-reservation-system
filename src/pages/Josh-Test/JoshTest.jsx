@@ -4,20 +4,13 @@ import React, { useState, useEffect } from "react";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import FirstFloor from "@/components/common/cards/FirstFloor";
 import SecondFloorr from "@/components/common/cards/SecondFloorr";
-import { Component as BigCalendar } from "@/components/common/calendar/Calendar";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
-import { MdOutlinePayment } from "react-icons/md";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
 import Clock from "@/components/common/time/clock";
-import Sidebar from "@/components/common/navigatin-side-top/sidebarDetails";
 import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm";
-import { X, ChevronRight } from "lucide-react";
+import { X } from "lucide-react";
 import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 
 const Joshtest = () => {
   const [selectedFloor, setSelectedFloor] = useState("floor1");
@@ -26,7 +19,6 @@ const Joshtest = () => {
   const [resetTrigger, setResetTrigger] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFormSidebarOpen, setIsFormSidebarOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null);
   const [buttonNum, setButtonNum] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -73,11 +65,6 @@ const Joshtest = () => {
     setButtonClicked(!buttonClicked);
   };
 
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-    setIsFormSidebarOpen(false);
-  };
-
   const resetState = () => {
     setResetTrigger(true);
     setTimeout(() => {
@@ -85,14 +72,8 @@ const Joshtest = () => {
     }, 0);
   };
 
-  const handleCalendarChange = (newValue) => {
-    setCalendarValue(newValue);
-    setCalendarKey(prevKey => prevKey + 1);
-  };
-
   return (
     <div className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]" id="reservation">
-      <NavigationTop />
       <main className="flex-1 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-6">
         <div
           className={`relative w-[100%] h-[85vh] overflow-hidden bg-white border border-black rounded-lg ${
@@ -115,16 +96,6 @@ const Joshtest = () => {
               </Select>
             </div>
             <DatePicker date={selectedDate} onDateChange={handleDateChange} state={buttonClicked} />
-            {/* <div className="absolute bottom-6 flex flex-row justify-between items-center p-4 z-10 left-0" style={{ borderRadius: "10px", width: "22%" }}>
-              <div className="flex flex-col items-center justify-center" style={{ backgroundColor: "#8BC34A", borderRadius: "10px", width: "100px", height: "100px" }}>
-                <span className="text-5xl font-bold text-green-600">69</span>
-                <span className="text-lg text-green-700">Available</span>
-              </div>
-              <div className="flex flex-col items-center justify-center" style={{ backgroundColor: "#64B5F6", borderRadius: "10px", width: "100px", height: "100px" }}>
-                <span className="text-5xl font-bold text-blue-600">69</span>
-                <span className="text-lg text-blue-700">Reserve</span>
-              </div>
-            </div> */}
             <div className="absolute bottom-0 pr-3 flex flex-col items-end z-10 w-full">
               <div className="flex items-center">
                 <span className="text-black-500 text-[10px] mr-1">Reserved</span>
@@ -184,50 +155,8 @@ const Joshtest = () => {
           <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
             <Clock />
           </div>
-
-          <div className="flex justify-center items-center py-7">
-            <h6 className="absolute z-10 text-gray-600 bg-[#f8f6f2] mx-6 px-5 font-bold">QUICK ACTIONS</h6>
-            <hr className="w-full border-black z-0" />
-          </div>
-          <Button onClick={toggleFormSidebar}>
-            <p>Campus Ministry Office &#40;CMO&#41; Retreat</p>
-          </Button>
-          <Button onClick={toggleFormSidebar}>
-            <p>Internal Reservation &#40;Individual Guest&#41; </p>
-          </Button>
-          <Button onClick={toggleFormSidebar}>
-            <p>Internal Reservation &#40;Group&#41;</p>
-          </Button>
-          <Button onClick={toggleFormSidebar}>
-            <p>External Reservation &#40;Individual Guest&#41;</p>
-          </Button>
-          <Button onClick={toggleFormSidebar}>
-            <p>External Reservation &#40;Group&#41;</p>
-          </Button>
-          <Button onClick={toggleFormSidebar}>
-            <p>Other Reservations</p>
-          </Button>
         </div>
       </main>
-
-      {(isSidebarOpen || isFormSidebarOpen) && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
-          onClick={toggleSidebar}
-        ></div>
-      )}
-
-      <div className="self-center h-[80vh] w-[90vw] p-5" id="calendar">
-        {/* <BigCalendar
-          style={{ padding: "0" }}
-          onChange={handleCalendarChange}
-          value={calendarValue}
-        /> */}
-        <FullCalendar
-          plugins={[ dayGridPlugin ]}
-          initialView="dayGridMonth"
-        />
-      </div>
     </div>
   );
 }

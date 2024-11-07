@@ -47,7 +47,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                     {[
                         ['Home', 'home'],
                         ['Reservation', 'Reservation'],
-                        ['Calendar', 'calendar'],
+                        ['Calendar', 'Calendar'],
                         ['Account', 'account'],
                     ].map(([title, path]) => (
                         <Link

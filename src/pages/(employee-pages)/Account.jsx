@@ -1,19 +1,19 @@
-'use client';
-import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Upload } from 'lucide-react';
-import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
-import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { toast } from "@/components/ui/use-toast"
+import { Building2, Calendar, Clock, Loader2, Mail, Phone, Upload, User } from 'lucide-react'
+import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop"
 
 const initialEmployee = {
   id: 'EMP001',
@@ -35,36 +35,36 @@ const initialEmployee = {
     { guestName: 'Mrs. Williams', bookingType: 'event', details: 'Wedding reception, Grand Ballroom', date: '2023-07-22', timestamp: '2023-06-18T11:30:00Z' },
     { guestName: 'Mr. Brown', bookingType: 'room', details: 'Room 210, 1 night', date: '2023-06-18', timestamp: '2023-06-18T16:45:00Z' }
   ]
-};
+}
 
 export default function Account() {
-  const [showReservation, setShowReservation] = useState(false);
-  const navigate = useNavigate();
-  const [employee, setEmployee] = useState(initialEmployee);
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate()
+  const [employee, setEmployee] = useState(initialEmployee)
+  const [isLoading, setIsLoading] = useState(false)
+  const [bookingFilter, setBookingFilter] = useState('all')
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
     const fetchEmployeeData = async () => {
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if (isMounted) setEmployee(initialEmployee);
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (isMounted) setEmployee(initialEmployee)
       } catch (error) {
-        console.error('Error fetching employee data:', error);
+        console.error('Error fetching employee data:', error)
       }
-    };
+    }
 
-    fetchEmployeeData();
+    fetchEmployeeData()
 
     const intervalId = setInterval(() => {
-      if (isMounted) simulateAutomaticUpdates();
-    }, 10000);
+      if (isMounted) simulateAutomaticUpdates()
+    }, 10000)
 
     return () => {
-      isMounted = false;
-      clearInterval(intervalId);
-    };
-  }, []);
+      isMounted = false
+      clearInterval(intervalId)
+    }
+  }, [])
 
   const simulateAutomaticUpdates = () => {
     const newInteraction = {
@@ -72,7 +72,7 @@ export default function Account() {
       roomNumber: `${Math.floor(Math.random() * 500 + 100)}`,
       notes: `Random interaction ${new Date().toLocaleTimeString()}`,
       timestamp: new Date().toISOString()
-    };
+    }
 
     const newBooking = {
       guestName: `Guest ${Math.floor(Math.random() * 100)}`,
@@ -80,204 +80,295 @@ export default function Account() {
       details: `Random booking ${new Date().toLocaleTimeString()}`,
       date: new Date().toISOString().split('T')[0],
       timestamp: new Date().toISOString()
-    };
+    }
 
     setEmployee(prev => ({
       ...prev,
       recentInteractions: [newInteraction, ...prev.recentInteractions.slice(0, 9)],
       bookingHistory: [newBooking, ...prev.bookingHistory.slice(0, 9)]
-    }));
+    }))
 
     toast({
       title: "Updates Received",
       description: "New interaction and booking have been automatically added.",
-    });
-  };
+    })
+  }
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEmployee(prev => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setEmployee(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleSelectChange = (name) => (value) => {
-    setEmployee(prev => ({ ...prev, [name]: value }));
-  };
+    setEmployee(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleSaveChanges = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1500))
       toast({
         title: "Profile updated",
         description: "Your profile information has been successfully updated.",
-      });
+      })
     } catch (error) {
-      console.error('Error saving changes:', error);
+      console.error('Error saving changes:', error)
       toast({
         title: "Error",
         description: "An error occurred while updating your profile.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleLogout = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      navigate('/');
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      navigate('/')
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Error logging out:', error)
       toast({
         title: "Error",
         description: "An error occurred while logging out.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
-        setEmployee(prev => ({ ...prev, profileImage: reader.result }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setEmployee(prev => ({ ...prev, profileImage: null }));
+        setEmployee(prev => ({ ...prev, profileImage: reader.result }))
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleBackToHome = () => {
-    setShowReservation(false);
-  };
-
-  const [activeTab, setActiveTab] = useState("personal");
+    navigate('/')
+  }
 
   return (
-    <div id='account' className="flex flex-col relative w-screen overflow-x-hidden h-screen bg-[#f8f6f2]">
-        
-      <main className="flex-1 sm:p-6 flex flex-col h-full space-y-4 md:flex-row md:space-y-0 md:space-x-6">
-        
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-          <div className="fixed top-0 left-0 right-0 z-50">
-            <NavigationTop handleBackToHome={handleBackToHome} />
+    <>
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <NavigationTop handleBackToHome={handleBackToHome} />
+      </div>
+      <Card className="fixed inset-0 w-screen h-screen pt-[5rem] bg-white/50 dark:bg-gray-900/50 overflow-hidden">
+
+        <CardHeader className="pb-4 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
+          <div className="relative group">
+              <Avatar className="w-24 h-24 ">
+                <img
+                  src="src/assets/images/SchoolLogo.png"
+                  alt="Upload Logo"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </Avatar>
+            </div>
+
+          <div className="flex-1">
+            <CardTitle className="text-3xl font-bold">{employee.name}</CardTitle>
+            <CardDescription className="text-lg mt-1">{employee.position}</CardDescription>
+            
           </div>
-          <Card className="w-full max-w-4xl">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <div className="relative">
-                  <Avatar className="w-24 h-24">
-                    <AvatarImage src={employee.profileImage || `https://api.dicebear.com/6.x/initials/svg?seed=${employee.name}`} alt={employee.name} />
-                    <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <label htmlFor="profile-image" className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1 cursor-pointer">
-                    <Upload size={16} />
-                    <input id="profile-image" type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
-                  </label>
-                </div>
-                <div className="text-center sm:text-left">
-                  <CardTitle className="text-2xl">{employee.name}</CardTitle>
-                  <CardDescription>{employee.position}</CardDescription>
-                  <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-2">
-                    {employee.languages.map(lang => (
-                      <Badge key={lang} variant="secondary">{lang}</Badge>
-                    ))}
+          <div className="flex gap-3 md:self-start">
+            <Button
+              onClick={handleSaveChanges}
+              disabled={isLoading}
+              className="shadow-lg hover:shadow-xl transition-shadow"
+            >
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Save Changes
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              disabled={isLoading}
+              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-red-500"
+            >
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Logout
+            </Button>
+
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="personal" className="mt-6 ">
+          <TabsList className="grid w-full grid-cols-3 gap-4 ">
+        <TabsTrigger
+          value="personal"
+          className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        >
+          <User className="w-4 h-4 mr-2" />
+          Employee Info
+        </TabsTrigger>
+        <TabsTrigger
+          value="interactions"
+          className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        >
+          <Calendar className="w-4 h-4 mr-2" />
+          Guest Interactions
+        </TabsTrigger>
+        <TabsTrigger
+          value="bookings"
+          className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        >
+          <Building2 className="w-4 h-4 mr-2" />
+          Booking History
+        </TabsTrigger>
+      </TabsList>
+            <div
+              className="mt-8 border-4 border-gray-300 p-6 h-[500px] overflow-y-auto no-scrollbar"
+              style={{
+                scrollbarWidth: "none", // Firefox
+                msOverflowStyle: "none" // Internet Explorer and Edge
+              }}
+            >
+              <TabsContent value="personal">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                      <Mail className="w-4 h-4" /> Email
+                    </Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={employee.email}
+                      onChange={handleInputChange}
+                      className="shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+                      <Phone className="w-4 h-4" /> Phone
+                    </Label>
+                    <Input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={employee.phone}
+                      onChange={handleInputChange}
+                      className="shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="department" className="text-sm font-medium flex items-center gap-2">
+                      <Building2 className="w-4 h-4" /> Department
+                    </Label>
+                    <Select value={employee.department} onValueChange={handleSelectChange("department")}>
+                      <SelectTrigger className="shadow-sm">
+                        <SelectValue placeholder="Select Department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Front Office">Front Office</SelectItem>
+                        <SelectItem value="Housekeeping">Housekeeping</SelectItem>
+                        <SelectItem value="Food & Beverage">Food & Beverage</SelectItem>
+                        <SelectItem value="Maintenance">Maintenance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="shift" className="text-sm font-medium flex items-center gap-2">
+                      <Clock className="w-4 h-4" /> Shift
+                    </Label>
+                    <Select value={employee.shift} onValueChange={handleSelectChange("shift")}>
+                      <SelectTrigger className="shadow-sm">
+                        <SelectValue placeholder="Select Shift" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Morning">Morning</SelectItem>
+                        <SelectItem value="Afternoon">Afternoon</SelectItem>
+                        <SelectItem value="Night">Night</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="notes" className="text-sm font-medium">Notes</Label>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={employee.notes}
+                      onChange={handleInputChange}
+                      className="min-h-[100px] shadow-sm"
+                    />
                   </div>
                 </div>
+              </TabsContent>
+               <TabsContent value="interactions">
+              <div className="space-y-6">
+                {employee.recentInteractions.map((interaction, index) => (
+                  <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
+                    <CardHeader className="bg-muted/50 py-3">
+                      <CardTitle className="text-lg font-medium">
+                        {interaction.guestName} - Room {interaction.roomNumber}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <p className="text-muted-foreground">{interaction.notes}</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {new Date(interaction.timestamp).toLocaleString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </CardHeader>
-            <CardContent>
-            <Tabs defaultValue="personal" className="w-full bg-white">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="personal">Employee Info</TabsTrigger>
-        <TabsTrigger value="interactions">Guest Interactions</TabsTrigger>
-        <TabsTrigger value="bookings">Booking History</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="personal" className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input type="email" id="email" name="email" value={employee.email} onChange={handleInputChange} />
-          </div>
-          <div>
-            <Label htmlFor="phone">Phone</Label>
-            <Input type="tel" id="phone" name="phone" value={employee.phone} onChange={handleInputChange} />
-          </div>
-          <div>
-            <Label htmlFor="department">Department</Label>
-            <Select value={employee.department} onValueChange={handleSelectChange("department")}>
-              <SelectTrigger><SelectValue placeholder="Select Department" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Front Office">Front Office</SelectItem>
-                <SelectItem value="Housekeeping">Housekeeping</SelectItem>
-                <SelectItem value="Food & Beverage">Food & Beverage</SelectItem>
-                <SelectItem value="Maintenance">Maintenance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="shift">Shift</Label>
-            <Select value={employee.shift} onValueChange={handleSelectChange("shift")}>
-              <SelectTrigger><SelectValue placeholder="Select Shift" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Morning">Morning</SelectItem>
-                <SelectItem value="Afternoon">Afternoon</SelectItem>
-                <SelectItem value="Night">Night</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="md:col-span-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" value={employee.notes} onChange={handleInputChange} />
-          </div>
-        </div>
-      </TabsContent>
-
-      <TabsContent value="interactions" className="space-y-4">
-        <ul className="divide-y divide-gray-200">
-          {employee.recentInteractions.map((interaction, index) => (
-            <li key={index} className="py-4">
-              <p><strong>Guest:</strong> {interaction.guestName}</p>
-              <p><strong>Room:</strong> {interaction.roomNumber}</p>
-              <p><strong>Notes:</strong> {interaction.notes}</p>
-              <p><small><strong>Timestamp:</strong> {new Date(interaction.timestamp).toLocaleString()}</small></p>
-            </li>
-          ))}
-        </ul>
-      </TabsContent>
-
-      <TabsContent value="bookings" className="space-y-4">
-        <ul className="divide-y divide-gray-200">
-          {employee.bookingHistory.map((booking, index) => (
-            <li key={index} className="py-4">
-              <p><strong>Guest:</strong> {booking.guestName}</p>
-              <p><strong>Type:</strong> {booking.bookingType}</p>
-              <p><strong>Details:</strong> {booking.details}</p>
-              <p><small><strong>Date:</strong> {new Date(booking.timestamp).toLocaleString()}</small></p>
-            </li>
-          ))}
-        </ul>
-      </TabsContent>
-    </Tabs>
-            </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-              <Button onClick={handleSaveChanges} disabled={isLoading}>
-                {isLoading ? <Loader2 className="animate-spin" /> : 'Save Changes'}
-              </Button>
-              <Button variant="destructive" onClick={handleLogout} disabled={isLoading}>
-                {isLoading ? <Loader2 className="animate-spin" /> : 'Logout'}
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </main>
-    </div>
-  );
+            </TabsContent>
+            <TabsContent value="bookings">
+              <div className="space-y-4">
+              <div className="flex space-x-2 fixed top-[325px] " >
+              <Button 
+                    variant={bookingFilter === 'all' ? "default" : "outline"} 
+                    onClick={() => setBookingFilter('all')}
+                  >
+                    All
+                  </Button>
+                  <Button 
+                    variant={bookingFilter === 'room' ? "default" : "outline"} 
+                    onClick={() => setBookingFilter('room')}
+                  >
+                    Room
+                  </Button>
+                  <Button 
+                    variant={bookingFilter === 'event' ? "default" : "outline"} 
+                    onClick={() => setBookingFilter('event')}
+                  >
+                    Event
+                  </Button>
+                </div>
+                <div className="space-y-6">
+                  {employee.bookingHistory
+                    .filter(booking => bookingFilter === 'all' || booking.bookingType === bookingFilter)
+                    .map((booking, index) => (
+                      <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
+                        <CardHeader className="bg-muted/50 py-3">
+                          <CardTitle className="text-lg font-medium">
+                            {booking.guestName} - {booking.bookingType.charAt(0).toUpperCase() + booking.bookingType.slice(1)}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-4">
+                          <p className="text-muted-foreground">{booking.details}</p>
+                          <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                            <p>Date: {booking.date}</p>
+                            <p>Booked: {new Date(booking.timestamp).toLocaleString()}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              </div>
+            </TabsContent>
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </>
+  )
 }

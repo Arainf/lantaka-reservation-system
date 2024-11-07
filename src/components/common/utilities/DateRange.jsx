@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export function DatePicker({ value, onChange, className }) {
+export function DatePicker({ value, onChange, className, state }) {
   const [date, setDate] = React.useState(value || {
     from: new Date(),
     to: addDays(new Date(), 0),
@@ -39,6 +39,8 @@ export function DatePicker({ value, onChange, className }) {
             style={{
               backgroundColor: "#95c1ff",
             }}
+
+            disabled={state}
           >
             <IoCalendarSharp className="mr-2 h-4 w-4" />
             {date?.from ? (

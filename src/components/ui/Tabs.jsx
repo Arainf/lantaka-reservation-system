@@ -8,7 +8,7 @@ export function Tabs({ children, defaultValue, className }) {
 
   return (
     <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className={className}>{children}</div>
+      <div className={`${className} w-full`}>{children}</div>
     </TabsContext.Provider>
   );
 }
@@ -21,8 +21,8 @@ export function TabsTrigger({
   value,
   children,
   className,
-  activeClass = 'bg-white text-black',
-  inactiveClass = 'bg-gray-200 text-gray-700',
+  activeClass = 'text-black',
+  inactiveClass = 'text-gray-700',
 }) {
   const { activeTab, setActiveTab } = useContext(TabsContext);
 

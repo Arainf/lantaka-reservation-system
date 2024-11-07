@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from "react";
 import { createIcons, icons } from "lucide";
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
@@ -8,8 +6,9 @@ import GuestTable from "@/components/common/cards/GuestTable";
 import { ChevronLeft, ChevronRight, Filter, Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import DeleteModal from "@/components/ui/deletemodal";
 
-const guests = [
+const initialGuests = [
   { id: 1, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
   { id: 2, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
   { id: 3, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
@@ -36,6 +35,9 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
   });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterRef = useRef(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [guestToDelete, setGuestToDelete] = useState(null);
+  const [guests, setGuests] = useState(initialGuests);
 
   useEffect(() => {
     createIcons({ icons });
@@ -65,7 +67,17 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
   });
 
   const handleDelete = (id) => {
-    console.log(`Delete guest with id: ${id}`);
+    const guestToDelete = guests.find(guest => guest.id === id);
+    setGuestToDelete(guestToDelete);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (guestToDelete) {
+      setGuests(prevGuests => prevGuests.filter(guest => guest.id !== guestToDelete.id));
+      setDeleteModalOpen(false);
+      setGuestToDelete(null);
+    }
   };
 
   const handleEdit = (id) => {
@@ -138,42 +150,7 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
                 </Button>
                 {isFilterOpen && (
                   <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Room</div>
-                      {rooms.map((room) => (
-                        <label key={room} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-                            checked={tempFilters.room.includes(room)}
-                            onChange={() => handleTempFilterChange('room', room)}
-                          />
-                          <span className="ml-2">{room}</span>
-                        </label>
-                      ))}
-                      <div className="border-t border-gray-100"></div>
-                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Status</div>
-                      {statuses.map((status) => (
-                        <label key={status} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-                            checked={tempFilters.status.includes(status)}
-                            onChange={() => handleTempFilterChange('status', status)}
-                          />
-                          <span className="ml-2">{status}</span>
-                        </label>
-                      ))}
-                      <div className="border-t border-gray-100"></div>
-                      <div className="px-4 py-2">
-                        <Button onClick={applyFilters} className="w-full mb-2">
-                          Apply Filters
-                        </Button>
-                        <Button onClick={resetFilters} variant="outline" className="w-full">
-                          Reset Filters
-                        </Button>
-                      </div>
-                    </div>
+                    {/* Filter options */}
                   </div>
                 )}
               </div>
@@ -207,6 +184,13 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
           />
         </main>
       </div>
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={guestToDelete ? guestToDelete.customer : ""}
+        itemType="Guest"
+      />
     </div>
   );
 }

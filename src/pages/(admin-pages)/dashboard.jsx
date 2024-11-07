@@ -71,15 +71,15 @@ const AdminDashboard = () => {
               <h2 className="text-3xl font-bold">Welcome back, Hotel Manager!</h2>
               <p className="text-gray-500">Here's what's happening with your hotel today.</p>
             </div>
-            <div className="flex items-center space-x-2 bg-white rounded-md shadow-sm p-2">
+            <div className="hidden lg:flex justify-between items-center space-x-2 bg-white rounded-md shadow-sm p-2">
               <DatePicker />
               <span className="text-gray-500">-</span>
               <DatePicker />
-              <div className="flex space-x-1 ml-2">
-                <Button variant="outline" size="icon"><Mail className="h-4 w-4" /></Button>
-                <Button variant="outline" size="icon"><Upload className="h-4 w-4" /></Button>
-                <Button variant="outline" size="icon"><FileText className="h-4 w-4" /></Button>
-                <Button variant="outline" size="icon"><Share2 className="h-4 w-4" /></Button>
+              <div className="hidden lg:flex justify-between space-x-1 ml-2">
+                <Button variant="outline" size="md"><Mail className="h-5 w-5" /></Button>
+                <Button variant="outline" size="md"><Upload className="h-5 w-5" /></Button>
+                <Button variant="outline" size="md"><FileText className="h-5 w-5" /></Button>
+                <Button variant="outline" size="md"><Share2 className="h-5 w-5" /></Button>
               </div>
             </div>
           </div>

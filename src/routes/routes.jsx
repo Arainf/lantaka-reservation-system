@@ -20,8 +20,9 @@ import AdminAccounts from "@/pages/(admin-pages)/accounts";
 // employee pages import routes
 import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
+import Account from "@/pages/(employee-pages)/Account";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
-
+import Calendar from "@/pages/(employee-pages)/Calendar";
 
 const AppRoutes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -121,6 +122,7 @@ const AppRoutes = () => {
           />
         }
       />
+      
 
       {/* Admin Dashboard: Protected, but bypassable in Dev Mode */}
       <Route
@@ -138,6 +140,26 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Reservation toggleSidebar={toggleSidebar} />}
+            allowedRoles={["Employee"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+      <Route
+        path="/Calendar"
+        element={
+          <ProtectedRoute
+            element={<Calendar />}
+            allowedRoles={["Employee"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+      <Route
+        path="/Account"
+        element={
+          <ProtectedRoute
+            element={<Account />}
             allowedRoles={["Employee"]}
             isDevMode={isDevMode}
           />

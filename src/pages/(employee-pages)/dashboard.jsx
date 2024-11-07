@@ -35,7 +35,7 @@ export default function Component() {
   }, []);
 
   return (
-    <main className="flex flex-col h-screen w-screen overflow-hidden m-0">
+    <main className="flex flex-col h-screen w-screen overflow-y-auto m-0">
       <NavigationTop />
 
       <section
