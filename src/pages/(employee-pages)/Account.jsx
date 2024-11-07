@@ -164,31 +164,19 @@ export default function Account() {
 
         <CardHeader className="pb-4 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
           <div className="relative group">
-            <Avatar className="w-24 h-24 border-4 border-white shadow-xl transition-transform group-hover:scale-105">
-              <AvatarImage
-                src={employee.profileImage || `https://api.dicebear.com/6.x/initials/svg?seed=${employee.name}`}
-                alt={employee.name}
-              />
-              <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-            </Avatar>
-            <label
-              htmlFor="profile-image"
-              className="absolute bottom-0 right-0 p-2 bg-primary rounded-full shadow-lg cursor-pointer transform transition-transform hover:scale-110"
-            >
-              <Upload className="w-4 h-4 text-primary-foreground" />
-              <input id="profile-image" type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
-            </label>
-          </div>
+              <Avatar className="w-24 h-24 ">
+                <img
+                  src="src/assets/images/SchoolLogo.png"
+                  alt="Upload Logo"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </Avatar>
+            </div>
+
           <div className="flex-1">
             <CardTitle className="text-3xl font-bold">{employee.name}</CardTitle>
             <CardDescription className="text-lg mt-1">{employee.position}</CardDescription>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {employee.languages.map(lang => (
-                <Badge key={lang} variant="secondary" className="px-3 py-1 text-sm">
-                  {lang}
-                </Badge>
-              ))}
-            </div>
+            
           </div>
           <div className="flex gap-3 md:self-start">
             <Button
@@ -203,45 +191,46 @@ export default function Account() {
               variant="destructive"
               onClick={handleLogout}
               disabled={isLoading}
-              className="shadow-lg hover:shadow-xl transition-shadow"
+              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-red-500"
             >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Logout
             </Button>
+
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="personal" className="mt-6">
-            <TabsList className="grid w-full grid-cols-3 gap-4 bg-transparent">
-              <TabsTrigger
-                value="personal"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shadow-lg flex items-center justify-center"
-              >
-                <User className="w-4 h-4 mr-2" />
-                Employee Info
-              </TabsTrigger>
-              <TabsTrigger
-                value="interactions"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shadow-lg flex items-center justify-center"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Guest Interactions
-              </TabsTrigger>
-              <TabsTrigger
-                value="bookings"
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground shadow-lg flex items-center justify-center"
-              >
-                <Building2 className="w-4 h-4 mr-2" />
-                Booking History
-              </TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="personal" className="mt-6 ">
+          <TabsList className="grid w-full grid-cols-3 gap-4 ">
+        <TabsTrigger
+          value="personal"
+          className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        >
+          <User className="w-4 h-4 mr-2" />
+          Employee Info
+        </TabsTrigger>
+        <TabsTrigger
+          value="interactions"
+          className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        >
+          <Calendar className="w-4 h-4 mr-2" />
+          Guest Interactions
+        </TabsTrigger>
+        <TabsTrigger
+          value="bookings"
+          className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+        >
+          <Building2 className="w-4 h-4 mr-2" />
+          Booking History
+        </TabsTrigger>
+      </TabsList>
             <div
-  className="mt-8 border-4 border-gray-300 p-6 h-[500px] overflow-y-auto no-scrollbar"
-  style={{
-    scrollbarWidth: "none", // Firefox
-    msOverflowStyle: "none" // Internet Explorer and Edge
-  }}
->
+              className="mt-8 border-4 border-gray-300 p-6 h-[500px] overflow-y-auto no-scrollbar"
+              style={{
+                scrollbarWidth: "none", // Firefox
+                msOverflowStyle: "none" // Internet Explorer and Edge
+              }}
+            >
               <TabsContent value="personal">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -334,8 +323,8 @@ export default function Account() {
             </TabsContent>
             <TabsContent value="bookings">
               <div className="space-y-4">
-                <div className="flex space-x-2">
-                  <Button 
+              <div className="flex space-x-2 fixed top-[325px] " >
+              <Button 
                     variant={bookingFilter === 'all' ? "default" : "outline"} 
                     onClick={() => setBookingFilter('all')}
                   >
