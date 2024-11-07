@@ -218,11 +218,11 @@ const Joshtest = () => {
       )}
 
       <div className="self-center h-[80vh] w-[90vw] p-5" id="calendar">
-        {/* <BigCalendar
+        <BigCalendar
           style={{ padding: "0" }}
           onChange={handleCalendarChange}
           value={calendarValue}
-        /> */}
+        />
         <FullCalendar
           plugins={[ dayGridPlugin ]}
           initialView="dayGridMonth"

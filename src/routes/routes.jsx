@@ -21,6 +21,7 @@ import AdminAccounts from "@/pages/(admin-pages)/accounts";
 import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
+import Calendar from "@/pages/(employee-pages)/Calendar";
 
 
 const AppRoutes = () => {
@@ -138,6 +139,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Reservation toggleSidebar={toggleSidebar} />}
+            allowedRoles={["Employee"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+      <Route
+        path="/Calendar"
+        element={
+          <ProtectedRoute
+            element={<Calendar />}
             allowedRoles={["Employee"]}
             isDevMode={isDevMode}
           />
