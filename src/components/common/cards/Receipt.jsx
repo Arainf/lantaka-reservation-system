@@ -1,29 +1,31 @@
-import React from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
-const CostCalculator = ({ 
+const CostCalculator = ({
   selectedRooms = ['Double Room', 'Triple Room'],
   selectedVenues = ['Conference Hall'],
   clientType = 'external',
   numberOfNights = 3
 }) => {
-  // Sample rates and discounts (replace with actual data in real application)
-  const roomRates = {
-    'Double Room': 2500,
-    'Triple Room': 3500,
-    'Matrimonial Room': 4000
-  }
+  const [price, setPrice] = useState({});
+  const [roomRates, setRoomRates] = useState({
+    'Double Room': 0,
+    'Triple Room': 0,
+    'Matrimonial Room': 0,
+  });
+
   const venueRates = {
     'Conference Hall': 15000,
-    'Meeting Room': 8000
-  }
-  const internalDiscount = 0.2 // 20% discount for internal clients
-  const taxRate = 0.12 // 12% tax
+    'Meeting Room': 8000,
+  };
+
+  const internalDiscount = 300; // 20% discount for internal clients
+//   const taxRate = 0.12; // 12% tax
 
   const calculateSubtotal = () => {
     let subtotal = 0;
-    
+
     // Ensure selectedRooms is an array
     if (Array.isArray(selectedRooms)) {
       selectedRooms.forEach(room => {
@@ -33,31 +35,59 @@ const CostCalculator = ({
     } else {
       console.error('selectedRooms is not an array');
     }
-  
+
     if (Array.isArray(selectedVenues)) {
       selectedVenues.forEach(venue => {
         subtotal += venueRates[venue] || 0;
       });
     }
-  
+
     return subtotal;
-  }
-  
+  };
+
   // Count occurrences of each room type
   const roomCounts = selectedRooms.reduce((acc, room) => {
     acc[room] = (acc[room] || 0) + 1;
     return acc;
   }, {});
 
-  const subtotal = calculateSubtotal()
-  const discount = clientType === 'internal' ? subtotal * internalDiscount : 0
-  const taxableAmount = subtotal - discount
-  const tax = taxableAmount * taxRate
-  const total = taxableAmount + tax
+  const subtotal = calculateSubtotal();
+  const discount = clientType === 'internal' ? internalDiscount : 0;
+  const taxableAmount = subtotal - discount;
+  const total = taxableAmount;
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount)
-  }
+    return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
+  };
+
+  const fetchPrice = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/getPrice');
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const dataPrice = await response.json();
+      setPrice(dataPrice);
+    } catch (error) {
+      console.error("Error fetching available rooms:", error);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    fetchPrice();
+  }, []);
+
+  useEffect(() => {
+    if (price) {
+      // Set roomRates based on the fetched price data
+      setRoomRates({
+        'Double Room': price.double_price || 0,
+        'Triple Room': price.triple_price || 0,
+        'Matrimonial Room': price.matrimonial_price || 0,
+      });
+    }
+  }, [price]);  // Only update roomRates when price changes
 
   return (
     <Card className="relative w-full bg-white text-gray-800 rounded-xl shadow-lg">
@@ -65,6 +95,7 @@ const CostCalculator = ({
         <div className="space-y-4">
           <div className="text-center">
             <h3 className="text-xl font-bold">Partial Receipt</h3>
+            <p className="text-sm text-gray-500">{clientType}</p>
             <p className="text-sm text-gray-500">Date: {new Date().toLocaleDateString()}</p>
           </div>
           <Separator />
@@ -94,14 +125,10 @@ const CostCalculator = ({
             </div>
             {clientType === 'internal' && (
               <div className="flex justify-between text-green-600">
-                <span>Internal Discount (20%):</span>
+                <span>Internal Discount (300 off*):</span>
                 <span>- {formatCurrency(discount)}</span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span>Tax (12%):</span>
-              <span>{formatCurrency(tax)}</span>
-            </div>
           </div>
           <Separator />
           <div className="flex justify-between items-baseline">
@@ -114,7 +141,7 @@ const CostCalculator = ({
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default CostCalculator
+export default CostCalculator;

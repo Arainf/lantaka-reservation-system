@@ -420,10 +420,10 @@ const calculateNumberOfNights = (dateRange) => {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="internal">
+                                    <SelectItem value="Internal">
                                       Internal
                                     </SelectItem>
-                                    <SelectItem value="external">
+                                    <SelectItem value="External">
                                       External
                                     </SelectItem>
                                   </SelectContent>

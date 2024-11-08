@@ -122,10 +122,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
 
                 {userData && (
                     <div className="flex items-center space-x-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={userData.profile_image} alt={userData.first_name} />
-                            <AvatarFallback>{userData.first_name[0]}{userData.last_name[0]}</AvatarFallback>
-                        </Avatar>
+                         <img src={Slogo} alt="LOGO" className="h-8 w-8"/>
                         <div className="text-sm">
                             <p className="font-medium">Welcome, {userData.first_name}!</p>
                             <p className="text-xs text-gray-400">{userRole}</p>
