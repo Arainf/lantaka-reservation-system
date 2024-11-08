@@ -109,7 +109,7 @@ export default function Component() {
       </section>
 
       <section
-        className={`absolute top-0 left-0 right-0 bottom-0 transition-all duration-1000 ease-in-out overflow-hidden ${
+        className={`absolute top-10 left-0 right-0 bottom-0 transition-all duration-1000 ease-in-out overflow-hidden ${
           showReservation ? "translate-y-0" : "translate-y-full"
         } overflow-y-auto`}
       >

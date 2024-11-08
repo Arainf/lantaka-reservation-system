@@ -10,110 +10,20 @@ import interactionPlugin from '@fullcalendar/interaction'
 import NavigationTop from '@/components/common/navigatin-side-top/clientNavigationTop'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CalendarIcon, HomeIcon, BellIcon, ActivityIcon } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useReservations } from '@/context/contexts'
 
 export default function Calendar() {
-  const [events, setEvents] = useState([])
+  const { events, bookingSummary, upcomingBookings, recentActivities, fetchEvents } = useReservations()
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [editedEvent, setEditedEvent] = useState(null)
-  const [bookingSummary, setBookingSummary] = useState({ total: 0, rooms: 0, venues: 0 })
-  const [upcomingBookings, setUpcomingBookings] = useState([])
-  const [recentActivities, setRecentActivities] = useState([])
 
-  useEffect(() => {
-    fetchEvents()
-  }, [])
-
-  const fetchEvents = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/reservationCalendar')
-      const formattedEvents = response.data.map(event => ({
-        reservation: event.reservationid,
-        id: event.id,
-        title: `${event.id} - ${event.guests}`,
-        start: moment(`${event.dateStart}T${event.checkIn}`).toDate(),
-        end: moment(`${event.dateEnd}T${event.checkOut}`).toDate(),
-        allDay: true,
-        resource: {
-          employee: event.employee,
-          guests: event.guests,
-          type: event.type,
-          status: event.status,
-        },
-      }))
-
-      const groupedEvents = groupEventsByDay(formattedEvents)
-      setEvents(groupedEvents)
-      updateBookingSummary(formattedEvents)
-      updateUpcomingBookings(formattedEvents)
-      generateRecentActivities(formattedEvents)
-    } catch (error) {
-      console.error('Error fetching events:', error)
-    }
-  }
-
-  const groupEventsByDay = (events) => {
-    const grouped = events.reduce((acc, event) => {
-      const dateKey = moment(event.start).format('YYYY-MM-DD')
-      if (!acc[dateKey]) {
-        acc[dateKey] = { rooms: [], venues: [] }
-      }
-      if (event.resource.type.toLowerCase() === 'room') {
-        acc[dateKey].rooms.push(event)
-      } else if (event.resource.type.toLowerCase() === 'venue') {
-        acc[dateKey].venues.push(event)
-      }
-      return acc
-    }, {})
-
-    return Object.entries(grouped).map(([date, { rooms, venues }]) => ({
-      start: moment(date).toDate(),
-      end: moment(date).toDate(),
-      allDay: true,
-      title: `${rooms.length + venues.length} Bookings`,
-      extendedProps: { rooms, venues, date },
-    }))
-  }
-
-  const updateBookingSummary = (events) => {
-    const summary = events.reduce((acc, event) => {
-      acc.total++
-      if (event.resource.type.toLowerCase() === 'room') {
-        acc.rooms++
-      } else if (event.resource.type.toLowerCase() === 'venue') {
-        acc.venues++
-      }
-      return acc
-    }, { total: 0, rooms: 0, venues: 0 })
-    setBookingSummary(summary)
-  }
-
-  const updateUpcomingBookings = (events) => {
-    const upcoming = events
-      .filter(event => moment(event.start).isAfter(moment()))
-      .sort((a, b) => moment(a.start).diff(moment(b.start)))
-      .slice(0, 5)
-    setUpcomingBookings(upcoming)
-  }
-
-  const generateRecentActivities = (events) => {
-    const activities = events
-      .sort((a, b) => moment(b.start).diff(moment(a.start)))
-      .slice(0, 5)
-      .map(event => ({
-        id: event.id,
-        action: `${event.resource.type} ${event.id} ${event.resource.status}`,
-        time: moment(event.start).fromNow(),
-      }))
-    setRecentActivities(activities)
-  }
 
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event)

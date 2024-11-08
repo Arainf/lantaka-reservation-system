@@ -229,6 +229,7 @@ export default function Account() {
               }}
             >
               <TabsContent value="personal">
+<<<<<<< HEAD
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="firstname" className="text-sm font-medium">First Name</Label>
@@ -336,6 +337,63 @@ export default function Account() {
     </TabsContent>
 
 
+=======
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                      <Mail className="w-4 h-4" /> Email
+                    </Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={employee.email}
+                      onChange={handleInputChange}
+                      className="shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+                      <Phone className="w-4 h-4" /> Phone
+                    </Label>
+                    <Input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={employee.phone}
+                      onChange={handleInputChange}
+                      className="shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="department" className="text-sm font-medium flex items-center gap-2">
+                      <Building2 className="w-4 h-4" /> Department
+                    </Label>
+                    <Select value={employee.department} onValueChange={handleSelectChange("department")}>
+                      <SelectTrigger className="shadow-sm">
+                        <SelectValue placeholder="Select Department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Front Office">Front Office</SelectItem>
+                        <SelectItem value="Housekeeping">Housekeeping</SelectItem>
+                        <SelectItem value="Food & Beverage">Food & Beverage</SelectItem>
+                        <SelectItem value="Maintenance">Maintenance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="notes" className="text-sm font-medium">Notes</Label>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={employee.notes}
+                      onChange={handleInputChange}
+                      className="min-h-[100px] shadow-sm"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+>>>>>>> b5422ec216932a1111a964f80315a862c4545316
                <TabsContent value="interactions">
                
               <div className="space-y-6">

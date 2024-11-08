@@ -121,18 +121,20 @@ export default function ReservationsTableWithModal({ data = [] }) {
           {editingReservation && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
+                <Label htmlFor="name" className="text-right font-bold">
+                  Name:
                 </Label>
+              
                 <Input
                   id="name"
                   value={editingReservation.customer}
                   className="col-span-3"
                 />
+              
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="email" className="text-right">
-                  Email
+                  Email:
                 </Label>
                 <Input
                   id="email"
@@ -142,7 +144,7 @@ export default function ReservationsTableWithModal({ data = [] }) {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="room" className="text-right">
-                  Room
+                  Room:
                 </Label>
                 <Input
                   id="room"
@@ -152,7 +154,7 @@ export default function ReservationsTableWithModal({ data = [] }) {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="roomType" className="text-right">
-                  Room Type
+                  Room Type:
                 </Label>
                 <Select defaultValue={editingReservation.roomType}>
                   <SelectTrigger className="col-span-3">
@@ -167,7 +169,7 @@ export default function ReservationsTableWithModal({ data = [] }) {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="status" className="text-right">
-                  Status
+                  Status:
                 </Label>
                 <Select defaultValue={editingReservation.status}>
                   <SelectTrigger className="col-span-3">
