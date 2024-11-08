@@ -182,8 +182,8 @@ export default function Account() {
             <Button
               onClick={handleSaveChanges}
               disabled={isLoading}
-              className="shadow-lg hover:shadow-xl transition-shadow"
-            >
+              className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+              >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save Changes
             </Button>
@@ -191,7 +191,7 @@ export default function Account() {
               variant="destructive"
               onClick={handleLogout}
               disabled={isLoading}
-              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-red-500"
+              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-500"
             >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Logout
@@ -202,22 +202,19 @@ export default function Account() {
         <CardContent>
           <Tabs defaultValue="personal" className="mt-6 ">
           <TabsList className="grid w-full grid-cols-3 gap-4 ">
-        <TabsTrigger
-          value="personal"
+        <TabsTrigger value="personal"
           className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
         >
           <User className="w-4 h-4 mr-2" />
           Employee Info
         </TabsTrigger>
-        <TabsTrigger
-          value="interactions"
+        <TabsTrigger value="interactions"
           className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
         >
           <Calendar className="w-4 h-4 mr-2" />
           Guest Interactions
         </TabsTrigger>
-        <TabsTrigger
-          value="bookings"
+        <TabsTrigger value="bookings"
           className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
         >
           <Building2 className="w-4 h-4 mr-2" />
@@ -232,77 +229,115 @@ export default function Account() {
               }}
             >
               <TabsContent value="personal">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> Email
-                    </Label>
-                    <Input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={employee.email}
-                      onChange={handleInputChange}
-                      className="shadow-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
-                      <Phone className="w-4 h-4" /> Phone
-                    </Label>
-                    <Input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={employee.phone}
-                      onChange={handleInputChange}
-                      className="shadow-sm"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="department" className="text-sm font-medium flex items-center gap-2">
-                      <Building2 className="w-4 h-4" /> Department
-                    </Label>
-                    <Select value={employee.department} onValueChange={handleSelectChange("department")}>
-                      <SelectTrigger className="shadow-sm">
-                        <SelectValue placeholder="Select Department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Front Office">Front Office</SelectItem>
-                        <SelectItem value="Housekeeping">Housekeeping</SelectItem>
-                        <SelectItem value="Food & Beverage">Food & Beverage</SelectItem>
-                        <SelectItem value="Maintenance">Maintenance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shift" className="text-sm font-medium flex items-center gap-2">
-                      <Clock className="w-4 h-4" /> Shift
-                    </Label>
-                    <Select value={employee.shift} onValueChange={handleSelectChange("shift")}>
-                      <SelectTrigger className="shadow-sm">
-                        <SelectValue placeholder="Select Shift" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Morning">Morning</SelectItem>
-                        <SelectItem value="Afternoon">Afternoon</SelectItem>
-                        <SelectItem value="Night">Night</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="notes" className="text-sm font-medium">Notes</Label>
-                    <Textarea
-                      id="notes"
-                      name="notes"
-                      value={employee.notes}
-                      onChange={handleInputChange}
-                      className="min-h-[100px] shadow-sm"
-                    />
-                  </div>
-                </div>
-              </TabsContent>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="firstname" className="text-sm font-medium">First Name</Label>
+          <Input
+            type="text"
+            id="firstname"
+            name="firstname"
+            value={employee.firstname}
+            onChange={handleInputChange}
+            className="shadow-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="lastname" className="text-sm font-medium">Last Name</Label>
+          <Input
+            type="text"
+            id="lastname"
+            name="lastname"
+            value={employee.lastname}
+            onChange={handleInputChange}
+            className="shadow-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="gender" className="text-sm font-medium">Gender</Label>
+          <Select value={employee.gender} onValueChange={handleSelectChange("gender")}>
+            <SelectTrigger className="shadow-sm">
+              <SelectValue placeholder="Select Gender" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Male">Male</SelectItem>
+              <SelectItem value="Female">Female</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="dateOfBirth" className="text-sm font-medium">Date of Birth</Label>
+          <Input
+            type="date"
+            id="dateOfBirth"
+            name="dateOfBirth"
+            value={employee.dateOfBirth}
+            onChange={handleInputChange}
+            className="shadow-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+            <Mail className="w-4 h-4" /> Email
+          </Label>
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            value={employee.email}
+            onChange={handleInputChange}
+            className="shadow-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="phone" className="text-sm font-medium flex items-center gap-2">
+            <Phone className="w-4 h-4" /> Phone
+          </Label>
+          <Input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={employee.phone}
+            onChange={handleInputChange}
+            className="shadow-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="department" className="text-sm font-medium flex items-center gap-2">
+            <Building2 className="w-4 h-4" /> Department
+          </Label>
+          <Select value={employee.department} onValueChange={handleSelectChange("department")}>
+            <SelectTrigger className="shadow-sm">
+              <SelectValue placeholder="Select Department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Front Office">Front Office</SelectItem>
+              <SelectItem value="Housekeeping">Housekeeping</SelectItem>
+              <SelectItem value="Food & Beverage">Food & Beverage</SelectItem>
+              <SelectItem value="Maintenance">Maintenance</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
+          <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            value={employee.password}
+            onChange={handleInputChange}
+            className="shadow-sm"
+          />
+        </div>
+        </div>
+       
+      </div>
+    </TabsContent>
+
+
                <TabsContent value="interactions">
+               
               <div className="space-y-6">
                 {employee.recentInteractions.map((interaction, index) => (
                   <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
