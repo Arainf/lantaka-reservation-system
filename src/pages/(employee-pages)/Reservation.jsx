@@ -14,7 +14,6 @@ import { BsFileTextFill } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -33,6 +32,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
+import { Separator } from "@/components/ui/separator"
 import Footer from "@/components/common/footer/Footer";
 import {
   Dialog,
@@ -46,6 +46,8 @@ import { useNavigate} from 'react-router-dom'
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { useRoomVenueProvider } from "@/context/contexts";
+import CostCalculator from "@/components/common/cards/Receipt";
+import { Badge } from '@/components/ui/badge'
 
 
 
@@ -68,7 +70,11 @@ export default function Component() {
   const navigate = useNavigate()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [selectedRoomReceipt, setSelectedRoomReceipt] = useState({
+    double: [],
+    triple: [],
+    matrimonial: []
+  });
   
   const form = useForm({
     defaultValues: {
@@ -93,16 +99,42 @@ export default function Component() {
     },
   });
 
-  const handleRoomClick = (roomId) => {
+  // Flatten selectedRoomReceipt to an array of room names (e.g., 'Double Room', 'Triple Room')
+  const getSelectedRooms = () => {
+    const rooms = [];
+    if (selectedRoomReceipt.double.length > 0) {
+      rooms.push(...selectedRoomReceipt.double.map(() => 'Double Room'));
+    }
+    if (selectedRoomReceipt.triple.length > 0) {
+      rooms.push(...selectedRoomReceipt.triple.map(() => 'Triple Room'));
+    }
+    if (selectedRoomReceipt.matrimonial.length > 0) {
+      rooms.push(...selectedRoomReceipt.matrimonial.map(() => 'Matrimonial Room'));
+    }
+    return rooms;
+  };
+
+  const handleRoomClick = (roomId, roomType) => {
     setSelectedRooms((prevSelected) => {
-      // Check if the roomId is already in the selectedRooms array
-      if (prevSelected.includes(roomId)) {
-        // If it is, remove it (toggle off)
-        return prevSelected.filter(id => id !== roomId);
-      } else {
-        // If it isn't, add it (toggle on)
-        return [...prevSelected, roomId];
-      }
+      const currentTypeRooms = prevSelected[roomType] || [];
+  
+      const updatedRooms = currentTypeRooms.includes(roomId)
+        ? currentTypeRooms.filter(id => id !== roomId) // Remove if already selected
+        : [...currentTypeRooms, roomId]; // Add if not selected
+  
+      // Update selectedRooms
+      const newSelectedRooms = {
+        ...prevSelected,
+        [roomType]: updatedRooms
+      };
+      
+      // Update selectedRoomReceipt based on the same logic
+      setSelectedRoomReceipt((prevReceipt) => ({
+        ...prevReceipt,
+        [roomType]: updatedRooms
+      }));
+  
+      return newSelectedRooms;
     });
   };
 
@@ -217,29 +249,29 @@ export default function Component() {
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
   
   // Function to render room sections
-  const renderRoomSection = (rooms, title) => (
+  const renderRoomSection = (rooms, title, roomType) => (
     <div className="mb-8">
       <h3 className="text-sm font-medium mb-4 text-gray-600">{title}</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {rooms.map((room) => {
-          const { room_id: roomId, room_status: isAvailable } = room; // Use room_status as is_available directly
-          const isSelected = selectedRooms.includes(roomId); // Check if the room is selected
+          const { room_id: roomId, room_status: isAvailable } = room; // Use room_status as isAvailable directly
+          const isSelected = selectedRooms[roomType]?.includes(roomId); // Check if the room is selected in specific type
   
           return (
             <Button
               key={roomId}
               variant={isAvailable ? "default" : "outline"}
-              className={`h-15 ${
+              className={`h-15 poppins-semibold ${
                 isAvailable
                   ? isSelected
-                    ? "bg-sky-500 text-white" // Change to black if selected
-                    : "bg-green-500 text-primary-foreground" // Default color
+                    ? "bg-slate-900 text-white" // Black if selected
+                    : "bg-green-400 text-primary-foreground" // Default color
                   : "bg-muted text-muted-foreground"
               }`}
               disabled={!isAvailable} // Disable if unavailable
-              onClick={() => handleRoomClick(roomId)} // Handle room click
+              onClick={() => handleRoomClick(roomId, roomType)} // Pass roomType to handleRoomClick
             >
-              {roomId}
+              {formatRoomName(roomId)}
             </Button>
           );
         })}
@@ -247,35 +279,75 @@ export default function Component() {
     </div>
   );
 
+// Function to calculate the number of nights based on a date range object
+const calculateNumberOfNights = (dateRange) => {
+  // Check if the dateRange is valid and contains 'from' and 'to' properties
+  if (!dateRange || !dateRange.from || !dateRange.to) {
+    console.error("Invalid date range");
+    return 0;
+  }
+
+  const { from, to } = dateRange;
+
+  // Ensure both 'from' and 'to' are valid Date objects
+  const start = new Date(from);
+  const end = new Date(to);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    console.error("Invalid date format");
+    return 0;
+  }
+
+  // Calculate the difference in milliseconds and convert to days
+  const timeDifference = end - start;
+  const numberOfNights = timeDifference / (1000 * 3600 * 24);
+
+  // Return the number of nights, ensuring it's at least 1
+  return Math.max(numberOfNights, 1);
+}
+
+
+  
+  
+ 
+  const formatRoomName = (name) => {
+    return name.replace(/([a-z])([1-9])/g, '$1 $2'); // Add space between lowercase and uppercase letters
+  };
+
+  const formatVenueName = (name) => {
+    return name.replace(/([a-z])([A-Z])/g, '$1 $2'); // Add space between lowercase and uppercase letters
+  };
+  
   const renderVenueSection = (venues, title) => (
     <div className="mb-8">
       <h3 className="text-sm font-medium mb-4 text-gray-600">{title}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
         {venues.map((room) => {
-          const { room_id: venueId, room_status: isAvailable } = room; // Use room_status as is_available directly
-          const isSelected = selectedVenues.includes(venueId); // Check if the room is selected
-  
+          const { room_id: venueId, room_status: isAvailable } = room;
+          const isSelected = selectedVenues.includes(venueId);
+    
           return (
             <Button
               key={venueId}
               variant={isAvailable ? "default" : "outline"}
-              className={`h-15 ${
+              className={`h-15 poppins-semibold ${
                 isAvailable
                   ? isSelected
-                    ? "bg-sky-500 text-white" // Change to black if selected
-                    : "bg-green-500 text-primary-foreground" // Default color
+                    ? "bg-sky-500 text-white"
+                    : "bg-green-500 text-primary-foreground"
                   : "bg-muted text-muted-foreground"
               }`}
-              disabled={!isAvailable} // Disable if unavailable
-              onClick={() => handleVenueClick(venueId)} // Handle room click
+              disabled={!isAvailable}
+              onClick={() => handleVenueClick(venueId)}
             >
-              {venueId}
+              {formatVenueName(venueId)}
             </Button>
           );
         })}
       </div>
     </div>
   );
+  
 
   const formatDateRange = (dateRange) => {
     if (!dateRange || !dateRange.from || !dateRange.to) return "Not specified"
@@ -284,8 +356,8 @@ export default function Component() {
   
   
   const dateRange = form.getValues("dateRangeRoom") || form.getValues("dateRangeVenue"); 
-  const formattedFromDate = dateRange.from ? new Date(dateRange.from).toLocaleDateString() : "_____";
-  const formattedToDate = dateRange.to ? new Date(dateRange.to).toLocaleDateString() : "_____";
+  const formattedFromDate = dateRange.from ? new Date(dateRange.from).toLocaleDateString() : "null";
+  const formattedToDate = dateRange.to ? new Date(dateRange.to).toLocaleDateString() : "null";
 
   return (
     <>
@@ -294,17 +366,15 @@ export default function Component() {
         <main className="flex flex-row">
           <div className="flex w-full">
             {/* Reservation Form */}
-            <section className="w-1/3 border-r bg-background p-3 drop-shadow-lg">
+            <section className="w-1/4 border-r bg-background p-3 drop-shadow-lg">
               <div className="max-w-4xl mx-auto p-1">
                 <div className="p-2">
-                  <h1 className="text-2xl font-bold text-center mb-2">
+                  <h1 className="text-2xl poppins-bold font-bold text-left mb-[-2]">
                     Reservation Form
                   </h1>
-                  <p className="text-center mb-2 text-gray-600">
+                  <p className="text-left mb-5 poppins-extralight text-sm  text-gray-600">
                     Please complete the form below.
                   </p>
-
-                  <Progress value={step * 35} className="mb-3" />
 
                   <Form {...form}>
                     <form
@@ -318,7 +388,8 @@ export default function Component() {
                             name="clientAlias"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Client Alias</FormLabel>
+                                <FormLabel
+                                 className={"poppins-semibold"}>Client Alias</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Client Alias" {...field} />
                                 </FormControl>
@@ -335,7 +406,8 @@ export default function Component() {
                             className="flex-1"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Client Type</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Client Type</FormLabel>
                                 <Select
                                   onValueChange={(value) => {
                                     field.onChange(value); // Call the original onChange function
@@ -365,7 +437,8 @@ export default function Component() {
                             className="flex-1"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Reservation Type</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Reservation Type</FormLabel>
                                 <Select
                                   onValueChange={(value) => {
                                     field.onChange(value); // Call the original onChange function
@@ -395,14 +468,15 @@ export default function Component() {
                             name="dateRangeRoom"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Reservation Date	&#40; Room	&#41; </FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Reservation Date	&#40; Room	&#41; </FormLabel>
                                 <FormControl>
                                   <div className="flex flex-row gap-2">
                                     <DatePicker
                                       value={field.value}
                                       onChange={field.onChange}
                                       className="custom-datepicker w-full"
-                                      state={roomState}
+                                      state={roomState} 
                                     />
                                     <Button
                                       variant="default"
@@ -415,7 +489,7 @@ export default function Component() {
                                         )
                                       }
                                     >
-                                      Show Available
+                                      Show
                                     </Button>
                                   </div>
                                 </FormControl>
@@ -428,9 +502,10 @@ export default function Component() {
                             name="dateRangeVenue"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Reservation Date &#40; Venue	&#41;</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Reservation Date &#40; Venue	&#41;</FormLabel>
                                 <FormControl>
-                                  <div className="flex flex-row gap-2">
+                                  <div className="flex flex-row gap-2 ">
                                     <DatePicker
                                       value={field.value}
                                       onChange={field.onChange}
@@ -448,7 +523,7 @@ export default function Component() {
                                         )
                                       }
                                     >
-                                      Show Available
+                                      Show
                                     </Button>
                                   </div>
                                 </FormControl>
@@ -461,7 +536,8 @@ export default function Component() {
                             name="numberofGuest"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Number of Guest</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Number of Guest</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input
@@ -490,7 +566,8 @@ export default function Component() {
                               name="firstName"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Guest First name</FormLabel>
+                                  <FormLabel
+                                  className={"poppins-semibold"}>First name</FormLabel>
                                   <FormControl>
                                     <Input placeholder="Your name" {...field} />
                                   </FormControl>
@@ -502,7 +579,8 @@ export default function Component() {
                               name="lastName"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Guest Last name</FormLabel>
+                                  <FormLabel
+                                  className={"poppins-semibold"}>Last name</FormLabel>
                                   <FormControl>
                                     <Input
                                       placeholder="Your last name"
@@ -518,7 +596,8 @@ export default function Component() {
                             name="gender"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Gender</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Gender</FormLabel>
                                 <Select
                                   onValueChange={field.onChange}
                                   defaultValue={field.value}
@@ -544,7 +623,8 @@ export default function Component() {
                             name="email"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>E-mail</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>E-mail</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input
@@ -567,7 +647,8 @@ export default function Component() {
                             name="phone"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Phone Number</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input
@@ -590,7 +671,8 @@ export default function Component() {
                             name="designation"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Designation</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Designation</FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Designation or position"
@@ -610,7 +692,8 @@ export default function Component() {
                             name="messengerAccount"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Messenger Account</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Messenger Account</FormLabel>
                                 <FormControl>
                                   <Input
                                     placeholder="Messenger Username"
@@ -626,7 +709,8 @@ export default function Component() {
                             name="address"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Address</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Address</FormLabel>
                                 <FormControl>
                                   <Textarea
                                     placeholder="Address details"
@@ -642,7 +726,8 @@ export default function Component() {
                             name="addNotes"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Additional Notes</FormLabel>
+                                <FormLabel
+                                className={"poppins-semibold"}>Additional Notes</FormLabel>
                                 <FormControl>
                                   <Textarea
                                     placeholder="notes"
@@ -678,35 +763,64 @@ export default function Component() {
             </section>
 
             {/* Room Layout */}
-            <section className="flex-1 bg-muted/50 p-6">
-              <h1 className="text-2xl font-bold">Available Rooms & Venue</h1>
-              <p className="text-sm font-normal">
-                From {formattedFromDate} to {formattedToDate}
-              </p>
+            <section className="flex-1 w-2/4 bg-muted/50 p-5">
+              <h1 className="text-2xl poppins-bold mb-1">Available</h1>            
+              <div className="flex flex-row w-full">
               <ScrollArea className="h-[calc(100vh-8rem)]">
+                
                 {showResults && (
                   <>
+                  <div className="flex flex-row gap-1 text-center align-middle items-center mb-1">
+                <h1 className="text-xs poppins-bold">Room</h1>
+                <Badge variant="outline">
+                  {formattedFromDate}
+                </Badge>
+                <h2>-</h2> 
+                <Badge variant="outline">
+                  {formattedToDate}
+                </Badge>
+                </div>
                     {renderRoomSection(
                       availableRooms.double_rooms,
-                      "Double Rooms"
+                      "Double Rooms" , "double"
                     )}
                     {renderRoomSection(
                       availableRooms.triple_rooms,
-                      "Triple Rooms"
+                      "Triple Rooms" , "triple"
                     )}
                     {renderRoomSection(
                       availableRooms.matrimonial_rooms,
-                      "Matrimonial Rooms"
+                      "Matrimonial Rooms", "matrimonial"
                     )}
+                    <div className="flex flex-row gap-1 text-center align-middle items-center mb-1">
+                <h1 className="text-xs poppins-bold">Venue</h1>
+                <Badge variant="outline">
+                  {formattedFromDate}
+                </Badge>
+                <h2>-</h2> 
+                <Badge variant="outline">
+                  {formattedToDate}
+                </Badge>
+                </div>
                     {renderVenueSection(
-                      availableRooms.venues_holder,
-                      "Venues"
-                    )}
+                        availableRooms.venues_holder,
+                        "Venues"
+                      )}
                   </>
                 )}
                 
+              </ScrollArea>   
+              </div>           
+            </section>
+            <section className="flex w-1/4 justify-center items-center bg-muted/50">
+              <ScrollArea className="h-[calc(100vh-8rem)] w-[90%] ">
+                  <CostCalculator 
+                    selectedRooms={getSelectedRooms()}
+                    selectedVenues={selectedVenues}
+                    clientType={form.getValues("clientType")}
+                    numberOfNights={calculateNumberOfNights(form.getValues("dateRangeRoom") || form.getValues("dateRangeVenue"))}
+                  />
               </ScrollArea>
-              
             </section>
           </div>
         </main>
@@ -837,7 +951,6 @@ export default function Component() {
         </DialogFooter>
         </DialogContent>
       </Dialog>
-      {/* Add Toaster component for notifications */}
       <Toaster />
     </>
   );

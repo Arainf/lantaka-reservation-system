@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState} from 'react'
 import axios from 'axios'
 import moment from 'moment'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import NavigationTop from '@/components/common/navigatin-side-top/clientNavigationTop'
 import { Button } from '@/components/ui/button'
@@ -143,16 +142,16 @@ export default function Calendar() {
         <div className="flex-[2] p-6">
             <h1 className='text-xl'>Reservation Calendar</h1>
             <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                plugins={[dayGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
                 events={events}
                 eventClick={handleEventClick}
                 editable={false}
                 selectable={true}
                 headerToolbar={{
-                  left: 'prev,next today',
+                  left: 'prev,next',
                   center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                  right: ''
                 }}
                 eventContent={renderEventContent}
                 eventClassNames={eventStyleGetter}

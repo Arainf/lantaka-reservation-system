@@ -64,7 +64,7 @@ export function DatePicker({ value, onChange, className, state }) {
             selected={date}
             onSelect={handleDateChange} // Use the callback here
             numberOfMonths={1}
-            className="border-blue-500 text-black hover:border-blue-700"
+            className="border-blue-500 text-black hover:border-blue-500"
           />
         </PopoverContent>
       </Popover>
