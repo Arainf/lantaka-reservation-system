@@ -1,5 +1,5 @@
 import { memo, useState, useContext } from "react";
-import { Link } from "react-router-dom"; // Import Link
+import { Link, useNavigate } from "react-router-dom"; // Import Link and useNavigate
 import { Bell } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import './navigationside.css';
@@ -13,6 +13,10 @@ const NavigationTop = memo(({ handleBackToHome }) => {
     const { userData, userRole } = useContext(UserContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [notificationsVisible, setNotificationsVisible] = useState(false);
+    const [dropdownVisible, setDropdownVisible] = useState(false); // State for dropdown
+    const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
+
     const [reservationData, setReservationData] = useState({
         name: '',
         date: '',
@@ -56,6 +60,22 @@ const NavigationTop = memo(({ handleBackToHome }) => {
         setNotificationsVisible(prev => !prev);
     };
 
+    const toggleDropdown = () => {
+        setDropdownVisible(prev => !prev); // Toggle dropdown visibility
+    };
+
+    const handleLogout = async () => {
+        setIsLoading(true);
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            navigate('/');
+        } catch (error) {
+            console.error('Error logging out:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-10">
             {/* Left Section (Logo and Title) */}
@@ -70,7 +90,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             {/* Center Section (Navigation Links) */}
             <div className="flex justify-center w-1/2">
                 <nav className="flex space-x-4">
-                {[
+                    {[
                         ['Home', 'home'],
                         ['Reservation', 'Reservation'],
                         ['Calendar', 'Calendar'],
@@ -85,14 +105,11 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                             <span className="linkTextStyle"></span>
                         </Link>
                     ))}
-                    
                 </nav>
             </div>
 
             {/* Right Section (Bell, Avatar, and User Info) */}
             <div className="flex items-center space-x-2 justify-end w-1/4">
-
-            
                 {/* Notification Bell */}
                 <div onClick={toggleNotifications} className="relative cursor-pointer">
                     <Bell size={24} className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all" />
@@ -127,6 +144,25 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                             <p className="font-medium">Welcome, {userData.first_name}!</p>
                             <p className="text-xs text-gray-400">{userRole}</p>
                         </div>
+                    </div>
+                )}
+                {/* Dropdown Menu */}
+                {dropdownVisible && (
+                    <div className="absolute right-0  mt-[280px] w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3">
+                        <img src={Slogo} alt="LOGO" className="h-14 w-14 mx-auto mb-2" />
+                        <p className="text-center font-medium text-lg mb-2">{userData.first_name} {userData.last_name}</p>
+                        <Link
+                            to="/account"
+                            className="block text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 hover:text-white data-[state=active]:bg-blue-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center mb-3 rounded-lg"
+                        >
+                            Account
+                        </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="w-full text-center py-2 px-4 shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450 rounded-lg"
+                        >
+                            Logout
+                        </button>
                     </div>
                 )}
             </div>

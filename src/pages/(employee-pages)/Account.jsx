@@ -17,15 +17,10 @@ import NavigationTop from "@/components/common/navigatin-side-top/clientNavigati
 
 const initialEmployee = {
   id: 'EMP001',
-  name: 'Alice Johnson',
-  email: 'alice.johnson@grandhotel.com',
+  name: 'Josh Chiong Pogi',
+  email: 'pogi si chiong @gmail.com',
   phone: '+1 (555) 123-4567',
-  position: 'Front Desk Receptionist',
-  department: 'Front Office',
-  shift: 'Morning',
   startDate: '2022-03-15',
-  languages: ['English', 'Spanish'],
-  notes: 'Excellent at handling VIP guests. Trained in emergency procedures.',
   recentInteractions: [
     { guestName: 'Mr. Smith', roomNumber: '301', notes: 'Late check-out requested for tomorrow', timestamp: '2023-06-20T09:30:00Z' },
     { guestName: 'Ms. Garcia', roomNumber: '512', notes: 'Complained about noisy neighbors', timestamp: '2023-06-20T10:15:00Z' }
@@ -140,16 +135,7 @@ export default function Account() {
     }
   }
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setEmployee(prev => ({ ...prev, profileImage: reader.result }))
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+
 
   const handleBackToHome = () => {
     navigate('/')
@@ -179,7 +165,7 @@ export default function Account() {
             <CardDescription className="text-lg mt-1">{employee.position}</CardDescription>
             
           </div>
-          <div className="flex gap-3 md:self-start">
+          <div className="flex gap-3 pt-[20px] md:self-start">
             <Button
               onClick={handleSaveChanges}
               disabled={isLoading}
@@ -192,7 +178,7 @@ export default function Account() {
               variant="destructive"
               onClick={handleLogout}
               disabled={isLoading}
-              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-500"
+              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450"
             >
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Logout
@@ -223,7 +209,7 @@ export default function Account() {
         </TabsTrigger>
       </TabsList>
             <div
-              className="mt-8 border-4 border-gray-300 p-6 h-[500px] overflow-y-auto no-scrollbar"
+              className="mt-8 border-4 border-gray-300 p-6 h-[450px] overflow-y-auto no-scrollbar"
               style={{
                 scrollbarWidth: "none", // Firefox
                 msOverflowStyle: "none" // Internet Explorer and Edge
@@ -253,19 +239,7 @@ export default function Account() {
             className="shadow-sm"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="gender" className="text-sm font-medium">Gender</Label>
-          <Select value={employee.gender} onValueChange={handleSelectChange("gender")}>
-            <SelectTrigger className="shadow-sm">
-              <SelectValue placeholder="Select Gender" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Male">Male</SelectItem>
-              <SelectItem value="Female">Female</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        
         <div className="space-y-2">
           <Label htmlFor="dateOfBirth" className="text-sm font-medium">Date of Birth</Label>
           <Input
@@ -303,35 +277,8 @@ export default function Account() {
             className="shadow-sm"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="department" className="text-sm font-medium flex items-center gap-2">
-            <Building2 className="w-4 h-4" /> Department
-          </Label>
-          <Select value={employee.department} onValueChange={handleSelectChange("department")}>
-            <SelectTrigger className="shadow-sm">
-              <SelectValue placeholder="Select Department" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Front Office">Front Office</SelectItem>
-              <SelectItem value="Housekeeping">Housekeeping</SelectItem>
-              <SelectItem value="Food & Beverage">Food & Beverage</SelectItem>
-              <SelectItem value="Maintenance">Maintenance</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-        <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-          <Input
-            type="password"
-            id="password"
-            name="password"
-            value={employee.password}
-            onChange={handleInputChange}
-            className="shadow-sm"
-          />
-        </div>
-        </div>
+        
+        
        
       </div>
     </TabsContent>
@@ -341,9 +288,9 @@ export default function Account() {
         <div className="mb-4 flex space-x-2 fixed top-[325px] ">
         <Button
   onClick={() => setSortOldestFirst(!sortOldestFirst)}
-  className="flex items-center gap-2 bg-blue-200 text-black border-blue-600 hover:bg-blue-300"
+  className="flex items-center gap-2 bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
 >
-  <ArrowUpDown className="h-4 w-4 text-blue-600" />
+  <ArrowUpDown className="h-4 w-4 text-white" />
   Sort {sortOldestFirst ? 'Newest to Oldest' : 'Oldest to Newest'}
 </Button>
         </div>
