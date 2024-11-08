@@ -138,7 +138,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                 </div>
 
                 {userData && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2" onClick={toggleDropdown}>
                          <img src={Slogo} alt="LOGO" className="h-8 w-8"/>
                         <div className="text-sm">
                             <p className="font-medium">Welcome, {userData.first_name}!</p>
