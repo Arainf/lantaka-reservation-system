@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
-import { Building2, Calendar, Clock, Loader2, Mail, Phone, Upload, User } from 'lucide-react'
+import { ArrowUpDown, Building2, Calendar, Clock, Loader2, Mail, Phone, Upload, User } from 'lucide-react'
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop"
 
 const initialEmployee = {
@@ -154,6 +154,7 @@ export default function Account() {
   const handleBackToHome = () => {
     navigate('/')
   }
+  const [sortOldestFirst, setSortOldestFirst] = useState(false)
 
   return (
     <>
@@ -336,26 +337,40 @@ export default function Account() {
     </TabsContent>
 
 
-               <TabsContent value="interactions">
-               
-              <div className="space-y-6">
-                {employee.recentInteractions.map((interaction, index) => (
-                  <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
-                    <CardHeader className="bg-muted/50 py-3">
-                      <CardTitle className="text-lg font-medium">
-                        {interaction.guestName} - Room {interaction.roomNumber}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                      <p className="text-muted-foreground">{interaction.notes}</p>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {new Date(interaction.timestamp).toLocaleString()}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
+    <TabsContent value="interactions">
+        <div className="mb-4 flex space-x-2 fixed top-[325px] ">
+        <Button
+  onClick={() => setSortOldestFirst(!sortOldestFirst)}
+  className="flex items-center gap-2 bg-blue-200 text-black border-blue-600 hover:bg-blue-300"
+>
+  <ArrowUpDown className="h-4 w-4 text-blue-600" />
+  Sort {sortOldestFirst ? 'Newest to Oldest' : 'Oldest to Newest'}
+</Button>
+        </div>
+        <div className="space-y-6 pt-5">
+          {[...employee.recentInteractions]
+            .sort((a, b) => {
+              const dateA = new Date(a.timestamp).getTime()
+              const dateB = new Date(b.timestamp).getTime()
+              return sortOldestFirst ? dateA - dateB : dateB - dateA
+            })
+            .map((interaction, index) => (
+              <Card key={index} className="overflow-hidden transition-all hover:shadow-lg ">
+                <CardHeader className="bg-muted/50 py-4">
+                  <CardTitle className="text-lg font-medium">
+                    {interaction.guestName} - Room {interaction.roomNumber}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <p className="text-muted-foreground">{interaction.notes}</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {new Date(interaction.timestamp).toLocaleString()}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+        </div>
+      </TabsContent>
             <TabsContent value="bookings">
               <div className="space-y-4">
               <div className="flex space-x-2 fixed top-[325px] " >

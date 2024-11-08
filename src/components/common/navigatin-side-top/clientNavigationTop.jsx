@@ -70,31 +70,29 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             {/* Center Section (Navigation Links) */}
             <div className="flex justify-center w-1/2">
                 <nav className="flex space-x-4">
-                    {[
+                {[
                         ['Home', 'home'],
                         ['Reservation', 'Reservation'],
                         ['Calendar', 'Calendar'],
                         ['Account', 'account'],
-                    ].map(([title, url]) => (
-                        <a
-                            href={url}
-                            className="rounded-lg px-3 py-2 text-slate-100 font-medium hover:bg-[#FCB813] hover:text-slate-900"
-                            onClick={(event) => {
-                                if (title === 'Add Reservation') {
-                                    event.preventDefault();
-                                    handleModalToggle();
-                                }
-                            }}
+                    ].map(([title, path]) => (
+                        <Link
+                            to={`/${path}`}
+                            className="clientnavtop relative text-slate-100 font-medium"
                             key={title}
                         >
                             {title}
-                        </a>
+                            <span className="linkTextStyle"></span>
+                        </Link>
                     ))}
+                    
                 </nav>
             </div>
 
             {/* Right Section (Bell, Avatar, and User Info) */}
             <div className="flex items-center space-x-2 justify-end w-1/4">
+
+            
                 {/* Notification Bell */}
                 <div onClick={toggleNotifications} className="relative cursor-pointer">
                     <Bell size={24} className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all" />
