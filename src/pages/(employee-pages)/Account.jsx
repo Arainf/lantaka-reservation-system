@@ -275,21 +275,6 @@ export default function Account() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shift" className="text-sm font-medium flex items-center gap-2">
-                      <Clock className="w-4 h-4" /> Shift
-                    </Label>
-                    <Select value={employee.shift} onValueChange={handleSelectChange("shift")}>
-                      <SelectTrigger className="shadow-sm">
-                        <SelectValue placeholder="Select Shift" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Morning">Morning</SelectItem>
-                        <SelectItem value="Afternoon">Afternoon</SelectItem>
-                        <SelectItem value="Night">Night</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="notes" className="text-sm font-medium">Notes</Label>
                     <Textarea
