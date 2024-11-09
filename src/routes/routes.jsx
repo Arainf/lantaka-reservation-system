@@ -17,11 +17,13 @@ import AdminEventLogs from "@/pages/(admin-pages)/eventlogs";
 import AdminReservation from "@/pages/(admin-pages)/reservation";
 import AdminGuestList from "@/pages/(admin-pages)/guestlist";
 import AdminAccounts from "@/pages/(admin-pages)/accounts";
+import AdminRoomVenue from "@/pages/(admin-pages)/roomvenue";
 // employee pages import routes
 import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
 import Account from "@/pages/(employee-pages)/Account";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
+
 import Calendar from "@/pages/(employee-pages)/Calendar";
 
 const AppRoutes = () => {
@@ -123,6 +125,21 @@ const AppRoutes = () => {
         }
       />
       
+      <Route
+        path="/roomvenue"
+        element={
+          <ProtectedRoute
+            element={
+              <AdminRoomVenue
+                sidebarOpen={sidebarOpen}
+                toggleSidebar={toggleSidebar}
+              />
+            }
+            allowedRoles={["Administrator"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
 
       {/* Admin Dashboard: Protected, but bypassable in Dev Mode */}
       <Route
@@ -165,7 +182,6 @@ const AppRoutes = () => {
           />
         }
       />
-
       {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorize />} />
 
@@ -173,6 +189,8 @@ const AppRoutes = () => {
 
       <Route path="/Rainiertest" element={<DashboardRegistrationForm />} />
       <Route path="/Joshtest" element={<JoshTest />} />
+      
+        
     </Routes>
   );
 };
