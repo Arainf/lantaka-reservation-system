@@ -123,7 +123,7 @@ const CostCalculator = ({
               <span>Subtotal:</span>
               <span>{formatCurrency(subtotal)}</span>
             </div>
-            {clientType === 'internal' && (
+            {clientType === 'Internal' && (
               <div className="flex justify-between text-green-600">
                 <span>Internal Discount (300 off*):</span>
                 <span>- {formatCurrency(discount)}</span>

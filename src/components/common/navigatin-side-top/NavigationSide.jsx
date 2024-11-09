@@ -89,7 +89,7 @@ const NavigationSide = ({ isOpen }) => {
     <div className="sidebarStyle" style={sidebarStyle}>
       <div className="headerStyle">
       <img
-          src="src/assets/images/logo1.png?height=50&width=50" // Logo image
+          src="src/assets/images/SchoolLogo.png?height=50&width=50" // Logo image
           alt="AteneoSeal" // Alt text for logo
           className="logoStyle" // Logo styling class
           style={{ display: isOpen ? 'none' : 'block' }}
