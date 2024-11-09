@@ -9,12 +9,6 @@ import { ChevronLeft, ChevronRight, Settings, Filter, Search, X, RefreshCw, Plus
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -243,7 +237,6 @@ const dummyAccounts = [
   }
 ];
 
-
 export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () => {} }) {
   const [accounts, setAccounts] = useState(dummyAccounts)
   const [searchTerm, setSearchTerm] = useState("")
@@ -260,7 +253,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
   const filterRef = useRef(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState(null)
-  const [addAccountModalOpen, setAddAccountModalOpen] = useState(false)
+  const [isAddAccountSidebarOpen, setIsAddAccountSidebarOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const formMethods = useForm({
@@ -382,7 +375,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
         description: "New account has been created successfully.",
       });
       formMethods.reset();
-      setAddAccountModalOpen(false);
+      setIsAddAccountSidebarOpen(false);
     } catch (error) {
       console.error("Registration error:", error);
       Toast({
@@ -404,7 +397,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       <NavigationSide isOpen={sidebarOpen} />
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto relative">
         <NavigationTop onSidebarToggle={toggleSidebar} />
 
         <main className="p-6 space-y-6">
@@ -476,7 +469,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
               <Button
                 variant="outline"
                 className="ml-2"
-                onClick={() => setAddAccountModalOpen(true)}
+                onClick={() => setIsAddAccountSidebarOpen(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Account
@@ -511,23 +504,35 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
             />
           </div>
         </main>
-      </div>
-      <DeleteModal
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        itemName={accountToDelete ? `${accountToDelete.account_fName} ${accountToDelete.account_lName}` : ""}
-        itemType="Account"
-      />
-      <Dialog open={addAccountModalOpen} onOpenChange={setAddAccountModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="mb-8 text-xl">Add New Account</DialogTitle>
-          </DialogHeader>
-          <FormProvider {...formMethods}>
-            <Form {...formMethods}>
-              <form onSubmit={formMethods.handleSubmit(handleAddAccount)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Darkened overlay */}
+        {isAddAccountSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setIsAddAccountSidebarOpen(false)}
+          ></div>
+        )}
+
+        {/* Add Account Sidebar */}
+        <div
+          className={`fixed inset-y-0 right-0 w-[500px] bg-white shadow-lg transform ${
+            isAddAccountSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+          } transition-transform duration-300 ease-in-out overflow-y-auto z-50`}
+        >
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Add New Account</h2>
+              <Button
+                variant="ghost"
+                size="xl"
+                onClick={() => setIsAddAccountSidebarOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+            </div>
+            <FormProvider {...formMethods}>
+              <Form {...formMethods}>
+                <form onSubmit={formMethods.handleSubmit(handleAddAccount)} className="space-y-6">
                   <FormField
                     control={formMethods.control}
                     name="account_role"
@@ -542,7 +547,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="Administrator">Administrator</SelectItem>
-                <SelectItem value="Employee">Employee</SelectItem>
+                            <SelectItem value="Employee">Employee</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -570,8 +575,6 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
                       </FormItem>
                     )}
                   />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={formMethods.control}
                     name="fName"
@@ -598,21 +601,19 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
                       </FormItem>
                     )}
                   />
-                </div>
-                <FormField
-                  control={formMethods.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="Enter E-mail" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={formMethods.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="Enter E-mail" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={formMethods.control}
                     name="password"
@@ -640,63 +641,70 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
                       </FormItem>
                     )}
                   />
-                </div>
-                <FormField
-                  control={formMethods.control}
-                  name="dob"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Date of Birth</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full md:w-[100%] pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Registering...
-                    </>
-                  ) : (
-                    "Register Account"
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+                  <FormField
+                    control={formMethods.control}
+                    name="dob"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Date of Birth</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Registering...
+                      </>
+                    ) : (
+                      "Register Account"
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </FormProvider>
+          </div>
+        </div>
+      </div>
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={accountToDelete ? `${accountToDelete.account_fName} ${accountToDelete.account_lName}` : ""}
+        itemType="Account"
+      />
     </div>
   )
 }
