@@ -7,7 +7,7 @@ import { UserContext } from "@/context/contexts";
 import Slogo from '@/assets/images/SchoolLogo.png';
 import Hlogo from '@/assets/images/HorizontalLogo.png';
 import Modal from '@/components/ui/modal';
-import { Bed, Calendar, CheckCircle } from 'lucide-react';
+import { Bed, Calendar, CheckCircle, Loader2, } from 'lucide-react';
 
 const NavigationTop = memo(({ handleBackToHome }) => {
     const { userData, userRole } = useContext(UserContext);
@@ -75,6 +75,25 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             setIsLoading(false);
         }
     };
+    const handleSaveChanges = async () => {
+        setIsLoading(true)
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1500))
+          toast({
+            title: "Profile updated",
+            description: "Your profile information has been successfully updated.",
+          })
+        } catch (error) {
+          console.error('Error saving changes:', error)
+          toast({
+            title: "Error",
+            description: "An error occurred while updating your profile.",
+            variant: "destructive",
+          })
+        } finally {
+          setIsLoading(false)
+        }
+      }
 
     return (
         <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-10">
@@ -159,10 +178,21 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                         </Link>
                         <button
                             onClick={handleLogout}
-                            className="w-full text-center py-2 px-4 shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450 rounded-lg"
+                            disabled={isLoading}
+                            className={`w-full text-center py-2 px-4 shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450 rounded-lg ${
+                                isLoading ? 'cursor-not-allowed opacity-70' : ''
+                            }`}
                         >
-                            Logout
+                            {isLoading ? (
+                                <div className="flex items-center justify-center">
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Logging out...
+                                </div>
+                            ) : (
+                                'Logout'
+                            )}
                         </button>
+
                     </div>
                 )}
             </div>
