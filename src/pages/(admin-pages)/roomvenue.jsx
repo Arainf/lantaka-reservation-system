@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
-import { ChevronLeft, ChevronRight, Filter, Search, X, RefreshCw, Plus, Edit, Trash2 } from "lucide-react"
+import { Filter, Search, X, RefreshCw, Plus, Edit, Trash2, Users, DollarSign } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
@@ -14,7 +14,6 @@ import * as z from "zod"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -29,17 +28,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Toast } from "@/components/ui/toast"
-import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -47,6 +37,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
+
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required.").max(100, "Name must be 100 characters or less."),
@@ -59,29 +50,23 @@ const formSchema = z.object({
 })
 
 const dummyItems = [
-  {
-    id: "ROOM101",
-    name: "Room 101",
-    type: "Room",
-    price: 200,
-    capacity: 2,
-    description: "A luxurious suite with a beautiful view.",
-  },
-  {
-    id: "VENUE001",
-    name: "Capiz Hall",
-    type: "Venue",
-    price: 1000,
-    capacity: 200,
-    description: "Perfect for large events and weddings.",
-  },
-  // Add more dummy data as needed
+  { id: "ROOM101", name: "Room 101", type: "Room", price: 200, capacity: 2, description: "A luxurious suite with a beautiful view." },
+  { id: "ROOM102", name: "Room 102", type: "Room", price: 180, capacity: 2, description: "Cozy room with modern amenities." },
+  { id: "ROOM103", name: "Room 103", type: "Room", price: 220, capacity: 3, description: "Spacious room with a balcony." },
+  { id: "ROOM104", name: "Room 104", type: "Room", price: 190, capacity: 2, description: "Quiet room with a garden view." },
+  { id: "ROOM105", name: "Room 105", type: "Room", price: 250, capacity: 4, description: "Family suite with two bedrooms." },
+  { id: "ROOM106", name: "Room 106", type: "Room", price: 210, capacity: 2, description: "Elegant room with a city view." },
+  { id: "VENUE001", name: "Capiz Hall", type: "Venue", price: 1000, capacity: 200, description: "Perfect for large events and weddings." },
+  { id: "VENUE002", name: "Emerald Room", type: "Venue", price: 800, capacity: 100, description: "Ideal for corporate meetings and seminars." },
+  { id: "VENUE003", name: "Sunset Pavilion", type: "Venue", price: 1200, capacity: 150, description: "Beautiful outdoor venue for special occasions." },
+  { id: "VENUE004", name: "Crystal Ballroom", type: "Venue", price: 1500, capacity: 300, description: "Luxurious ballroom for grand celebrations." },
+  { id: "VENUE005", name: "Garden Terrace", type: "Venue", price: 600, capacity: 80, description: "Charming venue for intimate gatherings." },
+  { id: "VENUE006", name: "Skyline Lounge", type: "Venue", price: 900, capacity: 120, description: "Modern venue with panoramic city views." },
 ]
 
 export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar = () => {} }) {
   const [items, setItems] = useState(dummyItems)
   const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
     type: [],
   })
@@ -96,9 +81,6 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
-
-  const itemsPerPage = 8
-  const totalPages = Math.ceil(items.length / itemsPerPage)
 
   const formMethods = useForm({
     resolver: zodResolver(formSchema),
@@ -131,16 +113,11 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
   }, [filters])
 
   const filteredItems = items.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = item  .name.toLowerCase().includes(searchTerm.toLowerCase()) || 
            item.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = filters.type.length === 0 || filters.type.includes(item.type)
     return matchesSearch && matchesType
   })
-
-  const paginatedItems = filteredItems.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
 
   const handleDelete = (item) => {
     setItemToDelete(item)
@@ -169,7 +146,6 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
   const applyFilters = () => {
     setFilters(tempFilters)
     setIsFilterOpen(false)
-    setCurrentPage(1)
   }
 
   const resetFilters = () => {
@@ -180,7 +156,6 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
       type: [],
     })
     setSearchTerm("")
-    setCurrentPage(1)
   }
 
   const handleAddOrEditItem = async (values) => {
@@ -234,6 +209,38 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
 
   const activeFilters = [...filters.type]
 
+  const renderItemCard = (item) => (
+    <Card key={item.id} className="mb-4 overflow-hidden drop-shadow-xl">
+      
+      <CardHeader>
+        <CardTitle>{item.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
+        <div className="flex items-center justify-between text-sm">
+          <span className="flex items-center">
+           
+            ₱ {item.price}
+          </span>
+          <span className="flex items-center">
+            <Users className="w-4 h-4 mr-1" />
+            {item.capacity}
+          </span>
+        </div>
+      </CardContent>
+      <CardFooter className="justify-end space-x-2">
+        <Button variant="ghost" onClick={() => handleEdit(item)}>
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+        <Button variant="destructive" onClick={() => handleDelete(item)}>
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       <NavigationSide isOpen={sidebarOpen} />
@@ -250,10 +257,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
                   type="text"
                   placeholder="Search by name or description..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value)
-                    setCurrentPage(1)
-                  }}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
                 />
                 <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
@@ -330,76 +334,20 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
               ))}
             </div>
           )}
-          <Card className="w-full">
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[10%]">ID</TableHead>
-                    <TableHead className="w-[20%]">Name</TableHead>
-                    <TableHead className="w-[10%]">Type</TableHead>
-                    <TableHead className="w-[10%]">Price</TableHead>
-                    <TableHead className="w-[10%]">Capacity</TableHead>
-                    <TableHead className="w-[30%]">Description</TableHead>
-                    <TableHead className="w-[10%] text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.id}</TableCell>
-                      <TableCell className="font-semibold">{item.name}</TableCell>
-                      <TableCell>{item.type}</TableCell>
-                      <TableCell>₱ {item.price}</TableCell>
-                      <TableCell>{item.capacity}</TableCell>
-                      <TableCell>{item.description}</TableCell>
-                      <TableCell>
-                        <div className="text-center py-4 space-x-2">
-                          <Button variant="ghost" onClick={() => handleEdit(item)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="destructive" onClick={() => handleDelete(item)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-          <div className="flex justify-center items-center space-x-4 my-4 text-[#0f172a]">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              Previous
-            </Button>
-            {[...Array(totalPages)].map((_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "primary" : "outline"}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`transition-all duration-300 ${
-                  currentPage === i + 1
-                    ? 'shadow-[0_0_10px_3px_rgba(59,130,246,0.5)] text-[#0f172a] bg-[#fcb813]'
-                    : ' bg-[#0f172a] text-primary-foreground'
-                }`}
-              >
-                {i + 1}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
+          
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Rooms</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {filteredItems.filter(item => item.type === "Room").slice(0, 15).map(renderItemCard)}
+              </div>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Venues</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {filteredItems.filter(item => item.type === "Venue").slice(0, 15).map(renderItemCard)}
+              </div>
+            </div>
           </div>
         </main>
 
@@ -419,7 +367,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
         >
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Add New Room/Venue</h2>
+              <h2 className="text-xl font-bold">Add New Room/Venue</h2>
               <Button
                 variant="ghost"
                 size="xl"
@@ -438,7 +386,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
                       <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter name" {...field} />
+                          <Input placeholder="Enter name of room/venue" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -530,7 +478,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
+            <DialogTitle>Edit Room/Venue Details</DialogTitle>
           </DialogHeader>
           <FormProvider {...formMethods}>
             <Form {...formMethods}>
