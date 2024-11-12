@@ -35,9 +35,9 @@ const initialEmployee = {
 export default function Account() {
   const navigate = useNavigate()
   const [employee, setEmployee] = useState(initialEmployee)
-  const [isLoading, setIsLoading] = useState(false)
   const [bookingFilter, setBookingFilter] = useState('all')
-
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   useEffect(() => {
     let isMounted = true
     const fetchEmployeeData = async () => {
@@ -98,44 +98,46 @@ export default function Account() {
     setEmployee(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSaveChanges = async () => {
-    setIsLoading(true)
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      toast({
-        title: "Profile updated",
-        description: "Your profile information has been successfully updated.",
-      })
-    } catch (error) {
-      console.error('Error saving changes:', error)
-      toast({
-        title: "Error",
-        description: "An error occurred while updating your profile.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+
+
+
+  const [activeButton, setActiveButton] = useState(null);
+
+  const handleButtonClick = (buttonName) => {
+    console.log('Button clicked:', buttonName); // Debugging statement
+    setActiveButton(buttonName);
+    
+    if (buttonName === 'save') {
+      setIsSaving(true);
+      setTimeout(() => {
+        console.log('Saving completed'); // Debugging statement
+        toast({
+          title: "Changes Saved",
+          description: "Your changes have been successfully saved.",
+        });
+        setIsSaving(false); 
+      }, 1000);
     }
-  }
+  };
 
-  const handleLogout = async () => {
-    setIsLoading(true)
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      navigate('/')
-    } catch (error) {
-      console.error('Error logging out:', error)
-      toast({
-        title: "Error",
-        description: "An error occurred while logging out.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+  const logoutButtonClick = (buttonName) => {
+    setActiveButton(buttonName);
+  
+    if (buttonName === 'logout') {
+      // Perform actual logout logic here:
+      console.log("Logging out...");
+  
+      setTimeout(() => {
+        setActiveButton(null);
+  
+        // Clear the user session or authentication token
+        localStorage.removeItem("userToken"); // Example, adjust according to your setup
+  
+        // Redirect to login page
+        navigate('/auth/login'); // Make sure this path matches your login route
+      }, 1000);
     }
-  }
-
-
+  };
 
   const handleBackToHome = () => {
     navigate('/')
@@ -166,25 +168,35 @@ export default function Account() {
             
           </div>
           <div className="flex gap-3 pt-[20px] md:self-start">
-            <Button
-              onClick={handleSaveChanges}
-              disabled={isLoading}
-              className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
-              >
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Save Changes
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleLogout}
-              disabled={isLoading}
-              className="shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450"
-            >
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Logout
-            </Button>
-
+          <Button
+  onClick={() => handleButtonClick('save')}
+  disabled={activeButton !== null || isSaving}
+  className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+>
+  {isSaving ? (
+    <div className="flex items-center justify-center">
+      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      Saving Changes...
+    </div>
+  ) : (
+    'Save Changes'
+  )}
+</Button>
+      <Button
+        onClick={() => logoutButtonClick('logout')}
+        disabled={activeButton !== null}
+        className="bg-[#FCB813] text-white hover:bg-yellow-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+      >
+        {activeButton === 'logout' ? (
+          <div className="flex items-center justify-center">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Loading Logout...
           </div>
+        ) : (
+          'Logout'
+        )}
+      </Button>
+    </div>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="personal" className="mt-6 ">
