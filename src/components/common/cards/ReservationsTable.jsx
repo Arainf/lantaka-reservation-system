@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function ReservationsTableWithModal({ data = [] }) {
+export default function ReservationsTableWithModal({ data = [], onDelete }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingReservation, setEditingReservation] = useState(null)
   const itemsPerPage = 8;
@@ -100,12 +100,12 @@ export default function ReservationsTableWithModal({ data = [] }) {
                 </TableCell>
                 <TableCell className="text-center py-4">
                   <div className="flex justify-center space-x-2">
-                    <Button variant="link" onClick={() => handleEditClick(item)}>
+                    <Button variant="ghost" onClick={() => handleEditClick(item)}>
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="destructive">
+                    <Button variant="destructive" onClick={() => onDelete(item)}>
                       <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </Button>          
                   </div>
                 </TableCell>
               </TableRow>
@@ -121,16 +121,15 @@ export default function ReservationsTableWithModal({ data = [] }) {
           {editingReservation && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right font-bold">
+                <Label htmlFor="name" className="text-right">
                   Name:
                 </Label>
-              
                 <Input
                   id="name"
                   value={editingReservation.customer}
+                  onChange={(e) => setEditingReservation({...editingReservation, customer: e.target.value})}
                   className="col-span-3"
                 />
-              
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="email" className="text-right">
@@ -139,6 +138,7 @@ export default function ReservationsTableWithModal({ data = [] }) {
                 <Input
                   id="email"
                   value={editingReservation.email}
+                  onChange={(e) => setEditingReservation({...editingReservation, email: e.target.value})}
                   className="col-span-3"
                 />
               </div>
@@ -149,6 +149,7 @@ export default function ReservationsTableWithModal({ data = [] }) {
                 <Input
                   id="room"
                   value={editingReservation.roomName}
+                  onChange={(e) => setEditingReservation({...editingReservation, roomName: e.target.value})}
                   className="col-span-3"
                 />
               </div>
@@ -156,7 +157,10 @@ export default function ReservationsTableWithModal({ data = [] }) {
                 <Label htmlFor="roomType" className="text-right">
                   Room Type:
                 </Label>
-                <Select defaultValue={editingReservation.roomType}>
+                <Select 
+                  value={editingReservation.roomType}
+                  onValueChange={(value) => setEditingReservation({...editingReservation, roomType: value})}
+                >
                   <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="Select room type" />
                   </SelectTrigger>
@@ -171,7 +175,10 @@ export default function ReservationsTableWithModal({ data = [] }) {
                 <Label htmlFor="status" className="text-right">
                   Status:
                 </Label>
-                <Select defaultValue={editingReservation.status}>
+                <Select 
+                  value={editingReservation.status}
+                  onValueChange={(value) => setEditingReservation({...editingReservation, status: value})}
+                >
                   <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -224,6 +231,6 @@ export default function ReservationsTableWithModal({ data = [] }) {
           <ChevronRight className="h-4 w-4 ml-2" />
         </Button>
       </div>
-      </Card>
+    </Card>
   )
 }
