@@ -212,21 +212,21 @@ const Reservation = () => {
 
 const SimplifiedFloorPlan = ({ floor }) => {
   // Get available rooms from context
-  const { availableRooms, fetchEverythingAvailable } = useRoomVenueProvider();
+  const { availableRooms, fetchEverythingAvailable, availableVenues } = useRoomVenueProvider();
 
   useEffect(() => {
     // Check if the data is already fetched or not
     if (availableRooms.double_rooms.length === 0) {
       fetchEverythingAvailable();
     }
-  }, [availableRooms, fetchEverythingAvailable]);
+  }, [availableRooms, fetchEverythingAvailable, availableVenues]);
 
   // Combine all available rooms and venues into one array
   const allRooms = [
     ...availableRooms.double_rooms,
     ...availableRooms.triple_rooms,
     ...availableRooms.matrimonial_rooms,
-    ...availableRooms.venues_holder
+    ...availableVenues.venues_holder
   ];
 
   return (

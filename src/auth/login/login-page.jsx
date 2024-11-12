@@ -21,8 +21,7 @@ const LoginPage = () => {
           <img src={LogoLRRS} className="mb-[-8%]"/>
           <LoginForm />
           <h5
-            className="italic text-center mt-5 text-slate-300"
-            style={{ fontFamily: 'Montserrat', fontWeight: '500' }}
+            className="italic poppins-light text-center mt-5 text-slate-300"
           >Forgot Password?
           </h5>
         </div>

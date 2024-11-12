@@ -1,147 +1,227 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, XCircle } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import * as z from "zod";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { usePriceContext } from "@/context/PriceContext";
 
-const CostCalculator = ({
+// Define the Zod schema for the discount
+const discountSchema = z.object({
+  type: z.string().min(1, "Discount type is required"),
+  amount: z.number().min(0, "Positive number required"),
+});
+
+// Define the Zod schema for the form
+const formSchema = z.object({
+  discounts: z.array(discountSchema),
+});
+
+export default function CostCalculator({
   selectedRooms = ['Double Room', 'Triple Room'],
   selectedVenues = ['Conference Hall'],
-  clientType = 'external',
-  numberOfNights = 3
-}) => {
-  const [price, setPrice] = useState({});
+  numberOfNights = 0,
+  clientType,
+}) {
+  const { 
+    price, 
+    setClientType, 
+    setDiscounts, 
+    setInitialTotalPrice,
+    discounts 
+  } = usePriceContext();
+
   const [roomRates, setRoomRates] = useState({
     'Double Room': 0,
     'Triple Room': 0,
     'Matrimonial Room': 0,
   });
 
-  const venueRates = {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      discounts: [{ type: '', amount: 0 }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "discounts",
+  });
+
+  useEffect(() => {
+    if (setClientType) {
+      setClientType(clientType);
+    }
+  }, [clientType, setClientType]);
+
+  useEffect(() => {
+    setRoomRates({
+      'Double Room': price.double_price || 0,
+      'Triple Room': price.triple_price || 0,
+      'Matrimonial Room': price.matrimonial_price || 0,
+    });
+  }, [price]);
+
+  const venueRates = useMemo(() => ({
     'Conference Hall': 15000,
     'Meeting Room': 8000,
-  };
+  }), []);
 
-  const internalDiscount = 300; // 20% discount for internal clients
-//   const taxRate = 0.12; // 12% tax
-
-  const calculateSubtotal = () => {
+  const calculateSubtotal = useMemo(() => {
     let subtotal = 0;
-
-    // Ensure selectedRooms is an array
-    if (Array.isArray(selectedRooms)) {
-      selectedRooms.forEach(room => {
-        const baseRate = roomRates[room] || 0;
-        subtotal += baseRate * numberOfNights;
-      });
-    } else {
-      console.error('selectedRooms is not an array');
-    }
-
-    if (Array.isArray(selectedVenues)) {
-      selectedVenues.forEach(venue => {
-        subtotal += venueRates[venue] || 0;
-      });
-    }
-
+    selectedRooms.forEach(room => {
+      const baseRate = roomRates[room] || 0;
+      subtotal += baseRate * numberOfNights;
+    });
+    selectedVenues.forEach(venue => {
+      subtotal += venueRates[venue] || 0;
+    });
     return subtotal;
-  };
+  }, [selectedRooms, selectedVenues, roomRates, venueRates, numberOfNights]);
 
-  // Count occurrences of each room type
-  const roomCounts = selectedRooms.reduce((acc, room) => {
+  useEffect(() => {
+    setInitialTotalPrice(calculateSubtotal);
+    setDiscounts(form.getValues('discounts'));
+  }, [calculateSubtotal, setInitialTotalPrice, discounts ]);
+
+  const roomCounts = useMemo(() => selectedRooms.reduce((acc, room) => {
     acc[room] = (acc[room] || 0) + 1;
     return acc;
-  }, {});
+  }, {}), [selectedRooms]);
 
-  const subtotal = calculateSubtotal();
-  const discount = clientType === 'internal' ? internalDiscount : 0;
-  const taxableAmount = subtotal - discount;
-  const total = taxableAmount;
+  const onSubmit = (data) => {
+    setDiscounts(data.discounts);
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
   };
 
-  const fetchPrice = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/getPrice');
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const dataPrice = await response.json();
-      setPrice(dataPrice);
-    } catch (error) {
-      console.error("Error fetching available rooms:", error);
-    }
+  const calculateTotal = (discounts) => {
+    const totalDiscount = discounts.reduce((sum, d) => sum + Number(d.amount), 0);
+    return calculateSubtotal - totalDiscount;
   };
 
-  // Initial fetch
-  useEffect(() => {
-    fetchPrice();
-  }, []);
-
-  useEffect(() => {
-    if (price) {
-      // Set roomRates based on the fetched price data
-      setRoomRates({
-        'Double Room': price.double_price || 0,
-        'Triple Room': price.triple_price || 0,
-        'Matrimonial Room': price.matrimonial_price || 0,
-      });
-    }
-  }, [price]);  // Only update roomRates when price changes
-
   return (
-    <Card className="relative w-full bg-white text-gray-800 rounded-xl shadow-lg">
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          <div className="text-center">
-            <h3 className="text-xl font-bold">Partial Receipt</h3>
-            <p className="text-sm text-gray-500">{clientType}</p>
-            <p className="text-sm text-gray-500">Date: {new Date().toLocaleDateString()}</p>
-          </div>
-          <Separator />
-          <div className="space-y-2 text-sm">
-            <h4 className="font-semibold">Room Charges:</h4>
-            {Object.keys(roomCounts).map((room) => (
-              <div key={room} className="flex justify-between">
-                <span>{room} ({roomCounts[room]}) x {numberOfNights} nights</span>
-                <span>{formatCurrency(roomRates[room] * roomCounts[room] * numberOfNights)}</span>
+    <div className="space-y-4">
+      <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
+        <CardContent className="p-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <Label className="text-xl font-bold mb-4">Discounts</Label>
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-center space-x-2 mb-2">
+                    <FormField
+                      control={form.control}
+                      name={`discounts.${index}.type`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input {...field} placeholder="Discount type" className="flex-grow" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`discounts.${index}.amount`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input {...field} type="number" placeholder="Amount" className="w-24" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => remove(index)}
+                      className="text-red-500"
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="space-y-2 text-sm">
-            <h4 className="font-semibold">Venue Charges:</h4>
-            {selectedVenues.map(venue => (
-              <div key={venue} className="flex justify-between">
-                <span>{venue}</span>
-                <span>{formatCurrency(venueRates[venue])}</span>
+              <div className='flex flex-row gap-2'>
+                <Button
+                  type="button"
+                  onClick={() => append({ type: '', amount: 0 })}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <PlusCircle className="h-4 w-4 mr-2 " />
+                  Add Discount
+                </Button>
+                {/* <Button type="submit">Save Changes</Button> */}
               </div>
-            ))}
-          </div>
-          <Separator />
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>{formatCurrency(subtotal)}</span>
-            </div>
-            {clientType === 'Internal' && (
-              <div className="flex justify-between text-green-600">
-                <span>Internal Discount (300 off*):</span>
-                <span>- {formatCurrency(discount)}</span>
-              </div>
-            )}
-          </div>
-          <Separator />
-          <div className="flex justify-between items-baseline">
-            <span className="text-lg font-semibold">Total:</span>
-            <span className="text-2xl font-bold">{formatCurrency(total)}</span>
-          </div>
-          <p className="text-xs text-gray-500 text-center">
-            This is an estimate. Final charges may vary.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
 
-export default CostCalculator;
+      <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="text-center">
+              <h3 className="text-xl font-bold">Partial Receipt</h3>
+              <p className="text-sm text-gray-500">{clientType}</p>
+              <p className="text-sm text-gray-500">Date: {new Date().toLocaleDateString()}</p>
+            </div>
+            <Separator />
+            <div className="space-y-2 text-sm">
+              <h4 className="font-semibold">Room Charges:</h4>
+              {Object.entries(roomCounts).map(([room, count]) => (
+                <div key={room} className="flex justify-between">
+                  <span>{room} ({count}) x {numberOfNights} nights</span>
+                  <span>{formatCurrency(roomRates[room] * count * numberOfNights)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-2 text-sm">
+              <h4 className="font-semibold">Venue Charges:</h4>
+              {selectedVenues.map(venue => (
+                <div key={venue} className="flex justify-between">
+                  <span>{venue}</span>
+                  <span>{formatCurrency(venueRates[venue])}</span>
+                </div>
+              ))}
+            </div>
+            <Separator />
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>{formatCurrency(calculateSubtotal)}</span>
+              </div>
+              {fields.map((discount, index) => (
+                discount.amount > 0 && (
+                  <div key={discount.id} className="flex justify-between text-green-600">
+                    <span>{form.getValues(`discounts.${index}.type`)} Discount:</span>
+                    <span>- {formatCurrency(Number(form.getValues(`discounts.${index}.amount`)))}</span>
+                  </div>
+                )
+              ))}
+            </div>
+            <Separator />
+            <div className="flex justify-between items-baseline">
+              <span className="text-lg font-semibold">Total:</span>
+              <span className="text-2xl font-bold">{formatCurrency(calculateTotal(form.getValues('discounts')))}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

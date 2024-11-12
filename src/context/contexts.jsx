@@ -64,7 +64,7 @@ export const AccountProvider = ({ children }) => {
     }else{
       const fetchAccountData = async () => {
         try {
-          const res = await fetch('http://192.168.68.101:5000/api/accounts');
+          const res = await fetch('http://localhost:5000/api/accounts');
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
           }
@@ -242,6 +242,9 @@ export const RoomandVenueProvider = ({ children }) => {
     double_rooms: [],
     triple_rooms: [],
     matrimonial_rooms: [],
+    
+  });
+  const [availableVenues, setAvailableVenues] = useState({
     venues_holder: [],
   });
   const [selectedRooms, setSelectedRooms] = useState([]);
@@ -277,11 +280,13 @@ export const RoomandVenueProvider = ({ children }) => {
         matrimonial_rooms: data.matrimonial_rooms.map((room) => ({
           ...room,
           is_available: room.room_status,
-        })),
+        }))
+      });
+      setAvailableVenues({
         venues_holder: data.venues_holder.map((room) => ({
           ...room,
           is_available: room.room_status,
-        })),
+        }))
       });
     } catch (error) {
       console.error("Error fetching everything available:", error); // Log any errors
@@ -291,10 +296,10 @@ export const RoomandVenueProvider = ({ children }) => {
   };
 
   // Fetch available rooms based on the selected date range and reservation type
-  const fetchAvailable = async (dateRangeRoom, dateRangeVenue, reservationType) => {
-    if (!dateRangeRoom || !dateRangeVenue) return;
+  const fetchAvailableRoom = async (dateRangeRoom) => {
+    if (!dateRangeRoom) return;
 
-    const { from, to } = dateRangeRoom || dateRangeVenue;
+    const { from, to } = dateRangeRoom;
     if (!from || !to) return;
 
     const formattedFrom = formatDateToYYYYMMDD(from);
@@ -302,7 +307,7 @@ export const RoomandVenueProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/availableRooms/${formattedFrom}/${formattedTo}/${reservationType}`
+        `http://localhost:5000/api/availableRooms/${formattedFrom}/${formattedTo}`
       );
 
       if (!response.ok) {
@@ -315,23 +320,52 @@ export const RoomandVenueProvider = ({ children }) => {
         double_rooms: availableData.double_rooms,
         triple_rooms: availableData.triple_rooms,
         matrimonial_rooms: availableData.matrimonial_rooms,
-        venues_holder: availableData.venues_holder,
       });
     } catch (error) {
       console.error("Error fetching available rooms:", error);
     }
   };
 
+  const fetchAvailableVenue = async (dateRangeVenue) => {
+    if (!dateRangeVenue) return;
+
+    const { from, to } = dateRangeVenue;
+    if (!from || !to) return;
+
+    const formattedFrom = formatDateToYYYYMMDD(from);
+    const formattedTo = formatDateToYYYYMMDD(to);
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/availableVenues/${formattedFrom}/${formattedTo}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const availableData = await response.json();
+
+      setAvailableVenues({
+        venues_holder: availableData.venues_holder,
+      });
+    } catch (error) {
+      console.error("Error fetching available Venues:", error);
+    }
+  }
+
   // Expose the state and functions to be used by the components
   const contextValue = {
     availableRooms,
+    availableVenues,
     selectedRooms,
     selectedVenues,
     reservationType,
     setReservationType,
     setSelectedRooms,
     setSelectedVenues,
-    fetchAvailable,
+    fetchAvailableRoom,
+    fetchAvailableVenue,
     fetchEverythingAvailable,
     isFetching,
   };

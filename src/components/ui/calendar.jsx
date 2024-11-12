@@ -11,8 +11,13 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }) {
+  // Function to disable dates before today
+  const disablePastDates = (date) => {
+    return date < new Date(new Date().setHours(0, 0, 0, 0))
+  }
+
   return (
-<DayPicker
+    <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
@@ -65,10 +70,10 @@ function Calendar({
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
       }}
+      disabled={disablePastDates}
       {...props}
     />
   )
 }
-Calendar.displayName = "Calendar";
 
 export { Calendar };
