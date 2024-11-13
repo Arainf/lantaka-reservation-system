@@ -23,7 +23,7 @@ const DeleteModal = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete {itemType}</DialogTitle>
-          <DialogDescription className="py-2">
+          <DialogDescription className="pt-4">
             Are you sure you want to delete {itemName}? This action cannot be undone.
           </DialogDescription>
         </DialogHeader>

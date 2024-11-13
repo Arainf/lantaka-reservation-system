@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState} from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import moment from 'moment'
 import FullCalendar from '@fullcalendar/react'
@@ -13,16 +13,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CalendarIcon, HomeIcon, BellIcon, ActivityIcon } from 'lucide-react'
+import { CalendarIcon, HomeIcon, ActivityIcon } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useReservations } from '@/context/contexts'
+import CustomerTable from "@/components/common/cards/ReservationsTable"
 
 export default function Calendar() {
   const { events, bookingSummary, upcomingBookings, recentActivities, fetchEvents } = useReservations()
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [editedEvent, setEditedEvent] = useState(null)
-
+  const [bookingFilter, setBookingFilter] = useState('all') // Fix: Initialize bookingFilter state
+  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false)
 
   const handleEventClick = (clickInfo) => {
     setSelectedEvent(clickInfo.event)
@@ -38,15 +40,15 @@ export default function Calendar() {
 
   const handleEditChange = (value, index, type) => {
     setEditedEvent(prev => {
-      const updatedEvents = [...prev[type]]
-      updatedEvents[index] = {
-        ...updatedEvents[index],
+      const updatedBookings = [...prev[type]]
+      updatedBookings[index] = {
+        ...updatedBookings[index],
         resource: {
-          ...updatedEvents[index].resource,
+          ...updatedBookings[index].resource,
           status: value
         }
       }
-      return { ...prev, [type]: updatedEvents }
+      return { ...prev, [type]: updatedBookings }
     })
   }
 
@@ -68,17 +70,156 @@ export default function Calendar() {
     }
   }
 
-  const eventStyleGetter = (info) => {
+  const eventStyleGetter = () => {
     return { 
       className: 'bg-primary/10 text-primary border border-primary/20 rounded-md shadow-sm hover:bg-primary/20 transition-colors',
     }
   }
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Assuming `upcomingBookings` is your data
+  const filteredBookings = upcomingBookings
+    .filter(booking => 
+      (bookingFilter === 'all' || booking.bookingType === bookingFilter) &&
+      (booking.guestName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+       booking.details.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
   return (
-    <main className="flex flex-col h-screen w-full overflow-hidden bg-background">
-      <NavigationTop />
-      <div className="flex-[1] flex">
-        <aside className="w-80 border-r p-4 bg-muted/30 drop-shadow-xl">
+    <main className="h-screen overflow-hidden bg-background pt-[65px]">
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <NavigationTop />
+      </div>
+      <div className="flex flex-row pt-[6px] pl-[30px]">
+      <div className="space-y-4">
+      {/* Filter Buttons */}
+      <h1 className="text-2xl pt-[20px] font-bold">Reservations Management</h1>
+      <div className="flex space-x-2 fixed top-[125px]">
+        <Button 
+          variant={bookingFilter === 'all' ? "default" : "outline"} 
+          onClick={() => setBookingFilter('all')}
+        >
+          All
+        </Button>
+        <Button 
+          variant={bookingFilter === 'room' ? "default" : "outline"} 
+          onClick={() => setBookingFilter('room')}
+        >
+          Room
+        </Button>
+        <Button 
+          variant={bookingFilter === 'event' ? "default" : "outline"} 
+          onClick={() => setBookingFilter('event')}
+        >
+          Event
+        </Button>
+      </div>
+
+      {/* Search Box */}
+<div className="flex items-center space-x-2 mt-6 pl-[230px]">
+  <input
+    type="text"
+    placeholder="Search bookings..."
+    className="border p-2 rounded bg-white text-black placeholder-gray-500"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+  />
+  <Button 
+    className="bg-white text-black border border-gray-300" 
+    onClick={() => {
+      // Add search logic here if needed
+      console.log('Searching for:', searchQuery); // Replace with actual search functionality
+    }}
+  >
+    Search
+  </Button>
+</div>
+
+
+      {/* Filtered Booking History */}
+      <div className="space-y-6 mt-4">
+        {filteredBookings.map((booking, index) => (
+          <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
+            <CardHeader className="bg-muted/50 py-3">
+              <CardTitle className="text-lg font-medium">
+                {booking.guestName} - {booking.bookingType.charAt(0).toUpperCase() + booking.bookingType.slice(1)}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <p className="text-muted-foreground">{booking.details}</p>
+              <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                <p>Date: {booking.date}</p>
+                <p>Booked: {new Date(booking.timestamp).toLocaleString()}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+   
+
+          {/* Main Content (Reservation Table) */}
+          <div
+  className="flex pr-8"
+  style={{
+    width: '148%',
+    height: '520px',
+    position: 'relative', // Or 'absolute', 'fixed', etc., depending on your needs
+    top: '50px', // Adjust the top offset as needed
+    paddingRight: '570px',
+    overflow: 'hidden', // Ensures no scrolling
+
+  }}
+>
+  <CustomerTable />
+</div>
+{/* Calendar */}
+
+<div
+  className="flex justify-center p-4"
+  style={{
+    position: 'relative', // Or 'absolute', 'fixed', etc.
+    top: '-600px', // Adjust as needed
+    left: '450px', // Adjust as needed
+  }}
+>
+              <Button onClick={() => setIsCalendarModalOpen(true)}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                Open Calendar
+              </Button>
+            </div>
+            <Dialog open={isCalendarModalOpen} onOpenChange={setIsCalendarModalOpen}>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                <DialogHeader>
+                  <DialogTitle>Reservation Calendar</DialogTitle>
+                </DialogHeader>
+                <div className="flex-[2] p-6">
+                  <FullCalendar
+                    plugins={[dayGridPlugin, interactionPlugin]}
+                    initialView="dayGridMonth"
+                    events={events}
+                    eventClick={handleEventClick}
+                    editable={false}
+                    selectable={true}
+                    headerToolbar={{
+                      left: 'prev,next',
+                      center: 'title',
+                      right: ''
+                    }}
+                    eventContent={renderEventContent}
+                    eventClassNames={eventStyleGetter}
+                    height="auto"
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
+          
+        </div>
+
+        {/* Side Panel (Calendar, Booking Summary, Upcoming Bookings, Recent Activities) */}
+        <div className="w-[320px]  flex flex-col  ">
+          
+
+          {/* Booking Summary */}
           <Card className="mb-4">
             <CardHeader>
               <CardTitle>Booking Summary</CardTitle>
@@ -100,6 +241,8 @@ export default function Calendar() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Upcoming Bookings */}
           <Card className="mb-4">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -108,19 +251,21 @@ export default function Calendar() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-32">
+              <ScrollArea className="h-32 overflow-auto">
                 {upcomingBookings.map((booking) => (
                   <div key={booking.id} className="mb-2 last:mb-0">
                     <div className="font-medium">{booking.title}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {moment(booking.start).format('MMM D, YYYY')}
+                    <div className="text-xs text-muted-foreground">
+                      {moment(booking.start).format('MMM DD, YYYY')}
                     </div>
                   </div>
                 ))}
               </ScrollArea>
             </CardContent>
           </Card>
-          <Card>
+
+          {/* Recent Activities */}
+          <Card className="mb-4">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ActivityIcon className="w-5 h-5" />
@@ -128,57 +273,40 @@ export default function Calendar() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-32">
+              <ScrollArea className="h-32 overflow-auto">
                 {recentActivities.map((activity) => (
                   <div key={activity.id} className="mb-2 last:mb-0">
-                    <div className="font-medium">{activity.action}</div>
-                    <div className="text-sm text-muted-foreground">{activity.time}</div>
+                    <div className="font-medium">{activity.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {moment(activity.timestamp).fromNow()}
+                    </div>
                   </div>
                 ))}
               </ScrollArea>
             </CardContent>
           </Card>
-        </aside>
-        <div className="flex-[2] p-6">
-            <h1 className='text-xl'>Reservation Calendar</h1>
-            <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                events={events}
-                eventClick={handleEventClick}
-                editable={false}
-                selectable={true}
-                headerToolbar={{
-                  left: 'prev,next',
-                  center: 'title',
-                  right: ''
-                }}
-                eventContent={renderEventContent}
-                eventClassNames={eventStyleGetter}
-                height="auto"
-              />
         </div>
       </div>
 
-      <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Bookings for {moment(editedEvent?.date).format('MMMM D, YYYY')}</DialogTitle>
-          </DialogHeader>
-          <DialogDescription>
-            {editedEvent && (
-              <div className="grid gap-6 py-4">
-                <BookingSection title="Rooms" icon={<HomeIcon className="w-5 h-5" />} bookings={editedEvent.rooms} onStatusChange={(value, index) => handleEditChange(value, index, 'rooms')} />
-                <BookingSection title="Venues" icon={<CalendarIcon className="w-5 h-5" />} bookings={editedEvent.venues} onStatusChange={(value, index) => handleEditChange(value, index, 'venues')} />
-              </div>
-            )}
-          </DialogDescription>
-          <DialogFooter>
-            <Button onClick={handleEditSubmit}>Save changes</Button>
-            <Button onClick={handleCloseEventDialog} variant="outline">Cancel</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Event Dialog */}
+      {isEventDialogOpen && (
+        <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
+          <DialogContent className="max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Event</DialogTitle>
+              <DialogDescription>Edit booking details below.</DialogDescription>
+            </DialogHeader>
+            <div>
+              <p className="text-sm">Status: {editedEvent?.status}</p>
+              {/* Your custom fields */}
+            </div>
+            <DialogFooter>
+              <Button onClick={handleEditSubmit}>Save Changes</Button>
+              <Button variant="outline" onClick={handleCloseEventDialog}>Cancel</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </main>
   )
 }
@@ -214,18 +342,15 @@ function BookingSection({ title, icon, bookings, onStatusChange }) {
         <div className="grid gap-4">
           {bookings.map((booking, index) => (
             <div key={booking.id} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">{booking.id}</Badge>
-                <span>{booking.title}</span>
-              </div>
+              <Badge variant="outline">{booking.id}</Badge>
+              <span>{booking.title}</span>
               <Select onValueChange={(value) => onStatusChange(value, index)} defaultValue={booking.resource.status}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="reserved">Reserved</SelectItem>
-                  <SelectItem value="occupied">Occupied</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="paid">Paid</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
