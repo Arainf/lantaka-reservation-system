@@ -1,120 +1,122 @@
-import React, { useState, useEffect, useRef } from "react";
-import { createIcons, icons } from "lucide";
-import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
-import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
-import GuestTable from "@/components/common/cards/GuestTable";
-import { ChevronLeft, ChevronRight, Filter, Search, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import DeleteModal from "@/components/ui/deletemodal";
+'use client'
 
-const initialGuests = [
-  { id: 1, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
-  { id: 2, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
-  { id: 3, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
-  { id: 4, customer: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', status: 'Confirmed', noGuest: '1' },
-  { id: 5, customer: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' },
-  { id: 6, customer: 'John Doe', email: 'john@example.com', room: '102', check_in_date: '2022-01-01 12:00:00', check_out_date: '2022-01-03 11:00:00', status: 'Confirmed', noGuest: '4' },
-  { id: 7, customer: 'Naruto The Shippuden', email: 'nutterto@example.com', room: '103', check_in_date: '2022-01-02 14:00:00', check_out_date: '2022-01-04 10:00:00', status: 'Pending', noGuest: '3' },
-  { id: 8, customer: 'Whites are Black inside', email: 'panda@example.com', room: '104', check_in_date: '2022-01-03 15:00:00', check_out_date: '2022-01-05 11:00:00', status: 'Cancelled', noGuest: '2' },
-  { id: 9, customer: 'RicocoSwag', email: 'ricocoswag@example.com', room: '105', check_in_date: '2022-01-04 13:00:00', check_out_date: '2022-01-06 10:00:00', status: 'Confirmed', noGuest: '1' },
-  { id: 10, customer: 'RaikoMS', email: 'rqikioms@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' },
-  { id: 11, customer: 'Tom Wilson', email: 'tom@example.com', room: '106', check_in_date: '2022-01-05 16:00:00', check_out_date: '2022-01-07 12:00:00', status: 'Pending', noGuest: '2' }
-];
+import React, { useState, useEffect, useRef } from "react"
+import { createIcons, icons } from "lucide"
+import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
+import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
+import GuestTable from "@/components/common/cards/GuestTable"
+import { Filter, Search, RefreshCw } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import DeleteModal from "@/components/ui/deletemodal"
+import { useGuestContext } from "@/context/guestContext"
 
 export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => {} }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const { guestsData } = useGuestContext()
+  const [guests, setGuests] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
     room: [],
     status: []
-  });
+  })
   const [tempFilters, setTempFilters] = useState({
     room: [],
     status: []
-  });
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const filterRef = useRef(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [guestToDelete, setGuestToDelete] = useState(null);
-  const [guests, setGuests] = useState(initialGuests);
+  })
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const filterRef = useRef(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [guestToDelete, setGuestToDelete] = useState(null)
 
   useEffect(() => {
-    createIcons({ icons });
+    createIcons({ icons })
 
     const handleClickOutside = (event) => {
       if (filterRef.current && !filterRef.current.contains(event.target)) {
-        setIsFilterOpen(false);
+        setIsFilterOpen(false)
       }
-    };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
-    setTempFilters(filters);
-  }, [filters]);
+    if (Array.isArray(guestsData)) {
+      setGuests(guestsData)
+    }
+  }, [guestsData])
+
+  useEffect(() => {
+    setTempFilters(filters)
+  }, [filters])
 
   const filteredGuests = guests.filter((guest) => {
-    const matchesSearch = guest.customer.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      guest.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRoom = filters.room.length === 0 || filters.room.includes(guest.room);
-    const matchesStatus = filters.status.length === 0 || filters.status.includes(guest.status);
-    return matchesSearch && matchesRoom && matchesStatus;
-  });
+    if (!guest) return false
+    const guestName = guest.guest_fName && guest.guest_lName 
+      ? `${guest.guest_fName} ${guest.guest_lName}`.toLowerCase()
+      : ''
+    const guestEmail = guest.guest_email ? guest.guest_email.toLowerCase() : ''
+    const searchTermLower = searchTerm.toLowerCase()
+
+    const matchesSearch = guestName.includes(searchTermLower) || guestEmail.includes(searchTermLower)
+    const matchesRoom = filters.room.length === 0 || (guest.room && filters.room.includes(guest.room))
+    const matchesStatus = filters.status.length === 0 || (guest.status && filters.status.includes(guest.status))
+    return matchesSearch && matchesRoom && matchesStatus
+  })
 
   const handleDelete = (id) => {
-    const guestToDelete = guests.find(guest => guest.id === id);
-    setGuestToDelete(guestToDelete);
-    setDeleteModalOpen(true);
-  };
+    const guestToDelete = guests.find(guest => guest && guest.guest_id === id)
+    setGuestToDelete(guestToDelete)
+    setDeleteModalOpen(true)
+  }
 
   const confirmDelete = () => {
     if (guestToDelete) {
-      setGuests(prevGuests => prevGuests.filter(guest => guest.id !== guestToDelete.id));
-      setDeleteModalOpen(false);
-      setGuestToDelete(null);
+      setGuests(prevGuests => prevGuests.filter(guest => guest && guest.guest_id !== guestToDelete.guest_id))
+      setDeleteModalOpen(false)
+      setGuestToDelete(null)
     }
-  };
+  }
 
   const handleEdit = (id) => {
-    console.log(`Edit guest with id: ${id}`);
-  };
+    console.log(`Edit guest with id: ${id}`)
+  }
 
   const handleTempFilterChange = (filterType, value) => {
     setTempFilters(prevFilters => {
       const updatedFilter = prevFilters[filterType].includes(value)
         ? prevFilters[filterType].filter(item => item !== value)
-        : [...prevFilters[filterType], value];
-      return { ...prevFilters, [filterType]: updatedFilter };
-    });
-  };
+        : [...prevFilters[filterType], value]
+      return { ...prevFilters, [filterType]: updatedFilter }
+    })
+  }
 
   const applyFilters = () => {
-    setFilters(tempFilters);
-    setIsFilterOpen(false);
-  };
+    setFilters(tempFilters)
+    setIsFilterOpen(false)
+  }
 
   const resetFilters = () => {
     setFilters({
       room: [],
       status: []
-    });
+    })
     setTempFilters({
       room: [],
       status: []
-    });
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
+    })
+    setSearchTerm("")
+    setCurrentPage(1)
+  }
 
-  const rooms = [...new Set(guests.map(g => g.room))];
-  const statuses = [...new Set(guests.map(g => g.status))];
+  const rooms = [...new Set(guests.filter(g => g && g.room).map(g => g.room))]
+  const statuses = [...new Set(guests.filter(g => g && g.status).map(g => g.status))]
 
-  const activeFilters = [...filters.room, ...filters.status];
+  const activeFilters = [...filters.room, ...filters.status]
 
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
@@ -149,8 +151,42 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
                   Filter
                 </Button>
                 {isFilterOpen && (
-                  <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                    {/* Filter options */}
+                  <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-4">
+                    <h3 className="text-lg font-semibold mb-2">Filters</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <h4 className="font-medium">Room</h4>
+                        {rooms.map(room => (
+                          <label key={room} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={tempFilters.room.includes(room)}
+                              onChange={() => handleTempFilterChange('room', room)}
+                              className="mr-2"
+                            />
+                            {room}
+                          </label>
+                        ))}
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Status</h4>
+                        {statuses.map(status => (
+                          <label key={status} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={tempFilters.status.includes(status)}
+                              onChange={() => handleTempFilterChange('status', status)}
+                              className="mr-2"
+                            />
+                            {status}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mt-4 flex justify-end space-x-2">
+                      <Button variant="outline" onClick={() => setIsFilterOpen(false)}>Cancel</Button>
+                      <Button onClick={applyFilters}>Apply</Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -188,9 +224,9 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
-        itemName={guestToDelete ? guestToDelete.customer : ""}
+        itemName={guestToDelete ? `${guestToDelete.guest_fName} ${guestToDelete.guest_lName}` : ""}
         itemType="Guest"
       />
     </div>
-  );
+  )
 }

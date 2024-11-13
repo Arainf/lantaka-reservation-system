@@ -516,7 +516,7 @@ export default function Component() {
                     <Form {...form}>
                       <form
                         onSubmit={form.handleSubmit(onPass)}
-                        className="space-y-6"
+                        className="space-y-6 animate-none"
                       >
                         {step === 1 && (
                           <>

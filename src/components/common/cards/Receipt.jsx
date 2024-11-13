@@ -116,7 +116,7 @@ export default function CostCalculator({
       <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
         <CardContent className="p-6">
           <Form {...form}>
-            <form className="space-y-4">
+            <form className="space-y-4 animate-none">
               <div>
                 <Label className="text-xl font-bold mb-4">Discounts</Label>
                 {fields.map((field, index) => (

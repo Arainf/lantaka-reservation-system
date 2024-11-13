@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Edit, Trash2, ChevronLeft, ChevronRight, Info, ChevronDown, ChevronUp } from 'lucide-react'
 import Slogo from '@/assets/images/SchoolLogo.png'
 import {
   Table,
@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,19 +32,32 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function ReservationsTableWithModal({ data = [], onDelete }) {
+export default function ReservationsTableWithModal({ data = [], onDelete, currentPage, setCurrentPage }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingReservation, setEditingReservation] = useState(null)
-  const itemsPerPage = 8;
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const currentData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const [expandedGroups, setExpandedGroups] = useState({})
+  const itemsPerPage = 8
+
+  const groupedReservations = useMemo(() => {
+    const groups = data.reduce((acc, reservation) => {
+      const key = `${reservation.guest_name}-${reservation.account_name}`
+      if (!acc[key]) {
+        acc[key] = []
+      }
+      acc[key].push(reservation)
+      return acc
+    }, {})
+    return Object.entries(groups)
+  }, [data])
+
+  const totalPages = Math.ceil(groupedReservations.length / itemsPerPage)
+  const currentData = groupedReservations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'confirmed':
         return 'bg-green-100 text-green-800'
-      case 'pending':
+      case 'waiting':
         return 'bg-yellow-100 text-yellow-800'
       case 'cancelled':
         return 'bg-red-100 text-red-800'
@@ -63,9 +77,15 @@ export default function ReservationsTableWithModal({ data = [], onDelete }) {
   }
 
   const handleSaveChanges = () => {
-    // Implement save logic here
     console.log("Saving changes for reservation:", editingReservation)
     handleCloseModal()
+  }
+
+  const toggleGroupExpansion = (groupKey) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupKey]: !prev[groupKey]
+    }))
   }
 
   return (
@@ -74,41 +94,91 @@ export default function ReservationsTableWithModal({ data = [], onDelete }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[25%]">Guest Information</TableHead>
-              <TableHead className="w-[20%]">Room Name</TableHead>
-              <TableHead className="w-[20%]">Room Type</TableHead>
-              <TableHead className="w-[20%]">Status</TableHead>
+              <TableHead className="w-[30%]">Guest Information</TableHead>
+              <TableHead className="w-[15%]">Reservation</TableHead>
+              <TableHead className="w-[15%]">Check-in</TableHead>
+              <TableHead className="w-[15%]">Check-out</TableHead>
+              <TableHead className="w-[10%]">Status</TableHead>
               <TableHead className="w-[15%] text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentData.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell className="flex items-center space-x-3 py-4">
-                  <img src={Slogo} alt="" className='h-8 w-8'/>
-                  <div>
-                    <div className="font-medium">{item.customer}</div>
-                    <div className="text-sm text-gray-500">{item.email}</div>
-                  </div>
-                </TableCell>
-                <TableCell className="py-4">{item.roomName}</TableCell>
-                <TableCell className="py-4">{item.roomType}</TableCell>
-                <TableCell className="py-4">
-                  <Badge variant="secondary" className={getStatusColor(item.status)}>
-                    {item.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-center py-4">
-                  <div className="flex justify-center space-x-2">
-                    <Button variant="ghost" onClick={() => handleEditClick(item)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="destructive" onClick={() => onDelete(item)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>          
-                  </div>
-                </TableCell>
-              </TableRow>
+            {currentData.map(([groupKey, reservations]) => (
+              <React.Fragment key={groupKey}>
+                <TableRow className="bg-gray-50">
+                  <TableCell colSpan={6} className="py-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <img src={Slogo} alt="" className='h-8 w-8'/>
+                        <div>
+                          <div className="font-medium">{reservations[0].guest_name}</div>
+                          <div className="text-sm text-gray-500">{reservations[0].account_name}</div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleGroupExpansion(groupKey)}
+                      >
+                        {expandedGroups[groupKey] ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                {expandedGroups[groupKey] && reservations.map((item) => (
+                  <TableRow key={item.reservation_id}>
+                    <TableCell></TableCell>
+                    <TableCell>{item.reservation}</TableCell>
+                    <TableCell>{new Date(item.check_in_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(item.check_out_date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className={getStatusColor(item.status)}>
+                        {item.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <div className="flex justify-center space-x-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost">
+                              <Info className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Reservation Details</DialogTitle>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-2 items-center gap-4">
+                                <span className="font-semibold">Guest Type:</span>
+                                <span>{item.guest_type}</span>
+                              </div>
+                              <div className="grid grid-cols-2 items-center gap-4">
+                                <span className="font-semibold">Initial Total:</span>
+                                <span>${item.receipt_initial_total.toFixed(2)}</span>
+                              </div>
+                              <div className="grid grid-cols-2 items-center gap-4">
+                                <span className="font-semibold">Total Amount:</span>
+                                <span>${item.receipt_total_amount.toFixed(2)}</span>
+                              </div>
+                              <div className="grid grid-cols-2 items-center gap-4">
+                                <span className="font-semibold">Additional Notes:</span>
+                                <span>{item.additional_notes}</span>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button variant="ghost" onClick={() => handleEditClick(item)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="destructive" onClick={() => onDelete(item)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>          
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>
@@ -122,54 +192,60 @@ export default function ReservationsTableWithModal({ data = [], onDelete }) {
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right">
-                  Name:
+                  Guest Name:
                 </Label>
                 <Input
                   id="name"
-                  value={editingReservation.customer}
-                  onChange={(e) => setEditingReservation({...editingReservation, customer: e.target.value})}
+                  value={editingReservation.guest_name}
+                  onChange={(e) => setEditingReservation({...editingReservation, guest_name: e.target.value})}
                   className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="email" className="text-right">
-                  Email:
+                <Label htmlFor="account" className="text-right">
+                  Account Name:
                 </Label>
                 <Input
-                  id="email"
-                  value={editingReservation.email}
-                  onChange={(e) => setEditingReservation({...editingReservation, email: e.target.value})}
+                  id="account"
+                  value={editingReservation.account_name}
+                  onChange={(e) => setEditingReservation({...editingReservation, account_name: e.target.value})}
                   className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="room" className="text-right">
-                  Room:
+                <Label htmlFor="reservation" className="text-right">
+                  Reservation:
                 </Label>
                 <Input
-                  id="room"
-                  value={editingReservation.roomName}
-                  onChange={(e) => setEditingReservation({...editingReservation, roomName: e.target.value})}
+                  id="reservation"
+                  value={editingReservation.reservation}
+                  onChange={(e) => setEditingReservation({...editingReservation, reservation: e.target.value})}
                   className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="roomType" className="text-right">
-                  Room Type:
+                <Label htmlFor="check-in" className="text-right">
+                  Check-in:
                 </Label>
-                <Select 
-                  value={editingReservation.roomType}
-                  onValueChange={(value) => setEditingReservation({...editingReservation, roomType: value})}
-                >
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select room type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Standard">Standard</SelectItem>
-                    <SelectItem value="Deluxe">Deluxe</SelectItem>
-                    <SelectItem value="Suite">Suite</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="check-in"
+                  type="datetime-local"
+                  value={editingReservation.check_in_date}
+                  onChange={(e) => setEditingReservation({...editingReservation, check_in_date: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="check-out" className="text-right">
+                  Check-out:
+                </Label>
+                <Input
+                  id="check-out"
+                  type="datetime-local"
+                  value={editingReservation.check_out_date}
+                  onChange={(e) => setEditingReservation({...editingReservation, check_out_date: e.target.value})}
+                  className="col-span-3"
+                />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="status" className="text-right">
@@ -183,9 +259,9 @@ export default function ReservationsTableWithModal({ data = [], onDelete }) {
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Confirmed">Confirmed</SelectItem>
-                    <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Cancelled">Cancelled</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="waiting">Waiting</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

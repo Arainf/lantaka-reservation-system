@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2 } from 'lucide-react';
-import Slogo from '@/assets/images/SchoolLogo.png'
+import React, { useState } from 'react'
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Edit, Trash2, Phone, Calendar, User, Clock } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -13,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 import {
   Dialog,
   DialogContent,
@@ -30,53 +29,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import Slogo from '@/assets/images/SchoolLogo.png';
 
 function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
-  const [expandedRows, setExpandedRows] = useState(new Set());
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState(null);
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(accounts.length / itemsPerPage);
-  const currentAccounts = accounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const [expandedRows, setExpandedRows] = useState(new Set())
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingAccount, setEditingAccount] = useState(null)
+  const itemsPerPage = 8
+  const totalPages = Math.ceil(accounts.length / itemsPerPage)
+  const currentAccounts = accounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   const toggleRowExpansion = (accountId) => {
     setExpandedRows((prevExpandedRows) => {
-      const newExpandedRows = new Set(prevExpandedRows);
+      const newExpandedRows = new Set(prevExpandedRows)
       if (newExpandedRows.has(accountId)) {
-        newExpandedRows.delete(accountId);
+        newExpandedRows.delete(accountId)
       } else {
-        newExpandedRows.add(accountId);
+        newExpandedRows.add(accountId)
       }
-      return newExpandedRows;
-    });
-  };
+      return newExpandedRows
+    })
+  }
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800'
       case 'inactive':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
   const handleEditClick = (account) => {
-    setEditingAccount(account);
-    setIsModalOpen(true);
-  };
+    setEditingAccount(account)
+    setIsModalOpen(true)
+  }
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setEditingAccount(null);
-  };
+    setIsModalOpen(false)
+    setEditingAccount(null)
+  }
 
   const handleSaveChanges = () => {
     // Implement save logic here
-    console.log("Saving changes for account:", editingAccount);
-    handleCloseModal();
-  };
+    console.log("Saving changes for account:", editingAccount)
+    handleCloseModal()
+  }
 
   return (
     <Card className="w-full">
@@ -101,6 +102,7 @@ function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleRowExpansion(account.account_id)}
+                      aria-label={expandedRows.has(account.account_id) ? "Collapse row" : "Expand row"}
                     >
                       {expandedRows.has(account.account_id) ? (
                         <ChevronUp className="h-4 w-4" />
@@ -110,7 +112,7 @@ function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
                     </Button>
                   </TableCell>
                   <TableCell className="flex items-center space-x-3 py-4">
-                    <img src={Slogo} alt="" className='h-8 w-8'/>
+                    <img src={Slogo} alt="" width={32} height={32} className="rounded-full" />
                     <div>
                       <div className="font-medium">{`${account.account_fName} ${account.account_lName}`}</div>
                       <div className="text-sm text-gray-500">{account.account_email}</div>
@@ -125,10 +127,10 @@ function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
                   </TableCell>
                   <TableCell className="text-center py-4">
                     <div className="flex justify-center space-x-2">
-                      <Button variant="ghost" onClick={() => handleEditClick(account)}>
+                      <Button variant="ghost" onClick={() => handleEditClick(account)} aria-label="Edit account">
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="destructive" onClick={() => onDelete(account)}>
+                      <Button variant="destructive" onClick={() => onDelete(account)} aria-label="Delete account">
                         <Trash2 className="h-4 w-4" />
                       </Button>          
                     </div>
@@ -136,26 +138,63 @@ function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
                 </TableRow>
                 {expandedRows.has(account.account_id) && (
                   <TableRow>
-                    <TableCell colSpan={8}>
-                      <div className="p-4 bg-gray-50">
-                        <h2 className="font-semibold mb-4 text-xl ">Additional Details</h2>
-                        <div className='pl-4'>
-                          <p className="font-semibold">Account Number: </p>
-                          <p>{account.account_id}</p>
-                          <p className="font-semibold">Phone: </p>
-                          <p>{account.account_phone}</p>
-                          <p className="font-semibold">Date of Birth: </p>
-                          <p>{account.account_dob}</p>
-                          <p className="font-semibold">Gender:</p>
-                          <p>{account.account_gender}</p>
-                          <p className="font-semibold" >Created: </p>
-                          <p>{account.account_created_at}</p>
-                          <p className="font-semibold">Updated: </p>
-                          <p>{account.account_updated_at}</p>
-                          <p className="font-semibold">Last Login: </p>
-                          <p>{account.account_last_login}</p>
-                        </div>
-                      </div>
+                    <TableCell colSpan={6}>
+                      <Card className="bg-gray-50 border-none shadow-inner">
+                        <CardContent className="p-6">
+                          <h2 className="font-semibold mb-4 text-xl text-primary">Additional Details</h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <User className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Account Number:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_id}</p>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <Phone className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Phone:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_phone}</p>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <Calendar className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Date of Birth:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_dob}</p>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <User className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Gender:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_gender}</p>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <Clock className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Created:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_created_at}</p>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <Clock className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Updated:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_updated_at}</p>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2 text-sm">
+                                <Clock className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium">Last Login:</span>
+                              </div>
+                              <p className="text-sm text-gray-600 ml-6">{account.account_last_login}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                     </TableCell>
                   </TableRow>
                 )}
@@ -164,33 +203,41 @@ function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
           </TableBody>
         </Table>
       </CardContent>
-      <div className="flex justify-center items-center space-x-4 my-4 text-[#0f172a]">
+      <div className="flex justify-center items-center space-x-4 my-4 text-primary">
         <Button
           variant="outline"
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
+          aria-label="Previous page"
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
           Previous
         </Button>
-        {[...Array(totalPages)].map((_, i) => (
-          <Button
-            key={i}
-            variant={currentPage === i + 1 ? "primary" : "outline"}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`transition-all duration-300 ${
-              currentPage === i + 1
-                ? 'shadow-[0_0_10px_3px_rgba(59,130,246,0.5)] text-[#0f172a] bg-[#fcb813]'
-                : ' bg-[#0f172a] text-primary-foreground'
-            }`}
-          >
-            {i + 1}
-          </Button>
-        ))}
+        <ScrollArea className="w-auto">
+          <div className="flex space-x-2">
+            {[...Array(totalPages)].map((_, i) => (
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? "default" : "outline"}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`transition-all duration-300 ${
+                  currentPage === i + 1
+                    ? 'shadow-[0_0_10px_3px_rgba(59,130,246,0.5)] bg-primary text-primary-foreground'
+                    : ''
+                }`}
+                aria-label={`Go to page ${i + 1}`}
+                aria-current={currentPage === i + 1 ? "page" : undefined}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
         <Button
           variant="outline"
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={currentPage === totalPages}
+          aria-label="Next page"
         >
           Next
           <ChevronRight className="h-4 w-4 ml-2" />
@@ -282,7 +329,7 @@ function AccountsTable({ accounts, onDelete, currentPage, setCurrentPage }) {
         </DialogContent>
       </Dialog>
     </Card>
-  );
+  )
 }
 
-export default AccountsTable;
+export default AccountsTable

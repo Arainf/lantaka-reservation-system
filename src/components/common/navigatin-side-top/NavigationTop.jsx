@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import './navigationside.css'; 
 import { UserContext } from "@/context/contexts";
 import Slogo from '@/assets/images/SchoolLogo.png';
+import { Button } from "@/components/ui/button";
+import { Link } from 'react-router-dom';
 
 const NavigationTop = memo(({ onSidebarToggle }) => { 
   const { userData, userRole, userImg } = useContext(UserContext);
@@ -31,6 +33,11 @@ const NavigationTop = memo(({ onSidebarToggle }) => {
         <div onClick={onSidebarToggle} className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all cursor-pointer"> 
           <Menu size={24} /> 
         </div>
+        <Link to="/home" >
+          <Button variant="default" >
+            Employee Page
+          </Button>
+        </Link>
       </div>
 
       <div className="flex items-center space-x-4">

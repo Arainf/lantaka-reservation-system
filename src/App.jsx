@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import AppRoutes from './routes/routes';  // Import the routing setup
 import { UserProvider, AccountProvider, ReservationProvider, RoomandVenueProvider } from './context/contexts';
 import { PriceProvider } from './context/priceContext';
+import { GuestProvider } from './context/guestContext';
+import { ReservationsProvider } from './context/reservationContext';
 
 
 function App() {
@@ -13,7 +15,11 @@ function App() {
         <ReservationProvider>
           <RoomandVenueProvider>
             <PriceProvider>
-              <AppRoutes />
+              <GuestProvider>
+                <ReservationsProvider>
+                  <AppRoutes />
+                </ReservationsProvider>
+              </GuestProvider>
             </PriceProvider>
           </RoomandVenueProvider>
         </ReservationProvider>

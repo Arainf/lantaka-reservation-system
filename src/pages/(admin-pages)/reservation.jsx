@@ -4,42 +4,26 @@ import React, { useState, useEffect, useRef } from "react"
 import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
-import CustomerTable from "@/components/common/cards/ReservationsTable"
-import { ChevronLeft, ChevronRight, Settings, Filter, Search, X, RefreshCw } from "lucide-react"
+import ReservationsTable from "@/components/common/cards/ReservationsTable"
+import { Filter, Search, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
-
-const reservations = [
-  {
-    id: 1,
-    email: "johndoe@gmail.com",
-    customer: "John Doe",
-    roomName: "Room 101",
-    roomType: "Standard",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    email: "alicej@gmail.com",
-    customer: "Alice Johnson",
-    roomName: "Room 102",
-    roomType: "Deluxe",
-    status: "Pending",
-  },
-  // ... (keep all other reservation entries as they were in the original code)
-]
+import { useReservationsContext } from "@/context/reservationContext"
 
 export default function AdminReservation({ sidebarOpen = false, toggleSidebar = () => {} }) {
+  const { reservationsData } = useReservationsContext()
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
-    roomType: [],
+    reservation: [],
     status: [],
+    guest_type: []
   })
   const [tempFilters, setTempFilters] = useState({
-    roomType: [],
+    reservation: [],
     status: [],
+    guest_type: []
   })  
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const filterRef = useRef(null)
@@ -65,12 +49,13 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
     setTempFilters(filters)
   }, [filters])
 
-  const filteredReservations = reservations.filter((reservation) => {
-    const matchesSearch = reservation.customer.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           reservation.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRoomType = filters.roomType.length === 0 || filters.roomType.includes(reservation.roomType)
+  const filteredReservations = reservationsData.filter((reservation) => {
+    const matchesSearch = reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+           reservation.account_name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesReservation = filters.reservation.length === 0 || filters.reservation.includes(reservation.reservation)
     const matchesStatus = filters.status.length === 0 || filters.status.includes(reservation.status)
-    return matchesSearch && matchesRoomType && matchesStatus
+    const matchesGuestType = filters.guest_type.length === 0 || filters.guest_type.includes(reservation.guest_type)
+    return matchesSearch && matchesReservation && matchesStatus && matchesGuestType
   })
 
   const handleDelete = (reservation) => {
@@ -79,9 +64,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
   }
 
   const confirmDelete = () => {
-    // Implement the actual delete logic here
-    console.log(`Deleting reservation for ${reservationToDelete.customer}`)
-    // After deletion logic, close the modal and reset the reservationToDelete
+    console.log(`Deleting reservation for ${reservationToDelete.guest_name}`)
     setDeleteModalOpen(false)
     setReservationToDelete(null)
   }
@@ -102,21 +85,24 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
 
   const resetFilters = () => {
     setFilters({
-      roomType: [],
+      reservation: [],
       status: [],
+      guest_type: []
     })
     setTempFilters({
-      roomType: [],
+      reservation: [],
       status: [],
+      guest_type: []
     })
     setSearchTerm("")
     setCurrentPage(1)
   }
 
-  const roomTypes = [...new Set(reservations.map(r => r.roomType))]
-  const statuses = [...new Set(reservations.map(r => r.status))]
+  const reservations = [...new Set(reservationsData.map(r => r.reservation))]
+  const statuses = [...new Set(reservationsData.map(r => r.status))]
+  const guestTypes = [...new Set(reservationsData.map(r => r.guest_type))]
 
-  const activeFilters = [...filters.roomType, ...filters.status]
+  const activeFilters = [...filters.reservation, ...filters.status, ...filters.guest_type]
 
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
@@ -132,7 +118,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search by name or email..."
+                  placeholder="Search by name or account..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
@@ -153,16 +139,16 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
                 {isFilterOpen && (
                   <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                     <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Room Type</div>
-                      {roomTypes.map((type) => (
-                        <label key={type} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Reservation</div>
+                      {reservations.map((res) => (
+                        <label key={res} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
                           <input
                             type="checkbox"
                             className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
-                            checked={tempFilters.roomType.includes(type)}
-                            onChange={() => handleTempFilterChange('roomType', type)}
+                            checked={tempFilters.reservation.includes(res)}
+                            onChange={() => handleTempFilterChange('reservation', res)}
                           />
-                          <span className="ml-2">{type}</span>
+                          <span className="ml-2">{res}</span>
                         </label>
                       ))}
                       <div className="border-t border-gray-100"></div>
@@ -176,6 +162,19 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
                             onChange={() => handleTempFilterChange('status', status)}
                           />
                           <span className="ml-2">{status}</span>
+                        </label>
+                      ))}
+                      <div className="border-t border-gray-100"></div>
+                      <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Guest Type</div>
+                      {guestTypes.map((type) => (
+                        <label key={type} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                            checked={tempFilters.guest_type.includes(type)}
+                            onChange={() => handleTempFilterChange('guest_type', type)}
+                          />
+                          <span className="ml-2">{type}</span>
                         </label>
                       ))}
                       <div className="border-t border-gray-100"></div>
@@ -213,10 +212,11 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
             </div>
           )}
           <div>
-            <CustomerTable
+            <ReservationsTable
               data={filteredReservations}           
               onDelete={handleDelete}
               currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
             />
           </div>
         </main>
@@ -225,8 +225,8 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
-        itemName={reservationToDelete ? reservationToDelete.customer : ""}
-        itemType="Guest"
+        itemName={reservationToDelete ? reservationToDelete.guest_name : ""}
+        itemType="Reservation"
       />
     </div>
   )
