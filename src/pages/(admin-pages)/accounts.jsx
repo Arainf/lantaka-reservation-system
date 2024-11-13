@@ -5,7 +5,7 @@ import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import AccountsTable from "@/components/common/cards/AccountsTable"
-import { ChevronLeft, ChevronRight, Settings, Filter, Search, X, RefreshCw, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Settings, Filter, Search, X, RefreshCw, Plus, Loader2, CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
@@ -13,7 +13,6 @@ import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { format } from "date-fns"
-import axios from "axios"
 import {
   Form,
   FormControl,
@@ -34,8 +33,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
-import { CalendarIcon, Loader2 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
+import { useAccountContext } from "@/context/contexts"
 
 const formSchema = z.object({
   account_role: z.enum(["Administrator", "Employee"], {
@@ -54,191 +53,9 @@ const formSchema = z.object({
   })
 })
 
-const dummyAccounts = [
-  {
-    account_id: "ACC001",
-    account_role: "Admin",
-    account_fName: "John",
-    account_lName: "Doe",
-    account_username: "johndoe",
-    account_email: "john.doe@example.com",
-    account_status: "Active",
-    account_phone: "+1234567890",
-    account_dob: "1990-01-01",
-    account_gender: "Male",
-    account_created_at: "2023-01-01T00:00:00Z",
-    account_updated_at: "2023-06-15T12:30:00Z",
-    account_last_login: "2023-06-30T09:15:00Z"
-  },
-  {
-    account_id: "ACC002",
-    account_role: "User",
-    account_fName: "Jane",
-    account_lName: "Smith",
-    account_username: "janesmith",
-    account_email: "jane.smith@example.com",
-    account_status: "Inactive",
-    account_phone: "+1987654321",
-    account_dob: "1992-05-15",
-    account_gender: "Female",
-    account_created_at: "2023-02-01T00:00:00Z",
-    account_updated_at: "2023-06-20T14:45:00Z",
-    account_last_login: "2023-06-25T11:30:00Z"
-  },
-  {
-    account_id: "ACC003",
-    account_role: "User",
-    account_fName: "Alice",
-    account_lName: "Johnson",
-    account_username: "alicejohnson",
-    account_email: "alice.johnson@example.com",
-    account_status: "Active",
-    account_phone: "+1234567891",
-    account_dob: "1988-03-12",
-    account_gender: "Female",
-    account_created_at: "2023-03-01T00:00:00Z",
-    account_updated_at: "2023-06-10T11:15:00Z",
-    account_last_login: "2023-06-28T08:20:00Z"
-  },
-  {
-    account_id: "ACC004",
-    account_role: "Moderator",
-    account_fName: "Bob",
-    account_lName: "Brown",
-    account_username: "bobbrown",
-    account_email: "bob.brown@example.com",
-    account_status: "Inactive",
-    account_phone: "+1234567892",
-    account_dob: "1995-08-21",
-    account_gender: "Male",
-    account_created_at: "2023-04-01T00:00:00Z",
-    account_updated_at: "2023-06-18T09:35:00Z",
-    account_last_login: "2023-06-22T07:25:00Z"
-  },
-  {
-    account_id: "ACC005",
-    account_role: "Admin",
-    account_fName: "Carol",
-    account_lName: "White",
-    account_username: "carolwhite",
-    account_email: "carol.white@example.com",
-    account_status: "Active",
-    account_phone: "+1234567893",
-    account_dob: "1985-10-10",
-    account_gender: "Female",
-    account_created_at: "2023-05-01T00:00:00Z",
-    account_updated_at: "2023-06-17T13:40:00Z",
-    account_last_login: "2023-06-29T05:10:00Z"
-  },
-  {
-    account_id: "ACC006",
-    account_role: "User",
-    account_fName: "David",
-    account_lName: "Clark",
-    account_username: "davidclark",
-    account_email: "david.clark@example.com",
-    account_status: "Active",
-    account_phone: "+1234567894",
-    account_dob: "1991-12-02",
-    account_gender: "Male",
-    account_created_at: "2023-06-01T00:00:00Z",
-    account_updated_at: "2023-06-14T10:50:00Z",
-    account_last_login: "2023-06-26T06:45:00Z"
-  },
-  {
-    account_id: "ACC007",
-    account_role: "User",
-    account_fName: "Eva",
-    account_lName: "Miller",
-    account_username: "evamiller",
-    account_email: "eva.miller@example.com",
-    account_status: "Inactive",
-    account_phone: "+1234567895",
-    account_dob: "1989-07-15",
-    account_gender: "Female",
-    account_created_at: "2023-07-01T00:00:00Z",
-    account_updated_at: "2023-07-10T14:30:00Z",
-    account_last_login: "2023-07-18T11:00:00Z"
-  },
-  {
-    account_id: "ACC008",
-    account_role: "Moderator",
-    account_fName: "Frank",
-    account_lName: "Green",
-    account_username: "frankgreen",
-    account_email: "frank.green@example.com",
-    account_status: "Active",
-    account_phone: "+1234567896",
-    account_dob: "1987-11-20",
-    account_gender: "Male",
-    account_created_at: "2023-08-01T00:00:00Z",
-    account_updated_at: "2023-08-05T15:25:00Z",
-    account_last_login: "2023-08-14T12:15:00Z"
-  },
-  {
-    account_id: "ACC009",
-    account_role: "Admin",
-    account_fName: "Grace",
-    account_lName: "Harris",
-    account_username: "graceharris",
-    account_email: "grace.harris@example.com",
-    account_status: "Inactive",
-    account_phone: "+1234567897",
-    account_dob: "1993-04-22",
-    account_gender: "Female",
-    account_created_at: "2023-09-01T00:00:00Z",
-    account_updated_at: "2023-09-07T10:00:00Z",
-    account_last_login: "2023-09-14T09:50:00Z"
-  },
-  {
-    account_id: "ACC010",
-    account_role: "User",
-    account_fName: "Henry",
-    account_lName: "Adams",
-    account_username: "henryadams",
-    account_email: "henry.adams@example.com",
-    account_status: "Active",
-    account_phone: "+1234567898",
-    account_dob: "1994-03-11",
-    account_gender: "Male",
-    account_created_at: "2023-10-01T00:00:00Z",
-    account_updated_at: "2023-10-08T09:10:00Z",
-    account_last_login: "2023-10-15T08:30:00Z"
-  },
-  {
-    account_id: "ACC011",
-    account_role: "User",
-    account_fName: "Ivy",
-    account_lName: "Roberts",
-    account_username: "ivyroberts",
-    account_email: "ivy.roberts@example.com",
-    account_status: "Inactive",
-    account_phone: "+1234567899",
-    account_dob: "1986-09-13",
-    account_gender: "Female",
-    account_created_at: "2023-11-01T00:00:00Z",
-    account_updated_at: "2023-11-05T12:00:00Z",
-    account_last_login: "2023-11-10T10:20:00Z"
-  },
-  {
-    account_id: "ACC012",
-    account_role: "Admin",
-    account_fName: "Jack",
-    account_lName: "Wilson",
-    account_username: "jackwilson",
-    account_email: "jack.wilson@example.com",
-    account_status: "Active",
-    account_phone: "+1234567800",
-    account_dob: "1982-02-28",
-    account_gender: "Male",
-    account_created_at: "2023-12-01T00:00:00Z",
-    account_updated_at: "2023-12-10T14:45:00Z",
-    account_last_login: "2023-12-20T09:05:00Z"
-  }
-];
-
 export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () => {} }) {
-  const [accounts, setAccounts] = useState(dummyAccounts)
+  const { accountData } = useAccountContext();
+  const [accounts, setAccounts] = useState(accountData || []);
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
@@ -270,6 +87,9 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
     },
   });
 
+
+  console.log("accounts:" , accountData);
+
   useEffect(() => {
     createIcons({ icons })
 
@@ -289,14 +109,19 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
     setTempFilters(filters)
   }, [filters])
 
-  const filteredAccounts = accounts.filter((account) => {
-    const matchesSearch = account.account_fName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           account.account_lName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           account.account_email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = filters.role.length === 0 || filters.role.includes(account.account_role)
-    const matchesStatus = filters.status.length === 0 || filters.status.includes(account.account_status)
-    return matchesSearch && matchesRole && matchesStatus
-  })
+  const filteredAccounts = accountData ? accountData.filter((accountData) => {
+    const matchesSearch = (
+      (accountData.account_fName && accountData.account_fName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (accountData.account_lName && accountData.account_lName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (accountData.account_email && accountData.account_email.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    
+    const matchesRole = filters.role.length === 0 || filters.role.includes(accountData.account_role);
+    const matchesStatus = filters.status.length === 0 || filters.status.includes(accountData.account_status);
+    
+    return matchesSearch && matchesRole && matchesStatus;
+  }) : [];
+  
 
   const handleDelete = (account) => {
     setAccountToDelete(account)
@@ -304,7 +129,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
   }
 
   const confirmDelete = () => {
-    setAccounts(accounts.filter(account => account.account_id !== accountToDelete.account_id))
+    setAccounts(accountData.filter(account => account.account_id !== accountToDelete.account_id))
     setDeleteModalOpen(false)
     setAccountToDelete(null)
   }
@@ -354,7 +179,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       const newAccount = {
-        account_id: `ACC${(accounts.length + 1).toString().padStart(3, '0')}`,
+        account_id: `ACC${(accountData.length + 1).toString().padStart(3, '0')}`,
         account_role: values.account_role,
         account_fName: values.fName,
         account_lName: values.lName,
@@ -369,7 +194,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
         account_last_login: null,
       };
 
-      setAccounts([...accounts, newAccount]);
+      setAccounts([...accountData, newAccount]);
       Toast({
         title: "Registration Successful",
         description: "New account has been created successfully.",
@@ -388,8 +213,8 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
     }
   }
 
-  const roles = [...new Set(accounts.map(a => a.account_role))]
-  const statuses = [...new Set(accounts.map(a => a.account_status))]
+  const roles = accountData ? [...new Set(accountData.map(a => a.account_role))] : []
+  const statuses = accountData ? [...new Set(accountData.map(a => a.account_status))] : []
 
   const activeFilters = [...filters.role, ...filters.status]
 
@@ -524,7 +349,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
               <h2 className="text-2xl font-bold">Add New Account</h2>
               <Button
                 variant="ghost"
-                size="xl"
+                size="icon"
                 onClick={() => setIsAddAccountSidebarOpen(false)}
               >
                 <X className="h-6 w-6" />
@@ -541,7 +366,7 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
                         <FormLabel>Role</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
                             </SelectTrigger>
                           </FormControl>

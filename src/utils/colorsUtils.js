@@ -21,9 +21,6 @@ export const calculateShade = (baseColor, amount) => {
   };
 
   export function formatDateToYYYYMMDD(date) {
-    console.log("Date type:", typeof date); // Check the type
-    console.log("Date value:", date); // Check the value
-  
     if (!(date instanceof Date)) {
       console.error("Provided value is not a Date object.");
       return null; // or handle the error accordingly

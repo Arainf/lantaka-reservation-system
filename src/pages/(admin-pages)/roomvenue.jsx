@@ -213,10 +213,10 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
     <Card key={item.id} className="mb-4 overflow-hidden drop-shadow-xl">
       
       <CardHeader>
-        <CardTitle>{item.name}</CardTitle>
+        <CardTitle >{item.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
+        <p className="text-sm text-muted-foreground mb-1">Double Bed</p>
         <div className="flex items-center justify-between text-sm">
           <span className="flex items-center">
            
@@ -229,13 +229,13 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
         </div>
       </CardContent>
       <CardFooter className="justify-end space-x-2">
-        <Button variant="ghost" onClick={() => handleEdit(item)}>
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
+        <Button variant="outline" onClick={() => handleEdit(item)}>
+          <Edit className="h-4 w-4" />
+         
         </Button>
         <Button variant="destructive" onClick={() => handleDelete(item)}>
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete
+          <Trash2 className="h-4 w-4" />
+  
         </Button>
       </CardFooter>
     </Card>

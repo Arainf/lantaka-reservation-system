@@ -49,10 +49,6 @@ import { Badge } from "@/components/ui/badge";
 import { usePriceContext } from "@/context/priceContext";
 import { Separator } from "@/components/ui/separator";
 
-// const dateRangeSchema = z.object({
-//   from: z.union([z.date().nullable().optional(), z.string().optional()]),
-//   to: z.union([z.date().nullable().optional(), z.string().optional()]),
-// });
 
 const step1Schema = z.object({
   clientAlias: z.string().min(1, "*"),
@@ -125,7 +121,7 @@ export default function Component() {
   const form = useForm({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
-      accountId: localStorage.getItem("account_id"),
+      accountId: "",
       clientAlias: "",
       clientType: "",
       dateRangeRoom: { from: "", to: "" },
@@ -208,6 +204,7 @@ export default function Component() {
       try {
         await step3Schema.parseAsync(data);
 
+        data.accountId = localStorage.getItem("account_id"); // replace with actual account id
         data.totalPrice = calculateTotalPrice();
         data.discount = discounts;
         data.initialTotalPrice = initialTotalPrice;

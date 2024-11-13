@@ -53,30 +53,27 @@ export const UserProvider = ({ children }) => {
 
 export const AccountContext = createContext(null);
 
+export const useAccountContext = () => useContext(AccountContext);
 
 export const AccountProvider = ({ children }) => {
   const [accountData, setAccountData] = useState(null);
 
   useEffect(() => {
-    const storedData = localStorage.getItem('accountData');
-    if (storedData){
-      setAccountData(JSON.parse(storedData));
-    }else{
-      const fetchAccountData = async () => {
-        try {
-          const res = await fetch('http://localhost:5000/api/accounts');
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          const data = await res.json();
-          setAccountData(data);
-          localStorage.setItem('accountData',JSON.stringify(data));
-        } catch (error) {
-          console.error('Failed to fetch account data:', error);
+    const fetchAccountData = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/accounts');
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
-      };
-      fetchAccountData();
-    }
+        const data = await res.json();
+        setAccountData(data);
+        console.log("Fetched account data:", data);  // Log fetched data
+      } catch (error) {
+        console.error('Failed to fetch account data:', error);
+      }
+    };
+
+    fetchAccountData();
   }, []); // Empty dependency array to run only once on mount
 
   return (
@@ -85,8 +82,6 @@ export const AccountProvider = ({ children }) => {
     </AccountContext.Provider>
   );
 };
-
-
 
 
 export const DataContext = ({ children }) => {

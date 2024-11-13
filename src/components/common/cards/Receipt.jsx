@@ -35,7 +35,6 @@ export default function CostCalculator({
     setClientType, 
     setDiscounts, 
     setInitialTotalPrice,
-    discounts 
   } = usePriceContext();
 
   const [roomRates, setRoomRates] = useState({
@@ -55,6 +54,8 @@ export default function CostCalculator({
     control: form.control,
     name: "discounts",
   });
+
+  const discounts = form.watch('discounts'); // Watch the discounts field for changes
 
   useEffect(() => {
     if (setClientType) {
@@ -89,23 +90,23 @@ export default function CostCalculator({
 
   useEffect(() => {
     setInitialTotalPrice(calculateSubtotal);
-    setDiscounts(form.getValues('discounts'));
-  }, [calculateSubtotal, setInitialTotalPrice, discounts ]);
+  }, [calculateSubtotal, setInitialTotalPrice]);
+
+  useEffect(() => {
+    // Automatically set discounts every time the discounts field changes
+    setDiscounts(discounts);
+  }, [discounts, setDiscounts]);
 
   const roomCounts = useMemo(() => selectedRooms.reduce((acc, room) => {
     acc[room] = (acc[room] || 0) + 1;
     return acc;
   }, {}), [selectedRooms]);
 
-  const onSubmit = (data) => {
-    setDiscounts(data.discounts);
-  };
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
   };
 
-  const calculateTotal = (discounts) => {
+  const calculateTotal = () => {
     const totalDiscount = discounts.reduce((sum, d) => sum + Number(d.amount), 0);
     return calculateSubtotal - totalDiscount;
   };
@@ -115,7 +116,7 @@ export default function CostCalculator({
       <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
         <CardContent className="p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form className="space-y-4">
               <div>
                 <Label className="text-xl font-bold mb-4">Discounts</Label>
                 {fields.map((field, index) => (
@@ -165,7 +166,6 @@ export default function CostCalculator({
                   <PlusCircle className="h-4 w-4 mr-2 " />
                   Add Discount
                 </Button>
-                {/* <Button type="submit">Save Changes</Button> */}
               </div>
             </form>
           </Form>
@@ -205,11 +205,11 @@ export default function CostCalculator({
                 <span>Subtotal:</span>
                 <span>{formatCurrency(calculateSubtotal)}</span>
               </div>
-              {fields.map((discount, index) => (
+              {discounts.map((discount, index) => (
                 discount.amount > 0 && (
-                  <div key={discount.id} className="flex justify-between text-green-600">
-                    <span>{form.getValues(`discounts.${index}.type`)} Discount:</span>
-                    <span>- {formatCurrency(Number(form.getValues(`discounts.${index}.amount`)))}</span>
+                  <div key={index} className="flex justify-between text-green-600">
+                    <span>{discount.type} Discount:</span>
+                    <span>- {formatCurrency(Number(discount.amount))}</span>
                   </div>
                 )
               ))}
@@ -217,7 +217,7 @@ export default function CostCalculator({
             <Separator />
             <div className="flex justify-between items-baseline">
               <span className="text-lg font-semibold">Total:</span>
-              <span className="text-2xl font-bold">{formatCurrency(calculateTotal(form.getValues('discounts')))}</span>
+              <span className="text-2xl font-bold">{formatCurrency(calculateTotal())}</span>
             </div>
           </div>
         </CardContent>
