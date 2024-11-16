@@ -1,16 +1,9 @@
+"use client"
+
 import { Bar, ComposedChart, Line, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { TrendingUp } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
-
-const data = [
-  { roomType: "Standard", bookingFrequency: 85, avgStayDuration: 2.3 }, // Average stay duration is the average length of stay (in days) for each room type
-  { roomType: "Double Bed", bookingFrequency: 75, avgStayDuration: 3.1 }, // table that it covers comes from Room_Reservation(Check-In and Check-Out)
-  { roomType: "Triple Bed", bookingFrequency: 45, avgStayDuration: 4.2 },  //To calculate the average stay duration, you would find the difference between the Check_Out and Check_In dates for each reservation, 
-  // which gives the stay duration for that booking. Then, by averaging this value across all bookings for each room type, you can get the average stay duration per room type.
-  { roomType: "Matrimonial", bookingFrequency: 35, avgStayDuration: 3.8 }
-]
 
 const chartConfig = {
   bookingFrequency: {
@@ -23,11 +16,19 @@ const chartConfig = {
   },
 }
 
-export function Component({ isLoading = false }) {
+export function Component({ data, isLoading }) {
   if (isLoading) {
     return (
       <Card className="w-full h-[400px]">
-        <Skeleton className="w-full h-full" />
+        <Skeleton className="w-full h-[400px]" />
+      </Card>
+    )
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="w-full h-[400px] flex items-center justify-center">
+        <p className="text-muted-foreground">No data available</p>
       </Card>
     )
   }
@@ -39,7 +40,7 @@ export function Component({ isLoading = false }) {
         <CardDescription>Booking frequency and average stay duration by room type</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        <ChartContainer config={chartConfig} className="h-[320px] w-full">
+        <ChartContainer config={chartConfig} className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 10, right: 25, left: 25, bottom: 20 }}>
               <XAxis
@@ -87,8 +88,6 @@ export function Component({ isLoading = false }) {
           </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-      </CardFooter>
     </Card>
   )
 }

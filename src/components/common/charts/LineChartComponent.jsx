@@ -21,6 +21,13 @@ export function Component({ data, isLoading }) {
     )
   }
 
+  if(!data || data.length === 0){
+    return (
+      <Card className="w-full h-[400px] flex items-center justify-center">
+        <p className="text-muted-foreground">No data available</p>
+      </Card>
+    )
+  }
   return (
     <Card className="w-full h-full">
       <CardHeader>
