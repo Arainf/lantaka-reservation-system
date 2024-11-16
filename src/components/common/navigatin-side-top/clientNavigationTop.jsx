@@ -20,10 +20,11 @@ const NavigationTop = memo(({ handleBackToHome }) => {
   const { userData, userRole } = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
+  
   const [reservationData, setReservationData] = useState({
     name: "",
     date: "",
@@ -145,7 +146,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
           {[
             ["Home", "home"],
             ["Reservation", "Reservation"],
-            ["Calendar", "Calendar"],
+            ["Bookings", "Bookings"],
             ["Account", "account"],
           ].map(([title, path]) => (
             <Link
@@ -169,7 +170,8 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all"
           />
           {notificationsVisible && (
-            <div className="absolute right-0 mt-2 w-80 bg-white text-black rounded-lg shadow-lg z-20 max-h-80 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-80 bg-white text-black rounded-lg shadow-lg z-20 max-h-80 overflow-hidden"
+            >
               <div className="p-4">
                 <div className="font-semibold border-b pb-2">Notifications</div>
                 <div className="max-h-72 overflow-y-auto">
@@ -201,8 +203,9 @@ const NavigationTop = memo(({ handleBackToHome }) => {
 
         {userData && (
           <div
-            className="relative flex items-center space-x-2"
-            onMouseEnter={() => setDropdownVisible(true)}
+            className="relative flex items-center space-x-2 p-2  rounded-lg hover:bg-blue-950 "
+            onClick={toggleDropdown}
+
           >
             {" "}
             <img src={Slogo} alt="LOGO" className="h-8 w-8" />
@@ -215,8 +218,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
         {/* Dropdown Menu */}
         {dropdownVisible && (
           <div
-            className="absolute right-0 mt-[21%] w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3"
-            onMouseLeave={() => setDropdownVisible(false)}
+            className="absolute right-0 mt-[330px] w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3 "
           >
             <img src={Slogo} alt="LOGO" className="h-14 w-14 mx-auto mb-2" />
             <p className="text-center font-medium text-lg mb-2">
@@ -228,7 +230,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                 className="text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 hover:text-white data-[state=active]:bg-blue-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center mb-3 rounded-lg"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                Dashboard
               </Link>
             )}
             <Link

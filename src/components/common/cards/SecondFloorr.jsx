@@ -200,19 +200,27 @@ const SecondFloorr = ({ resetTrigger }) => {
     // Add more rooms as needed
   };
 
+  const [hoverStates, setHoverStates] = useState({});
 
-  const [hoveredRoom, setHoveredRoom] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-
+  const [hoveredRoom, setHoveredRoom] = useState(null);
   const handleMouseEnter = (roomId, event) => {
+    setHoverStates((prevState) => ({
+      ...prevState,
+      [roomId]: true,
+    }));
     setHoveredRoom(roomId);
     setTooltipPos({ x: event.clientX, y: event.clientY });
   };
-
-  const handleMouseLeave = () => {
+  
+  // Consolidated function to handle mouse leave
+  const handleMouseLeave = (roomId) => {
+    setHoverStates((prevState) => ({
+      ...prevState,
+      [roomId]: false,
+    }));
     setHoveredRoom(null);
   };
-
   return (
     <div className="relative w-full h-full overflow-hidden ">
        <svg
@@ -253,120 +261,120 @@ const SecondFloorr = ({ resetTrigger }) => {
           	id="room202"
             className="roomHover"
             d="M1237.5 176.5V176H1237H1222H1221.5V176.5V191H1197.27H1197H1182H1181.5V191.5V258.5V259H1182H1191.5V285.5V286H1192H1208H1208.5V285.5V259H1237H1237.5V258.5V176.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room206"
             className="roomHover"
             d="M1121.5 192.5V192H1121H1080.5V176V175.5H1080H1065H1064.5V176V258.5V259H1065H1074.5V285.5V286H1075H1093H1093.5V285.5V259H1121H1121.5V258.5V192.5Z"
-            fill="#938E8E"
+            fill="blue"   
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
-          	id="room2010"
+          	id="room210"
             className="roomHover"
             d="M1004.5 192.5V192H1004H963.5V176.5V176H963H948H947.5V176.5V258.5V259H948H957.5V285.5V286H958H974H974.5V285.5V259H1004H1004.5V258.5V192.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room214"
             className="roomHover"
             d="M887.5 192.5V192H887H846.5V176.5V176H846H831H830.5V176.5V258.5V259H831H840.5V285.5V286H841H858H858.5V285.5V259H887H887.5V258.5V192.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room218"
             className="roomHover"
             d="M770.5 192.5V192H770H729.5V176.5V176H729H715H714.5V176.5V258.5V259H715H723.5V285.5V286H724H741H741.5V285.5V259H770H770.5V258.5V192.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room222"
             className="roomHover"
             d="M653.5 192.5V192H653H613.5V176.5V176H613H598H597.5V176.5V258.5V259H598H606.5V285.5V286H607H624H624.5V285.5V259H653H653.5V258.5V192.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
-          	id="rrom226"
+          	id="room226"
             className="roomHover"
             d="M537.5 192.473V191.972L537 191.973L497.5 192V176.5V176H497H481H480.5V176.5V258.5V259H481H490.5V285.5V286H491H508H508.5V285.5V259H537H537.5V258.5V192.473Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room230"
             className="roomHover"
             d="M420.5 192.473V191.972L420 191.973L380.5 192V176.5V176H380H364H363.5V176.5V258.5V259H364H373.5V285.5V286H374H391H391.5V285.5V259H420H420.5V258.5V192.473Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room234"
             className="roomHover"
             d="M303.5 192.5V192H303H262.5V176.5V176H262H247H246.5V176.5V258.5V259H247H256.5V285.5V286H257H274H274.5V285.5V259H303H303.5V258.5V192.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room232"
             className="roomHover"
             d="M335 259H306.5V192H347H347.5V191.5V176H362.5V259H354H353.5V259.5V286H335.5V259.5V259H335Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room236"
             className="roomHover"
             d="M160 259H131.5V192H172H172.5V191.5V176H187.5V259H179H178.5V259.5V286H160.5V259.5V259H160Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room224"
             className="roomHover"
             d="M569 259H540.5V192H580H580.5V191.5V176H596.5V259H587H586.5V259.5V286L569.5 286V259.5V259H569Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
 
           />
@@ -374,250 +382,250 @@ const SecondFloorr = ({ resetTrigger }) => {
           	id="room220"
             className="roomHover"
             d="M684.889 259H656.5V192H697H697.5V191.5V176H713.5V259H704H703.5V259.5V286H685.389V259.5V259H684.889Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
-          	id="228"
+          	id="room228"
             className="roomHover"
             d="M452 259H423.5V191.967H464H464.5V191.467V176H479.5V259H470H469.5V259.5V286L452.5 286V259.5V259H452Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room216"
             className="roomHover"
             d="M802 258.855L773.5 258.855V192H814H814.5V191.5V176H829.5V258.855L821 258.855H820.5V259.355V285.855H802.5V259.355V258.855H802Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room223"
             className="roomHover"
             d="M607 344H607.5V343.5V316.5H625.5V343.5V344H626H654.674V407H652.174H651.674V407.5V411H601.554V407.5V407H601.054H598.5V344H607Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room219"
             className="roomHover"
             d="M724 344H724.5V343.5V316.5H742.5V343.5V344H743H771.5V407H769H768.5V407.5V411H717.554V407.5V407H717.054H715.5V344H724Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room215"
             className="roomHover"
             d="M841.179 344H841.679V343.5V316.5H858.5V343.5V344H859H888.5V407H886H885.5V407.5V411H834.5V407.5V407H834H831.5V344H841.179Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
-          	id="203"
+          	id="room203"
             className="roomHover"
             d="M1192.18 344.5H1192.68V344L1192.68 316.5H1208.98V344V344.5H1209.48H1238.67L1238.5 407H1236H1235.5V407.5V411H1185.5V407.5V407H1185H1182.5V344.5H1192.18Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room207"
             className="roomHover"
             d="M1076 344H1076.5V343.5V317H1092.5V343.5V344H1093H1121.5V407H1120H1119.5V407.5V411H1068.5V407.5V407H1068H1065.5V344H1076Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room211"
             className="roomHover"
             d="M958 344H958.5V343.5V316H975.5V343.5V344H976H1004.67V407H1003H1002.5V407.5V411H951.5V407.5V407H951H948.5V344H958Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
-          	id="201"
+          	id="room201"
             className="roomHover"
             d="M1296 344.5H1295.5V344V316.5H1270.5V344V344.5H1270H1240.5V407H1243H1243.5V407.5V411H1272.74H1302.5H1305.5V407V344.5H1296Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room205"
             className="roomHover"
             d="M1170 344H1169.5V343.5V317H1152.58V343.5V344H1152.08H1123.5V407H1125.94H1126.44V407.5V411H1177.5V407.5V407H1178H1179.5V344H1170Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room209"
             className="roomHover"
             d="M1054 344H1053.5V343.5V317H1036.58V343.5V344H1036.08H1007.5V407H1009.94H1010.44V407.5V411H1060.5V407.5V407H1061H1063.5V344H1054Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room213"
             className="roomHover"
             d="M937 344H936.5V343.5V317H919.518V343.5V344H919.018H890.5V407.098H893H893.5V407.598V411H943.5V407.5V407H944H946.5V344H937Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room217"
             className="roomHover"
             d="M821 344.104H820.5V343.604V316.5H803.018V343.604V344.104H802.518H773.5V407H776H776.5V407.5V411H826.5V407.5V407H827H829.5V344.104H821Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room221"
             className="roomHover"
             d="M704 344H703.5V343.5V316.5H686.192V343.5V344H685.692H656.5L656.5 407H659H659.5V407.5V411H710.5V407.5V407H711H713.5V344H704Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room212"
             className="roomHover"
             d="M931.5 191.5V176H946.5V259H937H936.5V259.5V286.059L919.5 286.002V259.5V259H919H890.5V192.052L931.001 192L931.5 191.999V191.5Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room208"
             className="roomHover"
             d="M1036 259H1007.5V192H1048H1048.5V191.5V175.5H1063.5V259H1054H1053.5V259.5V286L1036.5 286V259.5V259H1036Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room204"
             className="roomHover"
             d="M1153 259H1124.5V192H1164H1164.5V191.5V176H1180.5V259H1171H1170.5V259.5V286H1153.5V259.5V259H1153Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room237"
             className="roomHover"
             d="M140 344H140.5V343.5V316.5H157.5V343.5V344H158H187.5V407H184.957H184.457V407.5V411H133.5V407.5V407H133H130.5V344H140Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
-          	id="room223"
+          	id="room233"
             className="roomHover"
             d="M257 344H257.5V343.5V316.5H274.5V343.5V344H275H304.5V407H302H301.5V407.5V411H250.5V407.5V407H250H247.5V344H257Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room235"
             className="roomHover"
             d="M237 344H236.5V343.5V316.5H219.5V343.5V344H219H189.5V407H192H192.495L192.5 407.495L192.538 411H243.5V407.5V407H244H245.5V344H237Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room227"
             className="roomHover"
             d="M471 344H470.5V343.5V316.5H452.5V343.5V344H452H423.5V407H425.043H425.543V407.5V411H476.648V407.5V407H477.148H479.5V344H471Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room231"
             className="roomHover"
             d="M354 344H353.5V343.5V316H336.5V343.5V344H336H306.5V407H309H309.5V407.5V411H360.5V407.5V407H361H362.5V344H354Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room229"
             className="roomHover"
             d="M374 344H374.5V343.5V316.5H391.5V343.5V344H392H421.5V407H419H418.5V407.5V411H367.5V407.5V407H367H364.5V344H374Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
           <path
           	id="room225"
             className="roomHover"
             d="M594 406.5H596.5V343.5V320H594H593.5V319.5V316H569.5V343.5V344H569H539.5V406.5H542H542.5V407V410.5H593.5V407V406.5H594Z"
-            fill="#938E8E"
+            fill="blue"
             fill-opacity="0.25"
             stroke="black"
-            onMouseEnter={() => setIsHovering(true)}
+           onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           />
         </g>
