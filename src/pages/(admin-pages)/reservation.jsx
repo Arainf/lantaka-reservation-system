@@ -12,7 +12,7 @@ import DeleteModal from "@/components/ui/deletemodal"
 import { useReservationsContext } from "@/context/reservationContext"
 
 export default function AdminReservation({ sidebarOpen = false, toggleSidebar = () => {} }) {
-  const { reservationsData } = useReservationsContext()
+  const { reservationsData, fetchReservations, deleteData } = useReservationsContext()
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
@@ -44,6 +44,9 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+  useEffect(() => {
+    fetchReservations()
+  },[deleteData])
 
   useEffect(() => {
     setTempFilters(filters)

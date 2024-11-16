@@ -6,10 +6,11 @@ export const useReservationsContext = () => useContext(ReservationContext);
 
 export const ReservationsProvider = ({ children }) => {
   const [reservationsData, setReservationsData] = useState([]); 
+  const [deleteData, setDeleteData] = useState("false");
 
   const fetchReservations = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/reservations`);
+      const response = await fetch(`http://localhost:5000/api/getReservations`);
       if (!response.ok) {
         throw new Error("Failed to fetch guests");
       }
@@ -22,13 +23,16 @@ export const ReservationsProvider = ({ children }) => {
 
   useEffect(() => {
     fetchReservations();
-  }, []);
+  }, [deleteData, setDeleteData]);
 
   console.log("guests data:" , reservationsData);
 
 
   const contextValue = {
-    reservationsData
+    reservationsData,
+    fetchReservations,
+    deleteData,
+    setDeleteData
   };
 
   return (

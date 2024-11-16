@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000)
+    const timer = setTimeout(() => setLoading(false), 500)
     return () => clearTimeout(timer)
   }, [])
 

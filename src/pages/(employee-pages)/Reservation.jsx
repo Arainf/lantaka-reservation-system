@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -49,7 +49,6 @@ import { Badge } from "@/components/ui/badge";
 import { usePriceContext } from "@/context/priceContext";
 import { Separator } from "@/components/ui/separator";
 
-
 const step1Schema = z.object({
   clientAlias: z.string().min(1, "*"),
   clientType: z.enum(["Internal", "External"], {
@@ -58,7 +57,7 @@ const step1Schema = z.object({
   reservationType: z.enum(["room", "venue", "both"], {
     errorMap: () => ({ message: "*" }),
   }),
-  numberofGuest: z.string().min(1, "*"),
+  MaxnumberofGuest: z.number().optional(),
 });
 
 const step2Schema = z.object({
@@ -106,7 +105,8 @@ export default function Component() {
     triple: [],
     matrimonial: [],
   });
-  const { price, clientType, setClientType, discounts, initialTotalPrice } = usePriceContext();
+  const { price, clientType, setClientType, discounts, initialTotalPrice } =
+    usePriceContext();
   const [venueMessage, setVenueMessage] = useState("");
   const [roomMessage, setRoomMessage] = useState("");
   const [dateRangeRoomsetter, setDateRangeRoomsetter] = useState({
@@ -117,6 +117,13 @@ export default function Component() {
     from: "",
     to: "",
   });
+  const [maxGuests, setMaxGuests] = useState(0);
+  const [capacity, setCapacity] = useState({
+    "Double capacity": 0,
+    "Triple capacity": 0,
+    "Matrimonial capacity": 0,
+  });
+  const [venueCapacity, setVenueCapacity] = useState([])
 
   const form = useForm({
     resolver: zodResolver(reservationSchema),
@@ -126,7 +133,7 @@ export default function Component() {
       clientType: "",
       dateRangeRoom: { from: "", to: "" },
       dateRangeVenue: { from: "", to: "" },
-      numberofGuest: "",
+      MaxnumberofGuest: 0,
       firstName: "",
       lastName: "",
       gender: "",
@@ -144,13 +151,72 @@ export default function Component() {
     },
   });
 
-  const getSelectedRooms = () => {
-    const rooms = [];
+  useEffect(() => {
+    setCapacity({
+      "Double capacity": price.double_capacity || 0,
+      "Triple capacity": price.triple_capacity || 0,
+      "Matrimonial capacity": price.Matrimonial_capacity || 0,
+    });
+  }, [price]);
+
+  useEffect(() => {
+    if (Array.isArray(price.venue_Holder)) {
+      const venues = price.venue_Holder.reduce((acc, venue) => {
+        acc[venue.venue_id] = venue.venue_capacity || 0
+        return acc
+      }, {})
+    
+      setVenueCapacity(venues); // Now an array of objects instead of a single object
+    } else {
+      setVenueCapacity([]); // Set an empty array as a fallback
+    }
+  }, [price]);
+
+  useEffect(() => {
+    fetchEverythingAvailable();
+  }, []);
+
+  useEffect(() => {
+    if (
+      availableRooms.double_rooms.length > 0 ||
+      availableVenues.venues_holder.length > 0
+    ) {
+      setShowResultsRoom(true);
+      setShowResultsVenue(true);
+    }
+  }, [availableRooms, availableVenues]);
+
+  const calculateMaxGuests = useCallback(() => {
+    let totalGuests = 0;
     if (selectedRoomReceipt.double.length > 0) {
-      rooms.push(...selectedRoomReceipt.double.map(() => "Double Room"));
+      totalGuests +=
+        selectedRoomReceipt.double.length * capacity["Double capacity"];
     }
     if (selectedRoomReceipt.triple.length > 0) {
-      rooms.push(...selectedRoomReceipt.triple.map(() => "Triple Room"));
+      totalGuests +=
+        selectedRoomReceipt.triple.length * capacity["Triple capacity"];
+    }
+    if (selectedRoomReceipt.matrimonial.length > 0) {
+      totalGuests +=
+        selectedRoomReceipt.matrimonial.length *
+        capacity["Matrimonial capacity"];
+    }
+    return totalGuests;
+  }, [selectedRoomReceipt, capacity]);
+
+  useEffect(() => {
+    const newMaxGuests = calculateMaxGuests();
+    setMaxGuests(newMaxGuests);
+    form.setValue("MaxnumberofGuest", newMaxGuests);
+  }, [selectedRoomReceipt, capacity, calculateMaxGuests, form]);
+
+  const getSelectedRooms = useCallback(() => {
+    const rooms = [];
+    if (selectedRoomReceipt.double.length > 0) {
+      rooms.push(...selectedRoomReceipt.double.map(() => "Double Bed"));
+    }
+    if (selectedRoomReceipt.triple.length > 0) {
+      rooms.push(...selectedRoomReceipt.triple.map(() => "Triple Bed"));
     }
     if (selectedRoomReceipt.matrimonial.length > 0) {
       rooms.push(
@@ -158,9 +224,9 @@ export default function Component() {
       );
     }
     return rooms;
-  };
+  }, [selectedRoomReceipt]);
 
-  const handleRoomClick = (roomId, roomType) => {
+  const handleRoomClick = useCallback((roomId, roomType) => {
     setSelectedRooms((prevSelected) => {
       const currentTypeRooms = prevSelected[roomType] || [];
       const updatedRooms = currentTypeRooms.includes(roomId)
@@ -185,17 +251,34 @@ export default function Component() {
 
       return newSelectedRooms;
     });
-  };
+  }, []);
 
-  const handleVenueClick = (venueId) => {
+  const handleVenueClick = useCallback((venueId) => {
     setSelectedVenues((prevSelected) => {
-      if (prevSelected.includes(venueId)) {
-        return prevSelected.filter((id) => id !== venueId);
-      } else {
-        return [...prevSelected, venueId];
-      }
+      const isSelected = prevSelected.includes(venueId);
+      const updatedVenues = isSelected
+        ? prevSelected.filter((id) => id !== venueId)
+        : [...prevSelected, venueId];
+  
+      const message = isSelected
+        ? `Venue ${venueId} deselected`
+        : `Venue ${venueId} selected`;
+  
+      setVenueMessage(message); // Set the message to indicate selection status
+  
+      // Calculate new max capacity based on selected venues
+      const newMaxCapacity = updatedVenues.reduce((total, venueId) => {
+        const venue = price.venue_Holder.find(v => v.venue_id === venueId);
+        return total + (venue ? venue.venue_capacity : 0);
+      }, 0);
+  
+      // Update maxGuests with the new capacity
+      setMaxGuests(newMaxCapacity); // Update maxGuests with the new capacity
+      form.setValue("MaxnumberofGuest", newMaxCapacity); // Update form value
+  
+      return updatedVenues; // Return the updated selected venues
     });
-  };
+  }, [price.venue_Holder, form]);
 
   const onPass = async (data) => {
     if (step < 3) {
@@ -204,10 +287,11 @@ export default function Component() {
       try {
         await step3Schema.parseAsync(data);
 
-        data.accountId = localStorage.getItem("account_id"); // replace with actual account id
+        data.accountId = localStorage.getItem("account_id");
         data.totalPrice = calculateTotalPrice();
         data.discount = discounts;
         data.initialTotalPrice = initialTotalPrice;
+        data.MaxnumberofGuest = maxGuests;
 
         data.dateRangeRoom = {
           from: dateRangeRoomsetter.from,
@@ -237,8 +321,8 @@ export default function Component() {
 
   const calculateTotalPrice = () => {
     let total = initialTotalPrice;
-    discounts.forEach(d => {
-      total -= Number(d.amount);
+    discounts.forEach((d) => {
+      total -= Number(d.Amount);
     });
     return total;
   };
@@ -247,27 +331,64 @@ export default function Component() {
     setIsConfirmationOpen(true);
   };
 
-  useEffect(() => {
-    fetchEverythingAvailable();
-  }, []);
-
-  useEffect(() => {
-    if (availableRooms.double_rooms.length > 0 || availableVenues.venues_holder.length > 0) {
-      setShowResultsRoom(true);
-      setShowResultsVenue(true);
-    }
-  }, [availableRooms, availableVenues]);
-
   const handleDisable = () => {
     if (reservationType === "room") {
       setRoomState(false);
       setVenueState(true);
+      fetchEverythingAvailable();
+
+      // Clear the dateRangeVenue if room is chosen
+      form.setValue("dateRangeVenue", { from: "", to: "" });
+
+      // Reset form field values related to venue
+      form.reset({
+        ...form.getValues(),
+        dateRangeRoom: { from: "", to: "" }, // Clear date range for rooms
+        MaxnumberofGuest: 0, // Reset max number of guests
+        selectedReservationRooms: [""],
+        selectedReservationVenues: [" "],
+      });
+
+      // Clear selected rooms and venues
+      setSelectedRooms([]);
+      setSelectedVenues([]);
     } else if (reservationType === "venue") {
       setRoomState(true);
       setVenueState(false);
+      fetchEverythingAvailable();
+
+      // Clear the dateRangeRoom if venue is chosen
+      form.setValue("dateRangeRoom", { from: "", to: "" });
+
+      // Reset form field values related to room
+      form.reset({
+        ...form.getValues(),
+        dateRangeVenue: { from: "", to: "" }, // Clear date range for venues
+        MaxnumberofGuest: 0, // Reset max number of guests
+        selectedReservationRooms: [""],
+        selectedReservationVenues: [" "],
+      });
+
+      // Clear selected rooms and venues
+      setSelectedRooms([]);
+      setSelectedVenues([]);
     } else if (reservationType === "both") {
       setRoomState(false);
       setVenueState(false);
+
+      // Clear both date ranges if both is chosen
+      form.reset({
+        ...form.getValues(),
+        dateRangeRoom: { from: "", to: "" }, // Clears the date range for rooms
+        dateRangeVenue: { from: "", to: "" }, // Clears the date range for venues
+        MaxnumberofGuest: 0, // Reset max number of guests
+        selectedReservationRooms: [""],
+        selectedReservationVenues: [" "],
+      });
+
+      // Clear selected rooms and venues
+      setSelectedRooms([]);
+      setSelectedVenues([]);
     }
   };
 
@@ -294,6 +415,7 @@ export default function Component() {
         toast({
           title: "Success",
           description: result.message || "Reservation submitted successfully!",
+          variant: "success",
         });
         setIsConfirmationOpen(false);
         form.reset();
@@ -385,7 +507,11 @@ export default function Component() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {rooms.map((room) => {
-          const { room_id: roomId, room_isready: isReady, room_status: isAvailable } = room;
+          const {
+            room_id: roomId,
+            room_isready: isReady,
+            room_status: isAvailable,
+          } = room;
           const isSelected = selectedRooms[roomType]?.includes(roomId);
 
           return (
@@ -444,7 +570,11 @@ export default function Component() {
       <h3 className="text-sm font-medium mb-4 text-gray-600">{title}</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
         {venues.map((room) => {
-          const { room_id: venueId, room_isready: isReady, room_status: isAvailable } = room;
+          const {
+            room_id: venueId,
+            room_isready: isReady,
+            room_status: isAvailable,
+          } = room;
           const isSelected = selectedVenues.includes(venueId);
 
           return (
@@ -453,12 +583,12 @@ export default function Component() {
               variant={isAvailable && isReady ? "default" : "outline"}
               className={`h-15 w-auto poppins-semibold ${
                 isAvailable
-                ? isSelected
-                  ? "bg-sky-500 text-white"
-                  : "bg-green-500 text-primary-foreground"
-                : isReady
-                ? "bg-muted text-muted-foreground"
-                : "bg-red-500 text-white"
+                  ? isSelected
+                    ? "bg-sky-500 text-white"
+                    : "bg-green-500 text-primary-foreground"
+                  : isReady
+                  ? "bg-muted text-muted-foreground"
+                  : "bg-red-500 text-white"
               }`}
               disabled={!isReady || !isAvailable}
               onClick={() => handleVenueClick(venueId)}
@@ -494,7 +624,10 @@ export default function Component() {
     : "null";
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount);
+    return new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+    }).format(amount);
   };
 
   return (
@@ -695,12 +828,12 @@ export default function Component() {
 
                             <FormField
                               control={form.control}
-                              name="numberofGuest"
+                              name="MaxnumberofGuest"
                               render={({ field }) => (
                                 <FormItem>
                                   <div className="flex flex-row gap-1">
-                                    <FormLabel className={"poppins-semibold"}>
-                                      Number of Guest
+                                    <FormLabel className="poppins-semibold">
+                                      Max number of Guests
                                     </FormLabel>
                                     <FormMessage className="form-message" />
                                   </div>
@@ -711,6 +844,8 @@ export default function Component() {
                                         placeholder="Enter number of guests"
                                         {...field}
                                         className="pl-10"
+                                        value={maxGuests}
+                                        readOnly
                                       />
                                       <FaUser
                                         className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -974,7 +1109,7 @@ export default function Component() {
                         )}
 
                         <div className="flex justify-between">
-                        <Button
+                          <Button
                             type="button"
                             disabled={step === 1}
                             onClick={prevStep}
@@ -1000,11 +1135,14 @@ export default function Component() {
 
             <section className="flex w-1/2 justify-center items-center bg-muted/50">
               <ScrollArea className="h-[calc(100vh-8rem)] w-[95%] p-2 ">
-                
                 {showResultsRoom && (
                   <div className="mb-8">
                     <h2 className="text-xl font-bold mb-4">Available Rooms</h2>
-
+                    <div className="flex flex-row gap-1 text-center align-middle items-center mb-1">
+                      <Badge variant="outline">{formattedFromDateRoom}</Badge>
+                      <h2>-</h2>
+                      <Badge variant="outline">{formattedToDateRoom}</Badge>
+                    </div>
                     {roomMessage && (
                       <p className="text-sm text-green-600 mt-2">
                         {roomMessage}
@@ -1012,12 +1150,12 @@ export default function Component() {
                     )}
                     {renderRoomSection(
                       availableRooms.double_rooms,
-                      "Double Rooms",
+                      "Double Bedroom",
                       "double"
                     )}
                     {renderRoomSection(
                       availableRooms.triple_rooms,
-                      "Triple Rooms",
+                      "Triple Bedroom",
                       "triple"
                     )}
                     {renderRoomSection(
@@ -1025,12 +1163,16 @@ export default function Component() {
                       "Matrimonial Rooms",
                       "matrimonial"
                     )}
-                   
                   </div>
                 )}
                 {showResultsVenue && (
                   <div>
                     <h2 className="text-xl font-bold mb-4">Available Venues</h2>
+                    <div className="flex flex-row gap-1 text-center align-middle items-center mb-1">
+                      <Badge variant="outline">{formattedFromDateVenue}</Badge>
+                      <h2>-</h2>
+                      <Badge variant="outline">{formattedToDateVenue}</Badge>
+                    </div>
                     {renderVenueSection(
                       availableVenues.venues_holder,
                       "Venues"
@@ -1048,9 +1190,10 @@ export default function Component() {
             <section className="flex w-1/4 justify-center items-center bg-muted/50">
               <ScrollArea className="h-[calc(100vh-8rem)] w-[90%] ">
                 <CostCalculator
+                
                   clientType={clientType}
-                  selectedRooms={getSelectedRooms()}
-                  selectedVenues={selectedVenues}
+                  selectedRooms={getSelectedRooms()} // This will return an updated list based on the current selected rooms
+                  selectedVenues={selectedVenues} // This will be an empty array when reset
                   numberOfNights={calculateNumberOfNights(
                     form.getValues("dateRangeRoom") ||
                       form.getValues("dateRangeVenue")
@@ -1070,7 +1213,7 @@ export default function Component() {
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-6 py-4">
-          <Card>
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FaUser className="mr-2" />
@@ -1127,11 +1270,10 @@ export default function Component() {
                 </div>
                 <div>
                   <Label className="font-medium">Number of Guests</Label>
-                  <p>{formData.numberofGuest || "Not specified"}</p>
+                  <p>{formData.MaxnumberofGuest || "Not specified"}</p>
                 </div>
               </CardContent>
             </Card>
-
 
             <Card>
               <CardHeader>
@@ -1228,19 +1370,23 @@ export default function Component() {
                   <span>Initial Total:</span>
                   <span>{formatCurrency(initialTotalPrice)}</span>
                 </div>
-                {discounts && discounts.map((d, index) => (
-                  <div key={index} className="flex justify-between text-green-600">
-                    <span>{d.type} Discount:</span>
-                    <span>- {formatCurrency(Number(d.amount))}</span>
-                  </div>
-                ))}
+                {discounts &&
+                  discounts.map((d, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between text-green-600"
+                    >
+                      <span>{d.type} Discount:</span>
+                      <span>- {formatCurrency(Number(d.Amount))}</span>
+                    </div>
+                  ))}
                 <Separator />
                 <div className="flex justify-between font-bold">
                   <span>Final Total:</span>
                   <span>{formatCurrency(formData.totalPrice)}</span>
                 </div>
               </CardContent>
-            </Card> 
+            </Card>
           </div>
           <DialogFooter>
             <Button
