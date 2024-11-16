@@ -1,9 +1,6 @@
-"use client";
-
-import * as React from "react";
-import { TrendingUp } from "lucide-react";
-import { Label, Pie, PieChart } from "recharts";
-import { calculateShade } from '@/utils/colorsUtils';
+import * as React from "react"
+import { TrendingUp } from "lucide-react"
+import { Label, Pie, PieChart } from "recharts"
 import {
   Card,
   CardContent,
@@ -11,46 +8,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   ChartContainer,
   ChartTooltip,
   ChartLegend,
   ChartLegendContent,
   ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Skeleton } from "@/components/ui/skeleton";
-
-export const description = "A donut chart with text";
-
-const baseColor = "#001f3f";
-
-const generateShades = () => {
-  const numberOfShades = 5;
-  const step = 40;
-  const generatedShades = [];
-
-  for (let i = -numberOfShades; i <= numberOfShades; i++) {
-    const shade = calculateShade(baseColor, i * step);
-    generatedShades.push(shade);
-  }
-
-  return generatedShades;
-};
-
-// Generate the shades once and store them in a constant
-const shades = generateShades();
-
-// Access specific shades from the generated array
-const firstShade = shades[6];  // Accessing the appropriate index
-const secondShade = shades[7];
-const thirdShade = shades[8];
-
-const chartData = [
-  { name: "Venue", visitors: 275, fill: firstShade },
-  { name: "Room", visitors: 200, fill: secondShade },
-  { name: "Other", visitors: 287, fill: thirdShade },
-];
+} from "@/components/ui/chart"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const chartConfig = {
   visitors: {
@@ -68,19 +34,27 @@ const chartConfig = {
     label: "Other",
     color: "hsl(var(--chart-3))",
   },
-};
+}
 
-export function Component({ isLoading }) {
+export function Component({ data, isLoading }) {
   const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
-  }, []);
+    return data ? data.reduce((acc, curr) => acc + curr.visitors, 0) : 0
+  }, [data])
 
   if (isLoading) {
     return (
       <Card className="flex flex-col">
         <Skeleton className="h-[400px] w-full" />
       </Card>
-    );
+    )
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <Card className="flex flex-col h-full items-center justify-center">
+        <p className="text-muted-foreground">No data available</p>
+      </Card>
+    )
   }
 
   return (
@@ -100,10 +74,11 @@ export function Component({ isLoading }) {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
+              data={data}
               dataKey="visitors"
               nameKey="name"
               innerRadius={60}
+              outerRadius={80}
               strokeWidth={5}
             >
               <Label
@@ -131,7 +106,7 @@ export function Component({ isLoading }) {
                           Visitors
                         </tspan>
                       </text>
-                    );
+                    )
                   }
                 }}
               />
@@ -149,5 +124,5 @@ export function Component({ isLoading }) {
         </div>
       </CardFooter>
     </Card>
-  );
+  )
 }

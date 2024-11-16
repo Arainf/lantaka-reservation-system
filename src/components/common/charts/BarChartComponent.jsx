@@ -21,6 +21,14 @@ export function Component({ data, isLoading }) {
     )
   }
 
+  if (!data || data.length === 0) {
+    return (
+      <Card className="w-full h-[400px] flex items-center justify-center">
+        <p className="text-muted-foreground">No data available</p>
+      </Card>
+    )
+  }
+
   return (
     <Card className="w-full h-full">
       <CardHeader>
@@ -35,7 +43,8 @@ export function Component({ data, isLoading }) {
                 dataKey="month" 
                 axisLine={false}
                 tickLine={false}
-                tickMargin={10} tickFormatter={(value) => value.slice(0, 3)}
+                tickMargin={10}
+                tickFormatter={(value) => value.slice(0, 3)}
               />
               <YAxis 
                 axisLine={false}

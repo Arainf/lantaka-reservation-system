@@ -23,7 +23,7 @@ export const PriceProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
+useEffect(() => {
     fetchPrice(clientType);
   }, [clientType]);
 
