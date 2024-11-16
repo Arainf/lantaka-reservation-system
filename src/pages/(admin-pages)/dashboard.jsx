@@ -11,6 +11,7 @@ import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker";
 import Footer from "@/components/common/footer/Footer";
 import { useDashboardContext } from '@/context/dashboardContext'
+import { DashboardDatePickerDemo as DashboardDatePicker  } from '@/components/common/utilities/DashboardDatePicker';
 
 const AdminDashboard = () => {
   const { loading, occupancyData, visitorData, revenueData, roomTypeData } = useDashboardContext(); // Access context data
@@ -32,9 +33,9 @@ const AdminDashboard = () => {
               <p className="text-gray-500">Here's what's happening with your hotel today.</p>
             </div>
             <div className="hidden lg:flex justify-between items-center space-x-3 bg-white rounded-md shadow-sm p-2">
-              <DatePicker />
+              <DashboardDatePicker />
               <span className="text-gray-500">-</span>
-              <DatePicker />
+              <DashboardDatePicker />
               <div className="hidden lg:flex justify-between space-x-3 ml-2">
                 <Button variant="outline" size="md"><Mail className="h-5 w-5" /></Button>
                 <Button variant="outline" size="md"><FileText className="h-5 w-5" /></Button>

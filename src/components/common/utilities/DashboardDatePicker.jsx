@@ -6,7 +6,7 @@ import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar2 } from "@/components/ui/calendar2"
 import {
   Popover,
   PopoverContent,
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/popover"
 
 // Add props for date and onDateChange
-export function DatePickerDemo({ date, onDateChange, state }) {
+export function DashboardDatePickerDemo({ date, onDateChange, state }) {
   return (
     <Popover style={{backgroundColor: "#95c1ff"}}>
       <PopoverTrigger asChild>
@@ -32,7 +32,7 @@ export function DatePickerDemo({ date, onDateChange, state }) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
+        <Calendar2
           mode="single"
           selected={date}  // Pass the selected date to the Calendar
           onSelect={(newDate) => {
