@@ -24,7 +24,7 @@ import Reservation from "@/pages/(employee-pages)/Reservation";
 import Account from "@/pages/(employee-pages)/Account";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
 
-import Calendar from "@/pages/(employee-pages)/Calendar";
+import Bookings from "@/pages/(employee-pages)/Bookings";
 
 const AppRoutes = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -163,10 +163,10 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/Calendar"
+        path="/Bookings"
         element={
           <ProtectedRoute
-            element={<Calendar />}
+            element={<Bookings />}
             allowedRoles={["Employee"]}
             isDevMode={isDevMode}
           />

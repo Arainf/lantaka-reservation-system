@@ -6,7 +6,7 @@ export const useReservationsContext = () => useContext(ReservationContext);
 
 export const ReservationsProvider = ({ children }) => {
   const [reservationsData, setReservationsData] = useState([]); 
-  const [deleteData, setDeleteData] = useState("false");
+  const [deleteData, setDeleteData] = useState(0);
 
   const fetchReservations = async () => {
     try {

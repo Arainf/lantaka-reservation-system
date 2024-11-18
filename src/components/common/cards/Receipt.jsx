@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, useMemo, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -59,11 +61,12 @@ export default function Component({
   })
 
   const [venueRates, setVenueRates] = useState([])
+  const [totalPrice, setTotalPrice] = useState(0)
   
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      discounts: [], // Start with an empty array
+      discounts: [],
     },
   })
 
@@ -95,11 +98,11 @@ export default function Component({
         return acc
       }, {})
     
-      setVenueRates(venues); // Now an array of objects instead of a single object
+      setVenueRates(venues)
     } else {
-      setVenueRates([]); // Set an empty array as a fallback
+      setVenueRates([])
     }
-  }, [price]);
+  }, [price])
 
   const calculateSubtotal = useCallback(() => {
     let subtotal = 0
@@ -108,7 +111,7 @@ export default function Component({
       subtotal += baseRate * numberOfNights
     })
     selectedVenues.forEach((venue) => {
-      const venueRate = venueRates[venue] || 0;
+      const venueRate = venueRates[venue] || 0
       subtotal += venueRate
     })
     return subtotal
@@ -165,94 +168,112 @@ export default function Component({
     return total
   }, [subtotal, discounts, discountsData, form])
 
-  const total = useMemo(() => calculateTotal(), [calculateTotal])
+  useEffect(() => {
+    const newTotal = calculateTotal()
+    setTotalPrice(newTotal)
+  }, [calculateTotal, discounts, discountsData, form])
+
+  const handleAddDiscount = () => {
+    append({ type: "" })
+  }
+
+  const calling = useCallback(() => {
+    const newTotal = calculateTotal()
+    setTotalPrice(newTotal)
+  },[calculateTotal, discounts, discountsData, form])
+
+  const handleRemoveDiscount = (index) => {
+    remove(index)
+  }
 
   return (
     <div className="space-y-4">
       {showDiscount && (
-            <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
-            <CardContent className="p-6">
-    
-              <Form {...form}>
-                <form className="space-y-4 animate-none">
-                  <div>
-                    <Label className="text-xl font-bold mb-4">Discounts</Label>
-                    {fields.length > 0 ? ( // Only render if there are fields
-                      fields.map((field, index) => (
-                        <div
-                          key={field.id}
-                          className="flex items-center space-x-2 mb-2"
-                        >
-                          <FormField
-                            control={form.control}
-                            name={`discounts.${index}.type`}
-                            render={({ field }) => (
-                              <FormItem className="flex-grow">
-                                <Select
-                                  onValueChange={(value) => field.onChange(value)}
-                                  value={field.value}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select Discount Type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Array.isArray(discountsData) && discountsData.length > 0 ? (
-                                      discountsData.map((discount) => (
-                                        <SelectItem key={discount.discount_id} value={discount.discount_name}>
-                                          {discount.discount_name} ({discount.discount_percentage}%)
-                                        </SelectItem>
-                                      ))
-                                    ) : ( 
-                                      <div>No discounts available</div>
-                                    )}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  onClick={() => remove(index)}
-                                  className="text-red-500"
-                                >
-                                  <XCircle className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Remove discount</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      ))
-                    ) : (
-                      <div>No discounts added yet.</div> // Optional message when no discounts are present
-                    )}
-                  </div>
-    
-                  <div className="flex flex-row gap-2">
-                    <Button
-                      type="button"
-                      onClick={() => append({ type: "" })} // Append a new discount field
-                      variant="outline"
-                      className="w-full"
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2 " />
-                      Add Discount
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+        <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
+          <CardContent className="p-6">
+            <Form {...form}>
+              <form className="space-y-4 animate-none">
+                <div>
+                  <Label className="text-xl font-bold mb-4">Discounts</Label>
+                  {fields.length > 0 ? (
+                    fields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className="flex items-center space-x-2 mb-2"
+                      >
+                        <FormField
+                          control={form.control}
+                          name={`discounts.${index}.type`}
+                          render={({ field }) => (
+                            <FormItem className="flex-grow">
+                              <Select
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  calling();
+                                }}
+                                
+                                value={field.value}
+                                
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select Discount Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Array.isArray(discountsData) && discountsData.length > 0 ? (
+                                    discountsData.map((discount) => (
+                                      <SelectItem key={discount.discount_id} value={discount.discount_name}>
+                                        {discount.discount_name} ({discount.discount_percentage}%)
+                                      </SelectItem>
+                                    ))
+                                  ) : ( 
+                                    <div>No discounts available</div>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => handleRemoveDiscount(index)}
+                                className="text-red-500"
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Remove discount</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    ))
+                  ) : (
+                    <div>No discounts added yet.</div>
+                  )}
+                </div>
+                <div className="flex flex-row gap-2">
+                  <Button
+                    type="button"
+                    onClick={handleAddDiscount}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2 " />
+                    Add Discount
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       )}
       
-
       <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
         <CardContent className="p-6">
           <div className="space-y-4">
@@ -321,7 +342,7 @@ export default function Component({
             <div className="flex justify-between items-baseline">
               <span className="text-lg font-semibold">Total:</span>
               <span className="text-2xl font-bold">
-                {formatCurrency(total)}
+                {formatCurrency(totalPrice)}
               </span>
             </div>
           </div>

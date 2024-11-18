@@ -153,9 +153,9 @@ export default function Calendar() {
             className="flex pr-8"
             style={{
               width: '148%',
-              height: '520px',
+              height: '510px',
               position: 'relative',
-              top: '50px',
+              top: '20px',
               paddingRight: '570px',
               overflow: 'hidden',
             }}
@@ -167,7 +167,7 @@ export default function Calendar() {
             className="flex justify-center p-4"
             style={{
               position: 'relative',
-              top: '-600px',
+              top: '-609px',
               left: '450px',
             }}
           >

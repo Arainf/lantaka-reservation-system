@@ -9,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa"
-import { MdOutlinePayment } from "react-icons/md"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -20,18 +18,29 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { DatePickerDemo as DatePicker } from "@/components/common/utilities/DateRangePicker"
-import Clock from "@/components/common/time/clock";
+import Clock from "@/components/common/time/clock"
 import FormSidebar from "@/components/common/navigatin-side-top/sidebarReservationForm"
-import { X, Plus } from "lucide-react"
+import { X, Plus, Search } from 'lucide-react'
 import { formatDateToYYYYMMDD } from "@/utils/colorsUtils"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useReservations, useRoomVenueProvider } from "@/context/contexts"
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa"
+import { MdOutlinePayment } from "react-icons/md"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const Reservation = () => {
   const { bookingSummary } = useReservations()
+  const navigate = useNavigate()
   
   const [selectedFloor, setSelectedFloor] = useState("floor1")
   const [isGrabbing, setIsGrabbing] = useState(false)
@@ -41,7 +50,17 @@ const Reservation = () => {
   const [dateTranslate, setDateTranslate] = useState("")
   const [calendarKey, setCalendarKey] = useState(0)
   const [isFancyMode, setIsFancyMode] = useState(false)
-  const navigate = useNavigate()
+  const [checkInModalOpen, setCheckInModalOpen] = useState(false)
+  const [checkOutModalOpen, setCheckOutModalOpen] = useState(false)
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [guests, setGuests] = useState([
+    { id: 1, name: 'John Doe', room: '101', checkInDate: '2023-06-01', checkOutDate: '2023-06-05', balance: 500 },
+    { id: 2, name: 'Jane Smith', room: '202', checkInDate: '2023-06-02', checkOutDate: '2023-06-07', balance: 750 },
+    { id: 3, name: 'Bob Johnson', room: '303', checkInDate: '2023-06-03', checkOutDate: '2023-06-06', balance: 600 },
+    { id: 4, name: 'Alice Brown', room: '404', checkInDate: '2023-06-04', checkOutDate: '2023-06-08', balance: 800 },
+    { id: 5, name: 'Charlie Davis', room: '505', checkInDate: '2023-06-05', checkOutDate: '2023-06-09', balance: 550 },
+  ])
 
   useEffect(() => {
     const initialDate = new Date()
@@ -76,11 +95,30 @@ const Reservation = () => {
     }, 0)
   }
 
+  const filteredGuests = guests.filter(guest => 
+    guest.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleCheckIn = (guestId) => {
+    console.log(`Checking in guest with ID: ${guestId}`)
+    setCheckInModalOpen(false)
+  }
+
+  const handleCheckOut = (guestId) => {
+    console.log(`Checking out guest with ID: ${guestId}`)
+    setCheckOutModalOpen(false)
+  }
+
+  const handlePayment = (guestId, amount) => {
+    console.log(`Processing payment of $${amount} for guest with ID: ${guestId}`)
+    setPaymentModalOpen(false)
+  }
+
   return (
     <div className="relative flex flex-col h-screen w-screen overflow-y-auto bg-background" id="reservation">
       <main className="flex flex-col md:flex-row h-full">
-        <div className="flex flex-col md:w-2/3 h-screen  p-4 space-y-4 ">
-          <Card className="flex h-screen  flex-col flex-1">
+        <div className="flex flex-col md:w-2/3 h-screen p-4 space-y-4">
+          <Card className="flex h-screen flex-col flex-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle>Floor Plan</CardTitle>
               <div className="flex items-center space-x-2">
@@ -135,7 +173,7 @@ const Reservation = () => {
           </Card>
         </div>
 
-        <div className="flex flex-col  md:w-1/3 h-auto p-6 space-y-3 overflow-y-auto border-l">
+        <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 overflow-y-auto border-l">
           <Card>
             <CardContent className="p-0">
               <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
@@ -143,7 +181,6 @@ const Reservation = () => {
               </div>
             </CardContent>
           </Card>
-          
 
           <Card>
             <CardHeader>
@@ -153,15 +190,122 @@ const Reservation = () => {
               <Button className="w-full justify-start" onClick={() => navigate("/Reservation")}>
                 <Plus className="mr-2 h-4 w-4" /> New Reservation
               </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <FaCalendarCheck className="mr-2 h-4 w-4" /> Check-in Guest
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <FaCalendarTimes className="mr-2 h-4 w-4" /> Check-out Guest
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <MdOutlinePayment className="mr-2 h-4 w-4" /> Process Payment
-              </Button>
+              <Dialog open={checkInModalOpen} onOpenChange={setCheckInModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full justify-start" variant="outline">
+                    <FaCalendarCheck className="mr-2 h-4 w-4" /> Check-in Guest
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] bg-gray-100">
+                  <DialogHeader>
+                    <DialogTitle>Check-in Guest</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex items-center space-x-2">
+                      <Search className="h-4 w-4 text-gray-500" />
+                      <Input
+                        placeholder="Search guest name..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="flex-grow"
+                      />
+                    </div>
+                    <ScrollArea className="h-[300px] rounded-md border">
+                      <div className="p-4">
+                        {filteredGuests.map(guest => (
+                          <div key={guest.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
+                            <div>
+                              <p className="font-medium">{guest.name}</p>
+                              <p className="text-sm text-gray-500">Room: {guest.room}</p>
+                            </div>
+                            <Button onClick={() => handleCheckIn(guest.id)} size="sm">
+                              Check-in
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog open={checkOutModalOpen} onOpenChange={setCheckOutModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full justify-start" variant="outline">
+                    <FaCalendarTimes className="mr-2 h-4 w-4" /> Check-out Guest
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] bg-gray-100">
+                  <DialogHeader>
+                    <DialogTitle>Check-out Guest</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex items-center space-x-2">
+                      <Search className="h-4 w-4 text-gray-500" />
+                      <Input
+                        placeholder="Search guest name..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="flex-grow"
+                      />
+                    </div>
+                    <ScrollArea className="h-[300px] rounded-md border">
+                      <div className="p-4">
+                        {filteredGuests.map(guest => (
+                          <div key={guest.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
+                            <div>
+                              <p className="font-medium">{guest.name}</p>
+                              <p className="text-sm text-gray-500">Room: {guest.room}</p>
+                              <p className="text-xs text-gray-400">Check-in: {guest.checkInDate}</p>
+                            </div>
+                            <Button onClick={() => handleCheckOut(guest.id)} size="sm">
+                              Check-out
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full justify-start" variant="outline">
+                    <MdOutlinePayment className="mr-2 h-4 w-4" /> Process Payment
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] bg-gray-100">
+                  <DialogHeader>
+                    <DialogTitle>Process Payment</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="flex items-center space-x-2">
+                      <Search className="h-4 w-4 text-gray-500" />
+                      <Input
+                        placeholder="Search guest name..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="flex-grow"
+                      />
+                    </div>
+                    <ScrollArea className="h-[300px] rounded-md border">
+                      <div className="p-4">
+                        {filteredGuests.map(guest => (
+                          <div key={guest.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
+                            <div>
+                              <p className="font-medium">{guest.name}</p>
+                              <p className="text-sm text-gray-500">Room: {guest.room}</p>
+                              <p className="text-xs text-gray-400">Balance: ${guest.balance}</p>
+                            </div>
+                            <Button onClick={() => handlePayment(guest.id, guest.balance)} size="sm">
+                              Pay ${guest.balance}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
 
@@ -172,25 +316,20 @@ const Reservation = () => {
             <CardContent>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  {/* {bookingSummary.total} */}
                   <div className="text-2xl font-bold">{bookingSummary.total}</div>
                   <div className="text-sm text-muted-foreground">Total</div>
                 </div>
                 <div>
-                  {/* {bookingSummary.rooms} */}
                   <div className="text-2xl font-bold">{bookingSummary.rooms}</div>
                   <div className="text-sm text-muted-foreground">Rooms</div>
                 </div>
                 <div>
-                  {/* {bookingSummary.venues} */}
                   <div className="text-2xl font-bold">{bookingSummary.venues}</div>
                   <div className="text-sm text-muted-foreground">Venues</div>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          
         </div>
       </main>
       
@@ -211,17 +350,14 @@ const Reservation = () => {
 }
 
 const SimplifiedFloorPlan = ({ floor }) => {
-  // Get available rooms from context
   const { availableRooms, fetchEverythingAvailable, availableVenues } = useRoomVenueProvider();
 
   useEffect(() => {
-    // Check if the data is already fetched or not
     if (availableRooms.double_rooms.length === 0) {
       fetchEverythingAvailable();
     }
   }, [availableRooms, fetchEverythingAvailable, availableVenues]);
 
-  // Combine all available rooms and venues into one array
   const allRooms = [
     ...availableRooms.double_rooms,
     ...availableRooms.triple_rooms,
@@ -239,7 +375,7 @@ const SimplifiedFloorPlan = ({ floor }) => {
               ? room.type === 'venue'
                 ? 'bg-blue-100 text-blue-800'
                 : 'bg-green-100 text-green-800'
-              : 'bg-gray-300 text-gray-700 line-through' // For unavailable rooms/venues
+              : 'bg-gray-300 text-gray-700 line-through'
           }`}
         >
           {room.id}

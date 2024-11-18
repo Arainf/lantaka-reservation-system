@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useCallback } from "react"
 import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import ReservationsTable from "@/components/common/cards/ReservationsTable"
-import { Filter, Search, RefreshCw } from "lucide-react"
+import { Filter, Search, RefreshCw } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
@@ -29,6 +29,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
   const filterRef = useRef(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [reservationToDelete, setReservationToDelete] = useState(null)
+  const [tableKey, setTableKey] = useState(0)
 
   useEffect(() => {
     createIcons({ icons })
@@ -44,9 +45,16 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const fetchReservationsAttachment = useCallback(async () => {
+    await fetchReservations()
+    setTableKey(prevKey => prevKey + 1) // Force re-render of ReservationsTable
+    setTempFilters(filters)
+  }, [fetchReservations, filters])
+
   useEffect(() => {
-    fetchReservations()
-  },[deleteData])
+    fetchReservationsAttachment()
+  }, [deleteData])
 
   useEffect(() => {
     setTempFilters(filters)
@@ -216,6 +224,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
           )}
           <div>
             <ReservationsTable
+              key={tableKey}
               data={filteredReservations}           
               onDelete={handleDelete}
               currentPage={currentPage}

@@ -373,22 +373,8 @@ export default function Component() {
       setSelectedRooms([]);
       setSelectedVenues([]);
     } else if (reservationType === "both") {
-      setRoomState(false);
-      setVenueState(false);
-
-      // Clear both date ranges if both is chosen
-      form.reset({
-        ...form.getValues(),
-        dateRangeRoom: { from: "", to: "" }, // Clears the date range for rooms
-        dateRangeVenue: { from: "", to: "" }, // Clears the date range for venues
-        MaxnumberofGuest: 0, // Reset max number of guests
-        selectedReservationRooms: [""],
-        selectedReservationVenues: [" "],
-      });
-
-      // Clear selected rooms and venues
-      setSelectedRooms([]);
-      setSelectedVenues([]);
+        setRoomState(false);
+        setVenueState(false);
     }
   };
 
