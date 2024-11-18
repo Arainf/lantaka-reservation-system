@@ -7,6 +7,7 @@ export const useReservationsContext = () => useContext(ReservationContext);
 export const ReservationsProvider = ({ children }) => {
   const [reservationsData, setReservationsData] = useState([]); 
   const [deleteData, setDeleteData] = useState(0);
+  const [saveNotes, setSaveNotes] = useState(0)
 
   const fetchReservations = async () => {
     try {
@@ -32,7 +33,9 @@ export const ReservationsProvider = ({ children }) => {
     reservationsData,
     fetchReservations,
     deleteData,
-    setDeleteData
+    setDeleteData,
+    saveNotes,
+    setSaveNotes
   };
 
   return (

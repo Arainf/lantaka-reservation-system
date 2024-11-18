@@ -12,7 +12,7 @@ import DeleteModal from "@/components/ui/deletemodal"
 import { useReservationsContext } from "@/context/reservationContext"
 
 export default function AdminReservation({ sidebarOpen = false, toggleSidebar = () => {} }) {
-  const { reservationsData, fetchReservations, deleteData } = useReservationsContext()
+  const { reservationsData, fetchReservations, deleteData, saveNote } = useReservationsContext()
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
@@ -50,11 +50,12 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
     await fetchReservations()
     setTableKey(prevKey => prevKey + 1) // Force re-render of ReservationsTable
     setTempFilters(filters)
+    console.log('rerenrsdfasdfad')
   }, [fetchReservations, filters])
 
   useEffect(() => {
     fetchReservationsAttachment()
-  }, [deleteData])
+  }, [deleteData, saveNote])
 
   useEffect(() => {
     setTempFilters(filters)
@@ -224,7 +225,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
           )}
           <div>
             <ReservationsTable
-              key={tableKey}
+              keys={tableKey}
               data={filteredReservations}           
               onDelete={handleDelete}
               currentPage={currentPage}
