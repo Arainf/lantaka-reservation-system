@@ -1,39 +1,136 @@
 import React, { memo, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Loader2, ArrowLeft } from "lucide-react";
+import {
+  Bell,
+  Loader2,
+  ArrowLeft,
+  Bed,
+  Calendar,
+  CheckCircle,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import "./navigationside.css";
 import { UserContext } from "@/context/contexts";
 import Slogo from "@/assets/images/SchoolLogo.png";
 import Hlogo from "@/assets/images/HorizontalLogo.png";
 import Modal from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import NotificationBell from "@/components/common/Notification/NotificationBell"; // Import NotificationBell
 
 const NavigationTop = memo(({ handleBackToHome }) => {
   const { userData, userRole } = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  
+  const [reservationData, setReservationData] = useState({
+    name: "",
+    date: "",
+    time: "",
+    guests: 1,
+  });
+
+  const notifications = [
+    {
+      id: 1,
+      title: "Booking Confirmed",
+      description: "Your booking at the Grand Hotel has been confirmed.",
+      icon: <Bed size={16} className="mr-2 text-blue-600" />,
+    },
+    {
+      id: 2,
+      title: "Check-in Reminder",
+      description: "Don't forget to check in at 3 PM today!",
+      icon: <Calendar size={16} className="mr-2 text-green-600" />,
+    },
+    {
+      id: 3,
+      title: "Payment Received",
+      description: "Your payment for the upcoming stay has been received.",
+      icon: <CheckCircle size={16} className="mr-2 text-yellow-600" />,
+    },
+    {
+      id: 4,
+      title: "New Offer!",
+      description: "Special discount available for your next stay. Book now!",
+      icon: <CheckCircle size={16} className="mr-2 text-orange-600" />,
+    },
+    {
+      id: 5,
+      title: "Reservation Updated",
+      description: "Your reservation details have been updated.",
+      icon: <Bed size={16} className="mr-2 text-purple-600" />,
+    },
+    {
+      id: 6,
+      title: "Reminder: Checkout",
+      description: "Your checkout is scheduled for tomorrow at 11 AM.",
+      icon: <Calendar size={16} className="mr-2 text-red-600" />,
+    },
+    {
+      id: 7,
+      title: "New Message",
+      description: "You have a new message from the hotel staff.",
+      icon: <CheckCircle size={16} className="mr-2 text-teal-600" />,
+    },
+    {
+      id: 8,
+      title: "Feedback Requested",
+      description: "Please provide feedback on your recent stay.",
+      icon: <CheckCircle size={16} className="mr-2 text-pink-600" />,
+    },
+    {
+      id: 9,
+      title: "Upcoming Events",
+      description: "Check out the upcoming events at our hotel!",
+      icon: <Calendar size={16} className="mr-2 text-indigo-600" />,
+    },
+    {
+      id: 10,
+      title: "New Amenities",
+      description: "We have added new amenities to enhance your stay!",
+      icon: <Bed size={16} className="mr-2 text-gray-600" />,
+    },
+  ];
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setReservationData({
+      ...reservationData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log("Reservation Data:", reservationData);
+    setIsModalOpen(false);
+  };
+
+  const toggleNotifications = () => {
+    setNotificationsVisible((prev) => !prev);
+  };
+
+  const toggleDropdown = () => {
+    setDropdownVisible((prev) => !prev);
   };
 
   const handleLogout = async () => {
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      navigate("/"); // Navigate to the home page
+      navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const toggleDropdown = () => {
-    setDropdownVisible((prev) => !prev);
   };
 
   return (
@@ -46,8 +143,17 @@ const NavigationTop = memo(({ handleBackToHome }) => {
       {/* Center Section (Navigation Links) */}
       <div className="flex justify-center w-1/2">
         <nav className="flex space-x-4">
-          {[["Home", "home"], ["Reservation", "Reservation"], ["Calendar", "Calendar"], ["Account", "account"]].map(([title, path]) => (
-            <Link to={`/${path}`} className="clientnavtop relative text-slate-100 font-medium" key={title}>
+          {[
+            ["Home", "home"],
+            ["Reservation", "Reservation"],
+            ["Bookings", "Bookings"],
+            ["Account", "account"],
+          ].map(([title, path]) => (
+            <Link
+              to={`/${path}`}
+              className="clientnavtop relative text-slate-100 font-medium"
+              key={title}
+            >
               {title}
               <span className="linkTextStyle"></span>
             </Link>
@@ -57,16 +163,51 @@ const NavigationTop = memo(({ handleBackToHome }) => {
 
       {/* Right Section (Bell, Avatar, and User Info) */}
       <div className="flex items-center space-x-2 justify-end w-1/4">
-        {/* Integrated NotificationBell */}
-        <NotificationBell />
+        {/* Notification Bell */}
+        <div onClick={toggleNotifications} className="relative cursor-pointer">
+          <Bell
+            size={24}
+            className="text-gray-400 hover:text-[#fcb813] hover:scale-110 transition-all"
+          />
+          {notificationsVisible && (
+            <div className="absolute right-0 mt-2 w-80 bg-white text-black rounded-lg shadow-lg z-20 max-h-80 overflow-hidden"
+            >
+              <div className="p-4">
+                <div className="font-semibold border-b pb-2">Notifications</div>
+                <div className="max-h-72 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className="flex items-start border-b py-2"
+                      >
+                        {notification.icon}
+                        <div>
+                          <p className="font-medium text-lg">
+                            {notification.title}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {notification.description}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-gray-600">No notifications.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
-        {/* User Avatar and Info */}
         {userData && (
           <div
-            className="relative flex items-center space-x-2 cursor-pointer"
+            className="relative flex items-center space-x-2 p-2  rounded-lg hover:bg-blue-950 "
             onClick={toggleDropdown}
-            onMouseEnter={() => setDropdownVisible(true)}
+
           >
+            {" "}
             <img src={Slogo} alt="LOGO" className="h-8 w-8" />
             <div className="text-sm">
               <p className="font-medium">Welcome, {userData.first_name}!</p>
@@ -74,12 +215,10 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             </div>
           </div>
         )}
-
         {/* Dropdown Menu */}
         {dropdownVisible && (
           <div
-            className="absolute right-0 mt-[21%] w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3"
-            onMouseLeave={() => setDropdownVisible(false)}
+            className="absolute right-0 mt-[330px] w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3 "
           >
             <img src={Slogo} alt="LOGO" className="h-14 w-14 mx-auto mb-2" />
             <p className="text-center font-medium text-lg mb-2">
@@ -91,7 +230,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
                 className="text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 hover:text-white data-[state=active]:bg-blue-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center mb-3 rounded-lg"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
+                Dashboard
               </Link>
             )}
             <Link
@@ -103,13 +242,33 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             <button
               onClick={handleLogout}
               disabled={isLoading}
-              className={`w-full py-2 px-4 ${isLoading ? "bg-gray-500" : "bg-red-600"} text-white rounded-lg shadow-md transition-all`}
+              className={`w-full text-center py-2 px-4 shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450 rounded-lg ${
+                isLoading ? "cursor-not-allowed opacity-70" : ""
+              }`}
             >
-              {isLoading ? <Loader2 className="animate-spin mx-auto" /> : "Logout"}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Logging out...
+                </div>
+              ) : (
+                "Logout"
+              )}
             </button>
           </div>
         )}
       </div>
+
+      {/* Modal for Reservations */}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleModalToggle}
+          onSubmit={handleSubmit}
+          reservationData={reservationData}
+          handleChange={handleChange}
+        />
+      )}
     </header>
   );
 });
