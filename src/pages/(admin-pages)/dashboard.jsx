@@ -16,10 +16,6 @@ import { DashboardDatePickerDemo as DashboardDatePicker  } from '@/components/co
 const AdminDashboard = () => {
   const { loading, occupancyData, visitorData, revenueData, roomTypeData } = useDashboardContext(); // Access context data
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500)
-    return () => clearTimeout(timer)
-  }, [])
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
