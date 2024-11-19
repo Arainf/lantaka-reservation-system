@@ -22,14 +22,12 @@ const navLinks = [
   {
     icon: <IoCalendarSharp style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Reservations
     display: "Reservations", // Text displayed for Reservations
-    icon2: <IoMdArrowDropdown style={{}} />, // Icon for dropdown
-    url: "/reservations", // No URL since it's a dropdown
-    
+    url: "/reservations", 
   },
   {
     icon: <FaPeopleGroup style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Guest
     display: "Guest", // Text displayed for Guest
-    url: "/guestlist", // No URL since it's a dropdown
+    url: "/guestlist", 
   },
   {
     icon: <ListCheck style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
@@ -61,15 +59,7 @@ const navMoreInfo = [
 ];
 
 const NavigationSide = ({ isOpen }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false); // State for controlling dropdown visibility
-
-  // Function to toggle dropdown visibility
-  const toggleDropdown = () => {
-    if (!isOpen) { // If the sidebar is closed, open it
-      setIsOpen(true);
-    }
-    setDropdownOpen((prev) => !prev); // Toggle the current state
-  };
+ 
 
   const ParentComponent = () => {
     const [isOpen, setIsOpen] = useState(false);

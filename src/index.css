@@ -21,6 +21,13 @@
   }
 }
 
+input:is(:-webkit-autofill, :autofill) {
+  background-color: #ffffff !important; /* White background */
+  color: #000000 !important; /* Black text color */
+  transition: all 5000s ease-in-out 0s; /* Prevent browser from reverting the color */
+}
+
+
 
 
 :root {
