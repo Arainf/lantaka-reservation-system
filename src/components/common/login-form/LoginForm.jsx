@@ -115,7 +115,7 @@ export function LoginForm() {
                   <div className="input-container">
                     <Input
                       id="username"
-                      className="input-field bg-white"
+                      className="input-field bg-white "
                       placeholder="Username"
                       {...field}
                     />

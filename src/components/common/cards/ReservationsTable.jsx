@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import React, { useState, useMemo, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Edit, Trash2, X, Files, Eye, Save } from 'lucide-react'
-import { Textarea } from "@/components/ui/textarea"
-import { PinIcon as PushPin } from 'lucide-react'
+import React, { useState, useMemo, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Edit, Trash2, X, Files, Eye, Save } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { PinIcon as PushPin } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -15,59 +15,58 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { usePriceContext } from "@/context/PriceContext"
-import { useToast } from "@/hooks/use-toast"
-import { Toaster } from "@/components/ui/toaster"
-import { useReservationsContext } from "@/context/reservationContext"
-import Slogo from "@/assets/images/SchoolLogo.png"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { usePriceContext } from "@/context/PriceContext";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
+import { useReservationsContext } from "@/context/reservationContext";
+import Slogo from "@/assets/images/SchoolLogo.png";
 
-// Helper function to calculate number of nights
 const calculateNumberOfNights = (checkInDate, checkOutDate) => {
-  const checkIn = new Date(checkInDate)
-  const checkOut = new Date(checkOutDate)
-  const timeDiff = checkOut.getTime() - checkIn.getTime()
-  const nightsDiff = Math.ceil(timeDiff / (1000 * 3600 * 24))
-  return nightsDiff
-}
+  const checkIn = new Date(checkInDate);
+  const checkOut = new Date(checkOutDate);
+  const timeDiff = checkOut.getTime() - checkIn.getTime();
+  const nightsDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  return nightsDiff;
+};
 
-export default function Component({ data = [] , keys }) {
-  // State declarations
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedGuest, setSelectedGuest] = useState(null)
-  const [accountToDelete, setAccountToDelete] = useState(null)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [notes, setNotes] = useState("")
-  const [venueRates, setVenueRates] = useState({})
+export default function ReservationsTable({ data = [], keys }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [accountToDelete, setAccountToDelete] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [venueRates, setVenueRates] = useState({});
   const [roomRates, setRoomRates] = useState({
     "Double Bed": 0,
     "Triple Bed": 0,
     "Matrimonial Bed": 0,
-  })
-  const { price, setClientType } = usePriceContext()
-  const { setDeleteData, setSaveNote } = useReservationsContext()
-  const { toast } = useToast()
+  });
+  const { price, setClientType } = usePriceContext();
+  const { setDeleteData, setSaveNote } = useReservationsContext();
+  const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  // Group data by guest, reservation type, check-in/out dates, and receipt total
   const groupedData = useMemo(() => {
     const result = data.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.reservation_checkin}-${reservation.reservation_checkout}-${reservation.receipt_total_amount}`
+      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}`;
 
       if (!acc[key]) {
         acc[key] = {
@@ -84,9 +83,7 @@ export default function Component({ data = [] , keys }) {
           reservations: [],
           reservationRoomID: [],
           reservationVenueID: [],
-          reservationCheckin: reservation.reservation_checkin,
-          reservationCheckout: reservation.reservation_checkout,
-        }
+        };
       }
 
       reservation.receipt_discounts.forEach((discount) => {
@@ -96,83 +93,196 @@ export default function Component({ data = [] , keys }) {
             (d) => d.discount_id === discount.discount_id
           )
         ) {
-          acc[key].receiptDiscounts.push(discount)
+          acc[key].receiptDiscounts.push(discount);
         }
-      })
+      });
 
       if (reservation.reservation_type === "room") {
-        acc[key].reservationRoomID.push(reservation.reservation_id)
+        acc[key].reservationRoomID.push(reservation.reservation_id);
       } else if (reservation.reservation_type === "venue") {
-        acc[key].reservationVenueID.push(reservation.reservation_id)
+        acc[key].reservationVenueID.push(reservation.reservation_id);
+      } else if (reservation.reservation_type === "both") {
+        if (reservation.room_type) {
+          acc[key].reservationRoomID.push(reservation.reservation_id);
+        } else {
+          acc[key].reservationVenueID.push(reservation.reservation_id);
+        }
       }
 
-      acc[key].reservations.push(reservation)
+      acc[key].reservations.push(reservation);
 
-      return acc
-    }, {})
+      return acc;
+    }, {});
 
-    console.log("Grouped Data:", result)
-    return result
-  }, [data])
+    const groupedArray = Object.values(result);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = groupedArray.slice(indexOfFirstItem, indexOfLastItem);
+
+    return {
+      allItems: groupedArray,
+      currentItems: currentItems,
+      totalPages: Math.ceil(groupedArray.length / itemsPerPage),
+    };
+  }, [data, currentPage, itemsPerPage]);
+
+  // const handleGeneratePDF = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/api/generate-pdf", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         guest_id: selectedGuest.guestId,
+  //         reservation_ids:
+  //           selectedGuest.reservationType === "both"
+  //             ? [
+  //                 ...selectedGuest.reservationRoomID,
+  //                 ...selectedGuest.reservationVenueID,
+  //               ]
+  //             : selectedGuest.reservationType === "room"
+  //             ? selectedGuest.reservationRoomID
+  //             : selectedGuest.reservationVenueID,
+  //         type: selectedGuest.reservationType,
+  //       }),
+  //     });
+
+  //     // Check if response is not OK
+  //     if (!response.ok) {
+  //       const contentType = response.headers.get("content-type");
+  //       if (contentType && contentType.includes("application/json")) {
+  //         const errorData = await response.json();
+  //         throw new Error(errorData.error || "Failed to generate PDF");
+  //       }
+  //       throw new Error("Failed to generate PDF");
+  //     }
+
+  //     // Process the response if it's a PDF
+  //     const contentType = response.headers.get("content-type");
+  //     if (contentType && contentType.includes("application/pdf")) {
+  //       // Convert response to blob
+  //       const blob = await response.blob();
+
+  //       // Create URL for the blob
+  //       const url = window.URL.createObjectURL(blob);
+
+  //       // Create a temporary anchor element to trigger the download
+  //       const link = document.createElement("a");
+  //       link.href = url;
+  //       link.setAttribute("download", `guestFolio_${selectedGuest.guestName}.pdf`);
+  //       document.body.appendChild(link);
+
+  //       // Trigger download
+  //       link.click();
+
+  //       // Cleanup: remove the anchor element and revoke the blob URL
+  //       document.body.removeChild(link);
+  //       window.URL.revokeObjectURL(url);
+
+  //       // Show success toast
+  //       toast({
+  //         title: "PDF Generated",
+  //         description: "Your PDF has been generated and downloaded successfully.",
+  //         variant: "default",
+  //       });
+  //     } else {
+  //       throw new Error("Server did not return a PDF");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+
+  //     // Handle errors and show failure toast
+  //     toast({
+  //       title: "PDF Generation Failed",
+  //       description:
+  //         error instanceof Error
+  //           ? error.message
+  //           : "There was an error generating the PDF. Please try again.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
+
 
   const handleGeneratePDF = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/generate-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(selectedGuest),
-        }
-      )
+      const response = await fetch("http://localhost:5000/api/generate-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          guest_id: selectedGuest.guestId,
+          reservation_ids:
+            selectedGuest.reservationType === "both"
+              ? [
+                  ...selectedGuest.reservationRoomID,
+                  ...selectedGuest.reservationVenueID,
+                ]
+              : selectedGuest.reservationType === "room"
+              ? selectedGuest.reservationRoomID
+              : selectedGuest.reservationVenueID,
+          type: selectedGuest.reservationType,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to generate PDF")
+        throw new Error("Failed to generate PDF");
       }
 
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement("a")
-      link.href = url
-      link.setAttribute("download", "reservation.pdf")
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Generate a filename based on guest information and current date
+      const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const fileName = `${selectedGuest.firstName}_${selectedGuest.lastName}_reservation_${currentDate}.pdf`;
+      link.setAttribute("download", fileName);
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      // Show success toast
+      toast({
+        title: "PDF Generated Successfully",
+        description: `The PDF has been generated and downloaded as ${fileName}`,
+        variant: "default",
+      });
+
     } catch (error) {
-      console.error("Error generating PDF:", error)
+      console.error("Error generating PDF:", error);
       toast({
         title: "PDF Generation Failed",
         description: "There was an error generating the PDF. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   useEffect(() => {
     if (Array.isArray(price.venue_Holder)) {
       const venues = price.venue_Holder.reduce((acc, venue) => {
         acc[venue.venue_id] =
-          venue.venue_price_internal || venue.venue_price_external
-        return acc
-      }, {})
-      setVenueRates(venues)
-      console.log("Venue Rates:", venues)
+          venue.venue_price_internal || venue.venue_price_external;
+        return acc;
+      }, {});
+      setVenueRates(venues);
     } else {
-      setVenueRates({})
+      setVenueRates({});
     }
-  }, [price])
+  }, [price]);
 
   useEffect(() => {
     setRoomRates({
       "Double Bed": price.double_price || 0,
       "Triple Bed": price.triple_price || 0,
       "Matrimonial Bed": price.matrimonial_price || 0,
-    })
-  }, [price])
+    });
+  }, [price]);
 
-  // Helper functions
   const getStatusColor = (status) => {
     const statusColors = {
       ready: "bg-green-50",
@@ -181,9 +291,9 @@ export default function Component({ data = [] , keys }) {
       cancelled: "bg-red-50",
       done: "bg-purple-50",
       onCleaning: "bg-orange-50",
-    }
-    return statusColors[status] || "bg-gray-50"
-  }
+    };
+    return statusColors[status] || "bg-gray-50";
+  };
 
   const getStatusColorBadge = (status) => {
     const statusColors = {
@@ -193,53 +303,57 @@ export default function Component({ data = [] , keys }) {
       cancelled: "bg-red-200 text-red-800",
       done: "bg-purple-200 text-purple-800",
       onCleaning: "bg-orange-200 text-orange-800",
-    }
-    return statusColors[status] || "bg-gray-100 text-gray-800"
-  }
+    };
+    return statusColors[status] || "bg-gray-100 text-gray-800";
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-PH", {
       style: "currency",
       currency: "PHP",
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
-  // Event handlers
   const handleCellClick = (guest) => {
-    setSelectedGuest(guest)
-    setNotes(guest.additionalNotes || "")
-    setIsDialogOpen(true)
-  }
+    setSelectedGuest(guest);
+    setNotes(guest.additionalNotes || "");
+    setIsDialogOpen(true);
+  };
 
   const handleEdit = () => {
-    console.log("Edit clicked for guest:", selectedGuest)
+    console.log("Edit clicked for guest:", selectedGuest);
     toast({
       title: "Edit Functionality",
       description: "Edit functionality is not yet implemented.",
       variant: "default",
-    })
-  }
+    });
+  };
 
   const handleDelete = (guest) => {
-    setAccountToDelete(guest)
-    setDeleteModalOpen(true)
-  }
+    setAccountToDelete(guest);
+    setDeleteModalOpen(true);
+  };
 
   const confirmDelete = async (type) => {
-    if (!accountToDelete) return
+    if (!accountToDelete) return;
 
     try {
       const dataToDelete = {
         guest_id: accountToDelete.guestId,
         type: type,
-      }
+      };
 
       if (type === "room") {
-        dataToDelete.reservation_ids = selectedGuest.reservationRoomID
+        dataToDelete.reservation_ids = selectedGuest.reservationRoomID;
       } else if (type === "venue") {
-        dataToDelete.reservation_ids = selectedGuest.reservationVenueID
+        dataToDelete.reservation_ids = selectedGuest.reservationVenueID;
+      } else if (type === "both") {
+        dataToDelete.reservation_ids = [
+          ...selectedGuest.reservationRoomID,
+          ...selectedGuest.reservationVenueID,
+        ];
       } else {
-        throw new Error("Invalid reservation type.")
+        throw new Error("Invalid reservation type.");
       }
 
       const response = await fetch(
@@ -251,42 +365,42 @@ export default function Component({ data = [] , keys }) {
           },
           body: JSON.stringify(dataToDelete),
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to delete")
+        throw new Error("Failed to delete");
       }
 
-      const result = await response.json()
-      console.log(result.message)
+      const result = await response.json();
+      console.log(result.message);
 
       toast({
         title: "Deletion Successful",
         description: "Reservations have been deleted.",
         variant: "success",
-      })
+      });
 
-      setDeleteModalOpen(false)
-      setIsDialogOpen(false)
-      setDeleteData(true)
+      setDeleteModalOpen(false);
+      setIsDialogOpen(false);
+      setDeleteData(true);
     } catch (error) {
-      console.error("Error deleting guest:", error)
+      console.error("Error deleting guest:", error);
 
       toast({
         title: "Deletion Failed",
         description:
           "There was an error deleting the reservation data. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setDeleteModalOpen(false)
-      setAccountToDelete(null)
+      setDeleteModalOpen(false);
+      setAccountToDelete(null);
     }
-  }
+  };
 
   const handleClose = () => {
-    setIsDialogOpen(false)
-  }
+    setIsDialogOpen(false);
+  };
 
   const handleStatusChange = (value) => {
     if (selectedGuest) {
@@ -296,14 +410,14 @@ export default function Component({ data = [] , keys }) {
           ...res,
           status: value,
         })),
-      }))
+      }));
     }
-  }
+  };
 
   const handleNotesChange = (e) => {
-    setNotes(e.target.value)
-    setSaveNote(false)
-  }
+    setNotes(e.target.value);
+    setSaveNote(false);
+  };
 
   const handleSaveNotes = async () => {
     if (selectedGuest) {
@@ -317,82 +431,88 @@ export default function Component({ data = [] , keys }) {
             guest_id: selectedGuest.guestId,
             notes: notes,
             reservation_ids:
-              selectedGuest.reservationType === "room"
+              selectedGuest.reservationType === "both"
+                ? [
+                    ...selectedGuest.reservationRoomID,
+                    ...selectedGuest.reservationVenueID,
+                  ]
+                : selectedGuest.reservationType === "room"
                 ? selectedGuest.reservationRoomID
                 : selectedGuest.reservationVenueID,
             type: selectedGuest.reservationType,
           }),
-        })
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to update notes")
+          throw new Error("Failed to update notes");
         }
 
-        const result = await response.json()
-        console.log(result.message)
+        const result = await response.json();
+        console.log(result.message);
 
         setSelectedGuest((prevGuest) => ({
           ...prevGuest,
           additionalNotes: notes,
-        }))
+        }));
 
-        // Update the notes in the groupedData as well
-        const updatedGroupedData = { ...groupedData }
+        const updatedGroupedData = { ...groupedData };
         const guestKey = Object.keys(updatedGroupedData).find(
           (key) => updatedGroupedData[key].guestId === selectedGuest.guestId
-        )
+        );
         if (guestKey) {
-          updatedGroupedData[guestKey].additionalNotes = notes
+          updatedGroupedData[guestKey].additionalNotes = notes;
         }
-        // You might need to update the state that holds groupedData here
-        // For example: setGroupedData(updatedGroupedData);
-        setNotes(updatedGroupedData.additionalNotes)
+        setNotes(updatedGroupedData.additionalNotes);
         toast({
           title: "Notes Updated",
           description: `Additional notes for ${selectedGuest.reservationType} have been updated successfully.`,
           variant: "success",
-        })
+        });
 
-        setDeleteData((prevKey) => prevKey + 1)
+        setDeleteData((prevKey) => prevKey + 1);
       } catch (error) {
-        console.error("Error updating notes:", error)
+        console.error("Error updating notes:", error);
 
         toast({
           title: "Update Failed",
           description: `Failed to update the additional notes for ${selectedGuest.reservationType}. Please try again.`,
           variant: "destructive",
-        })
+        });
       }
     }
-  }
-
+  };
 
   const handleSaveStatus = async (type) => {
-    if (!selectedGuest) return
+    if (!selectedGuest) return;
 
     try {
-      const reservation = selectedGuest.reservations[0]
+      const reservation = selectedGuest.reservations[0];
       if (!reservation) {
-        throw new Error("No reservation found for the selected guest.")
+        throw new Error("No reservation found for the selected guest.");
       }
 
-      const statusToUpdate = reservation.status
-      
+      const statusToUpdate = reservation.status;
+
       let payload = {
         guest_id: selectedGuest.guestId,
         status: statusToUpdate,
         type: type,
-      }
+      };
 
       if (type === "room") {
-        payload.reservation_ids = selectedGuest.reservationRoomID
+        payload.reservation_ids = selectedGuest.reservationRoomID;
       } else if (type === "venue") {
-        payload.reservation_ids = selectedGuest.reservationVenueID
+        payload.reservation_ids = selectedGuest.reservationVenueID;
+      } else if (type === "both") {
+        payload.reservation_ids = [
+          ...selectedGuest.reservationRoomID,
+          ...selectedGuest.reservationVenueID,
+        ];
       } else {
-        throw new Error("Invalid reservation type.")
+        throw new Error("Invalid reservation type.");
       }
 
-      console.log("Sending status update:", payload)
+      console.log("Sending status update:", payload);
 
       const response = await fetch("http://localhost:5000/api/change_status", {
         method: "PUT",
@@ -400,44 +520,94 @@ export default function Component({ data = [] , keys }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to update reservation status.")
+        throw new Error("Failed to update reservation status.");
       }
 
-      const result = await response.json()
-      console.log(result.message)
+      const result = await response.json();
+      console.log(result.message);
 
       toast({
         title: "Status Updated",
         description: "Reservation status has been updated successfully.",
         variant: "success",
-      })
+      });
 
-      setDeleteData((prevKey) => prevKey + 1)
+      setDeleteData((prevKey) => prevKey + 1);
     } catch (error) {
-      console.error("Error updating status:", error)
+      console.error("Error updating status:", error);
 
       toast({
         title: "Update Failed",
-        description: "Failed to update the reservation status. Please try again.",
+        description:
+          "Failed to update the reservation status. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const getGuestTypeColor = (type) => {
     switch (type.toLowerCase()) {
-      case 'internal':
-        return 'bg-blue-100 text-blue-800'
-      case 'external':
-        return 'bg-yellow-100 text-yellow-800'
+      case "internal":
+        return "bg-blue-100 text-blue-800";
+      case "external":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800'
+        return "bg-gray-100 text-gray-800";
     }
-  }
-  
+  };
+
+  const getReservationTypeBadge = (type, status) => {
+    switch (type.toLowerCase()) {
+      case "room":
+        return (
+          <Badge
+            variant="secondary"
+            className={`${getStatusColorBadge(status || "default")}`}
+          >
+            Room
+          </Badge>
+        );
+      case "venue":
+        return (
+          <Badge
+            variant="secondary"
+            className={`${getStatusColorBadge(status || "default")}`}
+          >
+            Venue
+          </Badge>
+        );
+      case "both":
+        return (
+          <div className="flex space-x-1">
+            <Badge
+              variant="secondary"
+              className={`${getStatusColorBadge(status || "default")}`}
+            >
+              Room
+            </Badge>
+            <Badge
+              variant="secondary"
+              className={`${getStatusColorBadge(status || "default")}`}
+            >
+              Venue
+            </Badge>
+          </div>
+        );
+      default:
+        return (
+          <Badge
+            variant="secondary"
+            className={`${getStatusColorBadge(status || "default")}`}
+          >
+            {type}
+          </Badge>
+        );
+    }
+  };
+
   return (
     <>
       <Card className="w-full">
@@ -454,15 +624,15 @@ export default function Component({ data = [] , keys }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {Object.values(groupedData).map((guest, index) => (
+              {groupedData.currentItems.map((guest, index) => (
                 <TableRow
                   key={index}
                   className={`cursor-pointer ${getStatusColor(
                     guest.reservations[0]?.status || "default"
                   )}`}
                   onClick={() => {
-                    handleCellClick(guest)
-                    setClientType(guest.guestType)
+                    handleCellClick(guest);
+                    setClientType(guest.guestType);
                   }}
                 >
                   <TableCell className="flex items-center space-x-3 py-4">
@@ -480,13 +650,23 @@ export default function Component({ data = [] , keys }) {
                       </div>
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
-                    <Badge variant="secondary" className={getGuestTypeColor(guest.guestType)}>
+                    <Badge
+                      variant="secondary"
+                      className={`${getStatusColorBadge(
+                        guest.reservations[0]?.status || "default"
+                      )} text-${guest.reservations[0]?.status || "gray"}-600`}
+                    >
                       {guest.guestType}
                     </Badge>
                   </TableCell>
-                  <TableCell>{guest.reservationType}</TableCell>
+                  <TableCell>
+                    {getReservationTypeBadge(
+                      guest.reservationType,
+                      guest.reservations[0]?.status || "default"
+                    )}
+                  </TableCell>
                   <TableCell>
                     {new Intl.DateTimeFormat("en-US", {
                       month: "long",
@@ -495,9 +675,7 @@ export default function Component({ data = [] , keys }) {
                       hour: "numeric",
                       minute: "numeric",
                       hour12: true,
-                    }).format(
-                      new Date(guest.reservations[0].check_in_date)
-                    )}
+                    }).format(new Date(guest.reservations[0].check_in_date))}
                   </TableCell>
                   <TableCell>{formatCurrency(guest.receiptTotal)}</TableCell>
                   <TableCell>
@@ -516,9 +694,51 @@ export default function Component({ data = [] , keys }) {
           </Table>
         </CardContent>
 
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(prev + 1, groupedData.totalPages)
+                )
+              }
+              disabled={currentPage === groupedData.totalPages}
+            >
+              Next
+            </Button>
+          </div>
+          <div>
+            Page {currentPage} of {groupedData.totalPages}
+          </div>
+          <Select
+            value={itemsPerPage.toString()}
+            onValueChange={(value) => setItemsPerPage(Number(value))}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Items per page" />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 20, 50].map((value) => (
+                <SelectItem key={value} value={value.toString()}>
+                  {value} per page
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {selectedGuest && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3" showCloseButton={false}>
+            <DialogContent
+              className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3"
+              showCloseButton={false}
+            >
               <div className="w-3/6 flex flex-col gap-2">
                 <Card className="flex-1 flex flex-col">
                   <CardContent className="p-4 flex flex-col h-full">
@@ -542,21 +762,75 @@ export default function Component({ data = [] , keys }) {
                     <Separator />
 
                     <div className="flex-grow">
-                      <h4 className="font-semibold my-2">
-                        {selectedGuest.reservationType} Reservations ({selectedGuest.reservations.length}):
-                      </h4>
-                      <ScrollArea className="h-[calc(55vh-8rem)] w-[95%] p-2">
-                        {selectedGuest.reservations.map((reservation, index) => (
-                          <div
-                            key={index}
-                            className="mb-2 p-2 bg-gray-50 rounded"
-                          >
-                            <p className="font-medium">
-                              {reservation.reservation}
-                            </p>
-                          </div>
-                        ))}
-                      </ScrollArea>
+                      {selectedGuest.reservationType === "both" ? (
+                        <>
+                          <h4 className="font-semibold my-2">
+                            Room Reservations (
+                            {selectedGuest.reservationRoomID.length}):
+                          </h4>
+                          <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
+                            {selectedGuest.reservations
+                              .filter(
+                                (reservation) =>
+                                  reservation.reservation &&
+                                  reservation.reservation.includes("Room")
+                              )
+                              .map((reservation, index) => (
+                                <div
+                                  key={index}
+                                  className="mb-2 p-2 bg-gray-50 rounded"
+                                >
+                                  <p className="font-medium">
+                                    {reservation.reservation}
+                                  </p>
+                                </div>
+                              ))}
+                          </ScrollArea>
+                          <h4 className="font-semibold my-2">
+                            Venue Reservations (
+                            {selectedGuest.reservationVenueID.length}):
+                          </h4>
+                          <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
+                            {selectedGuest.reservations
+                              .filter(
+                                (reservation) =>
+                                  reservation.reservation &&
+                                  !reservation.reservation.includes("Room")
+                              )
+                              .map((reservation, index) => (
+                                <div
+                                  key={index}
+                                  className="mb-2 p-2 bg-gray-50 rounded"
+                                >
+                                  <p className="font-medium">
+                                    {reservation.reservation}
+                                  </p>
+                                </div>
+                              ))}
+                          </ScrollArea>
+                        </>
+                      ) : (
+                        <>
+                          <h4 className="font-semibold my-2">
+                            {selectedGuest.reservationType} Reservations (
+                            {selectedGuest.reservations.length}):
+                          </h4>
+                          <ScrollArea className="h-[calc(55vh-8rem)] w-[95%] p-2">
+                            {selectedGuest.reservations.map(
+                              (reservation, index) => (
+                                <div
+                                  key={index}
+                                  className="mb-2 p-2 bg-gray-50 rounded"
+                                >
+                                  <p className="font-medium">
+                                    {reservation.reservation}
+                                  </p>
+                                </div>
+                              )
+                            )}
+                          </ScrollArea>
+                        </>
+                      )}
                     </div>
 
                     <Separator className="my-2" />
@@ -573,7 +847,9 @@ export default function Component({ data = [] , keys }) {
                             minute: "numeric",
                             hour12: true,
                           }).format(
-                            new Date(selectedGuest.reservations[0].check_in_date)
+                            new Date(
+                              selectedGuest.reservations[0].check_in_date
+                            )
                           )}
                         </p>
                       </div>
@@ -588,7 +864,9 @@ export default function Component({ data = [] , keys }) {
                             minute: "numeric",
                             hour12: true,
                           }).format(
-                            new Date(selectedGuest.reservations[0].check_out_date)
+                            new Date(
+                              selectedGuest.reservations[0].check_out_date
+                            )
                           )}
                         </p>
                       </div>
@@ -601,7 +879,9 @@ export default function Component({ data = [] , keys }) {
                     <Label htmlFor="status">Status</Label>
                     <div className="flex-1 flex-row flex gap-2">
                       <Select
-                        value={selectedGuest.reservations[0]?.status || "default"}
+                        value={
+                          selectedGuest.reservations[0]?.status || "default"
+                        }
                         onValueChange={handleStatusChange}
                       >
                         <SelectTrigger
@@ -610,7 +890,12 @@ export default function Component({ data = [] , keys }) {
                             selectedGuest.reservations[0]?.status || "default"
                           )}
                         >
-                          <SelectValue placeholder={selectedGuest.reservations[0]?.status || "Please select"} />
+                          <SelectValue
+                            placeholder={
+                              selectedGuest.reservations[0]?.status ||
+                              "Please select"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="ready">Ready</SelectItem>
@@ -618,10 +903,17 @@ export default function Component({ data = [] , keys }) {
                           <SelectItem value="onUse">On Use</SelectItem>
                           <SelectItem value="cancelled">Cancelled</SelectItem>
                           <SelectItem value="done">Done</SelectItem>
-                          <SelectItem value="onCleaning">On Cleaning</SelectItem>
+                          <SelectItem value="onCleaning">
+                            On Cleaning
+                          </SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button variant="outline" onClick={() => handleSaveStatus(selectedGuest.reservationType)}>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          handleSaveStatus(selectedGuest.reservationType)
+                        }
+                      >
                         Save Changes
                       </Button>
                     </div>
@@ -630,37 +922,34 @@ export default function Component({ data = [] , keys }) {
               </div>
 
               <div className="w-2/6 flex flex-col gap-2">
-              <Card className="w-full bg-yellow-50 border-yellow-200 shadow-md relative">
-                    <div className="absolute -top-3 -right-3 text-red-500 transform rotate-12">
-                      <PushPin className="w-6 h-6" />
+                <Card className="w-full bg-yellow-50 border-yellow-200 shadow-md relative">
+                  <div className="absolute -top-3 -right-3 text-red-500 transform rotate-12">
+                    <PushPin className="w-6 h-6" />
+                  </div>
+
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <Label htmlFor="notes" className="text-lg font-semibold">
+                        Additional Notes
+                      </Label>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSaveNotes}
+                        className="bg-white"
+                      >
+                        <Save className="h-4 w-4" />
+                      </Button>
                     </div>
-                    
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <Label
-                          htmlFor="notes"
-                          className="text-lg font-semibold"
-                        >
-                          Additional Notes
-                        </Label>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleSaveNotes}
-                          className="bg-white"
-                        >
-                          <Save className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <Textarea
-                        id="notes"
-                        placeholder="Type your notes here..."
-                        className="w-full h-28 bg-yellow-50 border-yellow-200 focus:border-yellow-300 focus:ring-yellow-200"
-                        value={notes}
-                        onChange={handleNotesChange}
-                      />
-                    </CardContent>
-                  </Card>
+                    <Textarea
+                      id="notes"
+                      placeholder="Type your notes here..."
+                      className="w-full h-28 bg-yellow-50 border-yellow-200 focus:border-yellow-300 focus:ring-yellow-200"
+                      value={notes}
+                      onChange={handleNotesChange}
+                    />
+                  </CardContent>
+                </Card>
 
                 <ScrollArea className="h-[calc(2/4vh-8rem)] w-full">
                   <Card className="bg-white text-gray-800  rounded-xl shadow-lg">
@@ -672,69 +961,92 @@ export default function Component({ data = [] , keys }) {
                             {selectedGuest.guestType}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Date: {new Date(selectedGuest.receiptDate).toLocaleDateString()}
+                            Date:{" "}
+                            {new Date(
+                              selectedGuest.receiptDate
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                         <Separator />
                         <ScrollArea className="h-[calc(3/4vh-8rem)] w-full">
-                          {selectedGuest.reservationType === "room" && (
+                          {(selectedGuest.reservationType === "room" ||
+                            selectedGuest.reservationType === "both") && (
                             <div className="space-y-2 text-sm">
                               <h4 className="font-semibold">Room Charges:</h4>
                               {Object.entries(
-                                selectedGuest.reservations.reduce((acc, reservation) => {
-                                  const roomType = reservation.room_type;
-                                  const numberOfNights = calculateNumberOfNights(
-                                    reservation.check_in_date,
-                                    reservation.check_out_date
-                                  );
+                                selectedGuest.reservations.reduce(
+                                  (acc, reservation) => {
+                                    if (reservation.room_type) {
+                                      const roomType = reservation.room_type;
+                                      const numberOfNights =
+                                        calculateNumberOfNights(
+                                          reservation.check_in_date,
+                                          reservation.check_out_date
+                                        );
 
-                                  if (!acc[roomType]) {
-                                    acc[roomType] = {
-                                      count: 0,
-                                      nights: numberOfNights,
-                                      total: 0,
-                                    };
-                                  }
-                                  acc[roomType].count += 1;
-
-                                  return acc;
-                                }, {})
+                                      if (!acc[roomType]) {
+                                        acc[roomType] = {
+                                          count: 0,
+                                          nights: numberOfNights,
+                                          total: 0,
+                                        };
+                                      }
+                                      acc[roomType].count += 1;
+                                    }
+                                    return acc;
+                                  },
+                                  {}
+                                )
                               ).map(([roomType, data]) => (
-                                <div key={roomType} className="flex justify-between">
+                                <div
+                                  key={roomType}
+                                  className="flex justify-between"
+                                >
                                   <span>
-                                    {roomType} ({data.count}) x {data.nights} nights
+                                    {roomType} ({data.count}) x {data.nights}{" "}
+                                    nights
                                   </span>
                                   <span>
                                     {formatCurrency(
-                                      data.count * data.nights * roomRates[roomType]
+                                      data.count *
+                                        data.nights *
+                                        roomRates[roomType]
                                     )}
                                   </span>
                                 </div>
                               ))}
                             </div>
                           )}
-
-                          {selectedGuest.reservationType === "venue" && (
+                          {(selectedGuest.reservationType === "venue" ||
+                            selectedGuest.reservationType === "both") && (
                             <div className="space-y-2 text-sm">
                               <h4 className="font-semibold">Venue Charges:</h4>
                               {Object.entries(
-                                selectedGuest.reservations.reduce((acc, venue) => {
-                                  const venueType = venue.reservation;
-                                  const venueRate = venueRates[venueType] || 0;
+                                selectedGuest.reservations.reduce(
+                                  (acc, venue) => {
+                                    if (!venue.reservation.includes("Room")) {
+                                      const venueType = venue.reservation;
+                                      const venueRate =
+                                        venueRates[venueType] || 0;
 
-                                  if (!acc[venueType]) {
-                                    acc[venueType] = {
-                                      count: 0,
-                                      total: 0,
-                                    };
-                                  }
-                                  acc[venueType].count += 1;
-                                  acc[venueType].total += venueRate;
-
-                                  return acc;
-                                }, {})
+                                      if (!acc[venueType]) {
+                                        acc[venueType] = {
+                                          count: 0,
+                                          total: 0,
+                                        };
+                                      }
+                                      acc[venueType].count += 1;
+                                      acc[venueType].total += venueRate;
+                                    }
+                                    return acc;
+                                  },
+                                  {}
+                                )
                               ).map(([venueType, data]) => (
-                                <div key={venueType} className="flex justify-between">
+                                <div
+                                  key={venueType}
+                                  className="flex justify-between"
+                                >
                                   <span>{venueType}</span>
                                   <span>{formatCurrency(data.total)}</span>
                                 </div>
@@ -742,40 +1054,33 @@ export default function Component({ data = [] , keys }) {
                             </div>
                           )}
                         </ScrollArea>
-
                         <Separator />
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span>Subtotal:</span>
-                            <span>{formatCurrency(selectedGuest.receiptSubTotal)}</span>
+                            <span>
+                              {formatCurrency(selectedGuest.receiptSubTotal)}
+                            </span>
                           </div>
-                        </div>
-                        {selectedGuest.receiptDiscounts.map((discount, index) => {
-                          if (discount) {
-                            const discountAmount =
-                              (selectedGuest.receiptSubTotal * discount.discount_percentage) / 100;
-
-                            return (
+                          {selectedGuest.receiptDiscounts.map(
+                            (discount, index) => (
                               <div
-                                key={`${index}-${discount.discount_id}`}
-                                className="flex justify-between text-sm text-green-600"
+                                key={index}
+                                className="flex justify-between text-green-600"
                               >
+                                <span>{discount.discount_name}:</span>
                                 <span>
-                                  {discount.discount_name} ({discount.discount_percentage}%):
+                                  -{formatCurrency(selectedGuest.receiptSubTotal * discount.discount_percentage/100)}
                                 </span>
-                                <span>{formatCurrency(discountAmount)}</span>
                               </div>
-                            );
-                          }
-                          return null;
-                        })}
-
-                        <Separator />
-                        <div className="flex justify-between items-baseline">
-                          <span className="text-lg font-semibold">Total:</span>
-                          <span className="text-2xl font-bold">
-                            {formatCurrency(selectedGuest.receiptTotal)}
-                          </span>
+                            )
+                          )}
+                          <div className="flex justify-between font-bold">
+                            <span>Total:</span>
+                            <span>
+                              {formatCurrency(selectedGuest.receiptTotal)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -794,14 +1099,7 @@ export default function Component({ data = [] , keys }) {
                     >
                       <X className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleEdit}
-                      className="bg-white"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -826,25 +1124,32 @@ export default function Component({ data = [] , keys }) {
             </DialogContent>
           </Dialog>
         )}
-
-        <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Confirm Deletion</DialogTitle>
-            </DialogHeader>
-            <p>Are you sure you want to delete this guest&apos;s reservations?</p>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={() => confirmDelete(selectedGuest.reservationType)}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </Card>
+
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <p>
+            Are you sure you want to delete the reservation for{" "}
+            {accountToDelete?.guestName}?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => confirmDelete(selectedGuest.reservationType)}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Toaster />
     </>
-  )
+  );
 }
