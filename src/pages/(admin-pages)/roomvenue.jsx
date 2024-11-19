@@ -10,7 +10,9 @@ import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import roomTypeImage from "@/assets/images/hotel_room.jpg"
 import * as z from "zod"
+
 import {
   Form,
   FormControl,
@@ -38,7 +40,7 @@ import {
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required.").max(100, "Name must be 100 characters or less."),
-  type: z.enum(["Room", "Venue"], {
+  type: z.enum(["Room", "Venue", "RoomType"], {
     required_error: "Please select a type.",
   }),
   internalPrice: z.number().min(0, "Price must be a positive number."),
@@ -56,11 +58,15 @@ const roomTypeFormSchema = z.object({
 })
 
 const dummyItems = [
-  { id: "VENUE001", name: "Old Talisay Bar", type: "Venue", internalPrice: 1600, externalPrice: 1800, capacity: 0, status: "Ready" },
-  { id: "VENUE002", name: "Seaside Area", type: "Venue", internalPrice: 1600, externalPrice: 1800, capacity: 0, status: "Maintenance"},
-  { id: "ROOM001", name: "Room301", type: "Room", internalPrice: 1600, externalPrice: 1500, capacity: 2, roomType: "Double Bed", status: "Cleaning" },
-  { id: "ROOM002", name: "Room302", type: "Room", internalPrice: 1800, externalPrice: 1350, capacity: 3, roomType: "Triple Bed" , status: "Maintenance"},
-  { id: "ROOM003", name: "Room303", type: "Room", internalPrice: 1600, externalPrice: 1800, capacity: 2, roomType: "Matrimonial", status: "Ready"},
+  { id: "VENUE001", name: "Old Talisay Bar", type: "Venue",  capacity: 0, status: "Ready" },
+  { id: "VENUE002", name: "Seaside Area", type: "Venue",  capacity: 0, status: "Maintenance"},
+  { id: "ROOM001", name: "Room301", type: "Room",  capacity: 2, roomType: "Double Bed", status: "Cleaning" },
+  { id: "ROOM002", name: "Room302", type: "Room",  capacity: 3, roomType: "Triple Bed" , status: "Maintenance"},
+  { id: "ROOM003", name: "Room303", type: "Room", capacity: 2, roomType: "Matrimonial", status: "Ready"},
+
+  { id: "ROOMTYPE001", name: "Double Bed", type: "roomType",internalPrice: 1600, externalPrice: 1800, capacity: 2 },
+  { id: "ROOMTYPE001", name: "Triple Bed", type: "roomType",internalPrice: 1900, externalPrice: 1900, capacity: 3 },
+  { id: "ROOMTYPE001", name: "Matrimonial", type: "roomType",internalPrice: 2200, externalPrice: 2500, capacity: 4},
 ]
 
 export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar = () => {} }) {
@@ -80,11 +86,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
-  const [roomTypes, setRoomTypes] = useState([
-    { name: "Double Bed", capacity: 2, internalPrice: 1600, externalPrice: 1800 },
-    { name: "Triple Bed", capacity: 3, internalPrice: 1800, externalPrice: 2000 },
-    { name: "Matrimonial", capacity: 2, internalPrice: 1600, externalPrice: 1800 },
-  ])
+  
 
   const formMethods = useForm({
     resolver: zodResolver(formSchema),
@@ -206,11 +208,6 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
     setIsEditModalOpen(true)
   }
 
-  const handleAddRoomType = (values) => {
-    setRoomTypes([...roomTypes, values])
-    roomTypeFormMethods.reset()
-  }
-
   const types = ["Room", "Venue"]
 
   const activeFilters = [...filters.type]
@@ -223,11 +220,22 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
             <h3 className="text-xl font-semibold">{item.name}</h3>
             <UserRound className="text-xs text-blue-500 w-4 h-4" />
             <span>{item.capacity}</span>
-          </div>
+          
           {item.type === "Room" && (
             <p className="text-sm text-muted-foreground">{item.roomType}</p>
           )}
         </div>
+        <div>
+            {item.type === "roomType" && (
+            <img
+            src={roomTypeImage}
+            className="mt-4 w-[280px] h-[120px] rounded-md"
+            
+            ></img>
+          )}
+         </div>
+          </div>
+
         <div className="text-middle min-w-[120px]">
           <div className="mt-4">
             <p
@@ -244,9 +252,20 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
               {item.status}
             </p>
           </div>
+          <div>
+            {item.type === "roomType" && (
+            <p  className="mt-4 ml-8 font-semibold"> Internal <br></br> ₱{item.internalPrice}</p>
+          )}
+            {item.type === "roomType" && (
+            <p className="mt-4 ml-8 font-semibold"> <p></p> External <br></br> ₱ {item.externalPrice}</p>
+          )}
+          </div>
+          
+          
         </div>
 
         <div className="flex gap-2 m-2">
+         
           <Button
             variant="outline"
             size="sm"
@@ -263,11 +282,12 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
           >
             <Trash2 className="h-8 w-8" />
           </Button>
+          </div>
+          
         </div>
-      </div>
+    
     </Card>
   )
-
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
       <NavigationSide isOpen={sidebarOpen} />
@@ -364,7 +384,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
                 </div>
               )}
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-[480px]">
                 <div className="w-[480px]">
                   <h2 className="text-xl font-semibold mb-4">Rooms</h2>
                   <div className="">
@@ -377,78 +397,15 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
                     {filteredItems.filter(item => item.type === "Venue").slice(0, 15).map(renderItemCard)}
                   </div>
                 </div>
+                <div className="w-[480px]">
+                  <h2 className="text-xl font-semibold mb-4">Room Types</h2>
+                  <div className="">
+                    {filteredItems.filter(item => item.type === "roomType").slice(0, 15).map(renderItemCard)}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="w-1/4">
-              <Card className="mb-4">
-                <CardHeader>
-                  <CardTitle>Add New Room Type</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <FormProvider {...roomTypeFormMethods}>
-                    <Form {...roomTypeFormMethods}>
-                      <form onSubmit={roomTypeFormMethods.handleSubmit(handleAddRoomType)} className="space-y-4">
-                        <FormField
-                          control={roomTypeFormMethods.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Enter room type name" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={roomTypeFormMethods.control}
-                          name="capacity"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Capacity</FormLabel>
-                              <FormControl>
-                                <Input type="number" placeholder="Enter capacity" {...field} onChange={(e) => field.onChange(+e.target.value)} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={roomTypeFormMethods.control}
-                          name="internalPrice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Internal Price</FormLabel>
-                              <FormControl>
-                                <Input type="number" placeholder="Enter internal price" {...field} onChange={(e) => field.onChange(+e.target.value)} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={roomTypeFormMethods.control}
-                          name="externalPrice"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>External Price</FormLabel>
-                              <FormControl>
-                                <Input type="number" placeholder="Enter external price" {...field} onChange={(e) => field.onChange(+e.target.value)} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button type="submit" className="w-full">
-                          Add Room Type
-                        </Button>
-                      </form>
-                    </Form>
-                  </FormProvider>
-                </CardContent>
-              </Card>
-            </div>
+            
           </div>
         </main>
 
@@ -527,7 +484,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
                           <Select 
                             onValueChange={(value) => {
                               field.onChange(value)
-                              const selectedType = roomTypes.find(type => type.name === value)
+                              const selectedType = dummyItems.find(type => type.name === value)
                               if (selectedType) {
                                 formMethods.setValue('capacity', selectedType.capacity)
                                 formMethods.setValue('internalPrice', selectedType.internalPrice)
@@ -542,7 +499,7 @@ export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {roomTypes.map((type) => (
+                              {dummyItems.map((type) => (
                                 <SelectItem key={type.name} value={type.name}>{type.name}</SelectItem>
                               ))}
                             </SelectContent>
