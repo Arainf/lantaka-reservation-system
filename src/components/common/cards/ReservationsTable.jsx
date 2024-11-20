@@ -37,6 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useReservationsContext } from "@/context/reservationContext";
 import Slogo from "@/assets/images/SchoolLogo.png";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const calculateNumberOfNights = (checkInDate, checkOutDate) => {
   const checkIn = new Date(checkInDate);
@@ -204,7 +205,6 @@ export default function ReservationsTable({ data = [], keys }) {
   //   }
   // };
 
-
   const handleGeneratePDF = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/generate-pdf", {
@@ -237,7 +237,7 @@ export default function ReservationsTable({ data = [], keys }) {
       link.href = url;
 
       // Generate a filename based on guest information and current date
-      const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const currentDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
       const fileName = `${selectedGuest.firstName}_${selectedGuest.lastName}_reservation_${currentDate}.pdf`;
       link.setAttribute("download", fileName);
 
@@ -251,7 +251,6 @@ export default function ReservationsTable({ data = [], keys }) {
         description: `The PDF has been generated and downloaded as ${fileName}`,
         variant: "default",
       });
-
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast({
@@ -500,14 +499,12 @@ export default function ReservationsTable({ data = [], keys }) {
       };
 
       if (type === "room") {
-        payload.reservation_ids = selectedGuest.reservationRoomID;
+        payload.reservation_room_ids = selectedGuest.reservationRoomID;
       } else if (type === "venue") {
-        payload.reservation_ids = selectedGuest.reservationVenueID;
+        payload.reservation_venue_ids = selectedGuest.reservationVenueID;
       } else if (type === "both") {
-        payload.reservation_ids = [
-          ...selectedGuest.reservationRoomID,
-          ...selectedGuest.reservationVenueID,
-        ];
+        payload.reservation_room_ids = selectedGuest.reservationRoomID;
+        payload.reservation_venue_ids = selectedGuest.reservationVenueID;
       } else {
         throw new Error("Invalid reservation type.");
       }
@@ -610,521 +607,513 @@ export default function ReservationsTable({ data = [], keys }) {
 
   return (
     <>
-      <Card className="w-full">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[25%]">Guest Details</TableHead>
-                <TableHead className="w-[15%]">Guest Type</TableHead>
-                <TableHead className="w-[15%]">Reservation Type</TableHead>
-                <TableHead className="w-[20%]">Check-in</TableHead>
-                <TableHead className="w-[15%]">Total Amount</TableHead>
-                <TableHead className="w-[10%]">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {groupedData.currentItems.map((guest, index) => (
-                <TableRow
-                  key={index}
-                  className={`cursor-pointer ${getStatusColor(
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-bg-[#0f172a]">
+            <TableHead className="w-[25%] text-white">Guest Details</TableHead>
+            <TableHead className="w-[15%] text-white">Guest Type</TableHead>
+            <TableHead className="w-[15%] text-white">Reservation Type</TableHead>
+            <TableHead className="w-[20%] text-white">Check-in</TableHead>
+            <TableHead className="w-[15%] text-white">Total Amount</TableHead>
+            <TableHead className="w-[10%] text-white">Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {groupedData.currentItems.map((guest, index) => (
+            <TableRow
+              key={index}
+              className={`cursor-pointer ${getStatusColor(
+                guest.reservations[0]?.status || "default"
+              )}`}
+              onClick={() => {
+                handleCellClick(guest);
+                setClientType(guest.guestType);
+              }}
+            >
+              <TableCell className="flex items-center space-x-3 py-4">
+                <img
+                  src={Slogo}
+                  alt={keys}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+                <div>
+                  <div className="font-medium">{guest.guestName}</div>
+                  <div className="text-sm text-gray-500">
+                    {guest.guestEmail}
+                  </div>
+                </div>
+              </TableCell>
+
+              <TableCell>
+                <Badge
+                  variant="secondary"
+                  className={`${getStatusColorBadge(
                     guest.reservations[0]?.status || "default"
-                  )}`}
-                  onClick={() => {
-                    handleCellClick(guest);
-                    setClientType(guest.guestType);
-                  }}
+                  )} text-${guest.reservations[0]?.status || "gray"}-600`}
                 >
-                  <TableCell className="flex items-center space-x-3 py-4">
+                  {guest.guestType}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                {getReservationTypeBadge(
+                  guest.reservationType,
+                  guest.reservations[0]?.status || "default"
+                )}
+              </TableCell>
+              <TableCell>
+                {new Intl.DateTimeFormat("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true,
+                }).format(new Date(guest.reservations[0].check_in_date))}
+              </TableCell>
+              <TableCell>{formatCurrency(guest.receiptTotal)}</TableCell>
+              <TableCell>
+                <Badge
+                  variant="secondary"
+                  className={`${getStatusColorBadge(
+                    guest.reservations[0]?.status || "default"
+                  )} text-${guest.reservations[0]?.status || "gray"}-600`}
+                >
+                  {guest.reservations[0]?.status || "N/A"}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <div className="flex items-center justify-between px-2 py-4">
+        <div className="text-sm text-gray-700">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+          {Math.min(currentPage * itemsPerPage, groupedData.allItems.length)} of{" "}
+          {groupedData.allItems.length} entries
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Previous
+          </Button>
+          {[...Array(groupedData.totalPages)].map((_, index) => (
+            <Button
+              key={index}
+              variant={currentPage === index + 1 ? "default" : "outline"}
+              size="sm"
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </Button>
+          ))}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === groupedData.totalPages}
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-2" />
+          </Button>
+        </div>
+      </div>
+
+      {selectedGuest && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent
+            className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3"
+            showCloseButton={false}
+          >
+            <div className="w-3/6 flex flex-col gap-2">
+              <Card className="flex-1 flex flex-col">
+                <CardContent className="p-4 flex flex-col h-full">
+                  <div className="flex items-center space-x-3 py-3">
                     <img
                       src={Slogo}
-                      alt={keys}
+                      alt=""
                       width={32}
                       height={32}
                       className="rounded-full"
                     />
                     <div>
-                      <div className="font-medium">{guest.guestName}</div>
+                      <div className="font-medium">
+                        {selectedGuest.guestName}
+                      </div>
                       <div className="text-sm text-gray-500">
-                        {guest.guestEmail}
+                        {selectedGuest.guestEmail}
                       </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={`${getStatusColorBadge(
-                        guest.reservations[0]?.status || "default"
-                      )} text-${guest.reservations[0]?.status || "gray"}-600`}
-                    >
-                      {guest.guestType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {getReservationTypeBadge(
-                      guest.reservationType,
-                      guest.reservations[0]?.status || "default"
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {new Intl.DateTimeFormat("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "numeric",
-                      minute: "numeric",
-                      hour12: true,
-                    }).format(new Date(guest.reservations[0].check_in_date))}
-                  </TableCell>
-                  <TableCell>{formatCurrency(guest.receiptTotal)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={`${getStatusColorBadge(
-                        guest.reservations[0]?.status || "default"
-                      )} text-${guest.reservations[0]?.status || "gray"}-600`}
-                    >
-                      {guest.reservations[0]?.status || "N/A"}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(prev + 1, groupedData.totalPages)
-                )
-              }
-              disabled={currentPage === groupedData.totalPages}
-            >
-              Next
-            </Button>
-          </div>
-          <div>
-            Page {currentPage} of {groupedData.totalPages}
-          </div>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => setItemsPerPage(Number(value))}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Items per page" />
-            </SelectTrigger>
-            <SelectContent>
-              {[5, 10, 20, 50].map((value) => (
-                <SelectItem key={value} value={value.toString()}>
-                  {value} per page
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {selectedGuest && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent
-              className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3"
-              showCloseButton={false}
-            >
-              <div className="w-3/6 flex flex-col gap-2">
-                <Card className="flex-1 flex flex-col">
-                  <CardContent className="p-4 flex flex-col h-full">
-                    <div className="flex items-center space-x-3 py-3">
-                      <img
-                        src={Slogo}
-                        alt=""
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <div className="font-medium">
-                          {selectedGuest.guestName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {selectedGuest.guestEmail}
-                        </div>
-                      </div>
-                    </div>
-                    <Separator />
-
-                    <div className="flex-grow">
-                      {selectedGuest.reservationType === "both" ? (
-                        <>
-                          <h4 className="font-semibold my-2">
-                            Room Reservations (
-                            {selectedGuest.reservationRoomID.length}):
-                          </h4>
-                          <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
-                            {selectedGuest.reservations
-                              .filter(
-                                (reservation) =>
-                                  reservation.reservation &&
-                                  reservation.reservation.includes("Room")
-                              )
-                              .map((reservation, index) => (
-                                <div
-                                  key={index}
-                                  className="mb-2 p-2 bg-gray-50 rounded"
-                                >
-                                  <p className="font-medium">
-                                    {reservation.reservation}
-                                  </p>
-                                </div>
-                              ))}
-                          </ScrollArea>
-                          <h4 className="font-semibold my-2">
-                            Venue Reservations (
-                            {selectedGuest.reservationVenueID.length}):
-                          </h4>
-                          <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
-                            {selectedGuest.reservations
-                              .filter(
-                                (reservation) =>
-                                  reservation.reservation &&
-                                  !reservation.reservation.includes("Room")
-                              )
-                              .map((reservation, index) => (
-                                <div
-                                  key={index}
-                                  className="mb-2 p-2 bg-gray-50 rounded"
-                                >
-                                  <p className="font-medium">
-                                    {reservation.reservation}
-                                  </p>
-                                </div>
-                              ))}
-                          </ScrollArea>
-                        </>
-                      ) : (
-                        <>
-                          <h4 className="font-semibold my-2">
-                            {selectedGuest.reservationType} Reservations (
-                            {selectedGuest.reservations.length}):
-                          </h4>
-                          <ScrollArea className="h-[calc(55vh-8rem)] w-[95%] p-2">
-                            {selectedGuest.reservations.map(
-                              (reservation, index) => (
-                                <div
-                                  key={index}
-                                  className="mb-2 p-2 bg-gray-50 rounded"
-                                >
-                                  <p className="font-medium">
-                                    {reservation.reservation}
-                                  </p>
-                                </div>
-                              )
-                            )}
-                          </ScrollArea>
-                        </>
-                      )}
-                    </div>
-
-                    <Separator className="my-2" />
-
-                    <div className="mt-auto text-sm text-gray-600">
-                      <div className="flex justify-between">
-                        <p>Check In:</p>
-                        <p>
-                          {new Intl.DateTimeFormat("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "numeric",
-                            hour12: true,
-                          }).format(
-                            new Date(
-                              selectedGuest.reservations[0].check_in_date
-                            )
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex justify-between">
-                        <p>Check Out:</p>
-                        <p>
-                          {new Intl.DateTimeFormat("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "numeric",
-                            hour12: true,
-                          }).format(
-                            new Date(
-                              selectedGuest.reservations[0].check_out_date
-                            )
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="p-4">
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="status">Status</Label>
-                    <div className="flex-1 flex-row flex gap-2">
-                      <Select
-                        value={
-                          selectedGuest.reservations[0]?.status || "default"
-                        }
-                        onValueChange={handleStatusChange}
-                      >
-                        <SelectTrigger
-                          id="status"
-                          className={getStatusColorBadge(
-                            selectedGuest.reservations[0]?.status || "default"
-                          )}
-                        >
-                          <SelectValue
-                            placeholder={
-                              selectedGuest.reservations[0]?.status ||
-                              "Please select"
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ready">Ready</SelectItem>
-                          <SelectItem value="waiting">Waiting</SelectItem>
-                          <SelectItem value="onUse">On Use</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                          <SelectItem value="done">Done</SelectItem>
-                          <SelectItem value="onCleaning">
-                            On Cleaning
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="outline"
-                        onClick={() =>
-                          handleSaveStatus(selectedGuest.reservationType)
-                        }
-                      >
-                        Save Changes
-                      </Button>
                     </div>
                   </div>
-                </Card>
-              </div>
+                  <Separator />
 
-              <div className="w-2/6 flex flex-col gap-2">
-                <Card className="w-full bg-yellow-50 border-yellow-200 shadow-md relative">
-                  <div className="absolute -top-3 -right-3 text-red-500 transform rotate-12">
-                    <PushPin className="w-6 h-6" />
-                  </div>
-
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <Label htmlFor="notes" className="text-lg font-semibold">
-                        Additional Notes
-                      </Label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSaveNotes}
-                        className="bg-white"
-                      >
-                        <Save className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Textarea
-                      id="notes"
-                      placeholder="Type your notes here..."
-                      className="w-full h-28 bg-yellow-50 border-yellow-200 focus:border-yellow-300 focus:ring-yellow-200"
-                      value={notes}
-                      onChange={handleNotesChange}
-                    />
-                  </CardContent>
-                </Card>
-
-                <ScrollArea className="h-[calc(2/4vh-8rem)] w-full">
-                  <Card className="bg-white text-gray-800  rounded-xl shadow-lg">
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <div className="text-center">
-                          <h3 className="text-xl font-bold">Partial Receipt</h3>
-                          <p className="text-sm text-gray-500">
-                            {selectedGuest.guestType}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Date:{" "}
-                            {new Date(
-                              selectedGuest.receiptDate
-                            ).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Separator />
-                        <ScrollArea className="h-[calc(3/4vh-8rem)] w-full">
-                          {(selectedGuest.reservationType === "room" ||
-                            selectedGuest.reservationType === "both") && (
-                            <div className="space-y-2 text-sm">
-                              <h4 className="font-semibold">Room Charges:</h4>
-                              {Object.entries(
-                                selectedGuest.reservations.reduce(
-                                  (acc, reservation) => {
-                                    if (reservation.room_type) {
-                                      const roomType = reservation.room_type;
-                                      const numberOfNights =
-                                        calculateNumberOfNights(
-                                          reservation.check_in_date,
-                                          reservation.check_out_date
-                                        );
-
-                                      if (!acc[roomType]) {
-                                        acc[roomType] = {
-                                          count: 0,
-                                          nights: numberOfNights,
-                                          total: 0,
-                                        };
-                                      }
-                                      acc[roomType].count += 1;
-                                    }
-                                    return acc;
-                                  },
-                                  {}
-                                )
-                              ).map(([roomType, data]) => (
-                                <div
-                                  key={roomType}
-                                  className="flex justify-between"
-                                >
-                                  <span>
-                                    {roomType} ({data.count}) x {data.nights}{" "}
-                                    nights
-                                  </span>
-                                  <span>
-                                    {formatCurrency(
-                                      data.count *
-                                        data.nights *
-                                        roomRates[roomType]
-                                    )}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          {(selectedGuest.reservationType === "venue" ||
-                            selectedGuest.reservationType === "both") && (
-                            <div className="space-y-2 text-sm">
-                              <h4 className="font-semibold">Venue Charges:</h4>
-                              {Object.entries(
-                                selectedGuest.reservations.reduce(
-                                  (acc, venue) => {
-                                    if (!venue.reservation.includes("Room")) {
-                                      const venueType = venue.reservation;
-                                      const venueRate =
-                                        venueRates[venueType] || 0;
-
-                                      if (!acc[venueType]) {
-                                        acc[venueType] = {
-                                          count: 0,
-                                          total: 0,
-                                        };
-                                      }
-                                      acc[venueType].count += 1;
-                                      acc[venueType].total += venueRate;
-                                    }
-                                    return acc;
-                                  },
-                                  {}
-                                )
-                              ).map(([venueType, data]) => (
-                                <div
-                                  key={venueType}
-                                  className="flex justify-between"
-                                >
-                                  <span>{venueType}</span>
-                                  <span>{formatCurrency(data.total)}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </ScrollArea>
-                        <Separator />
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span>Subtotal:</span>
-                            <span>
-                              {formatCurrency(selectedGuest.receiptSubTotal)}
-                            </span>
-                          </div>
-                          {selectedGuest.receiptDiscounts.map(
-                            (discount, index) => (
+                  <div className="flex-grow">
+                    {selectedGuest.reservationType === "both" ? (
+                      <>
+                        <h4 className="font-semibold my-2">
+                          Room Reservations (
+                          {selectedGuest.reservationRoomID.length}):
+                        </h4>
+                        <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
+                          {selectedGuest.reservations
+                            .filter(
+                              (reservation) =>
+                                reservation.reservation &&
+                                reservation.reservation.includes("Room")
+                            )
+                            .map((reservation, index) => (
                               <div
                                 key={index}
-                                className="flex justify-between text-green-600"
+                                className="mb-2 p-2 bg-gray-50 rounded"
                               >
-                                <span>{discount.discount_name}:</span>
-                                <span>
-                                  -{formatCurrency(selectedGuest.receiptSubTotal * discount.discount_percentage/100)}
-                                </span>
+                                <p className="font-medium">
+                                  {reservation.reservation}
+                                </p>
+                              </div>
+                            ))}
+                        </ScrollArea>
+                        <h4 className="font-semibold my-2">
+                          Venue Reservations (
+                          {selectedGuest.reservationVenueID.length}):
+                        </h4>
+                        <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
+                          {selectedGuest.reservations
+                            .filter(
+                              (reservation) =>
+                                reservation.reservation &&
+                                !reservation.reservation.includes("Room")
+                            )
+                            .map((reservation, index) => (
+                              <div
+                                key={index}
+                                className="mb-2 p-2 bg-gray-50 rounded"
+                              >
+                                <p className="font-medium">
+                                  {reservation.reservation}
+                                </p>
+                              </div>
+                            ))}
+                        </ScrollArea>
+                      </>
+                    ) : (
+                      <>
+                        <h4 className="font-semibold my-2">
+                          {selectedGuest.reservationType} Reservations (
+                          {selectedGuest.reservations.length}):
+                        </h4>
+                        <ScrollArea className="h-[calc(55vh-8rem)] w-[95%] p-2">
+                          {selectedGuest.reservations.map(
+                            (reservation, index) => (
+                              <div
+                                key={index}
+                                className="mb-2 p-2 bg-gray-50 rounded"
+                              >
+                                <p className="font-medium">
+                                  {reservation.reservation}
+                                </p>
                               </div>
                             )
                           )}
-                          <div className="flex justify-between font-bold">
-                            <span>Total:</span>
-                            <span>
-                              {formatCurrency(selectedGuest.receiptTotal)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </ScrollArea>
-              </div>
-
-              <div className="relative bottom-0">
-                <div className="flex justify-between flex-col h-full items-center gap-2">
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleClose}
-                      className="bg-white"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleGeneratePDF}
-                      className="bg-white"
-                    >
-                      <Files className="h-4 w-4" />
-                    </Button>
+                        </ScrollArea>
+                      </>
+                    )}
                   </div>
 
-                  <div className="flex relative bottom-0">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(selectedGuest)}
+                  <Separator className="my-2" />
+
+                  <div className="mt-auto text-sm text-gray-600">
+                    <div className="flex justify-between">
+                      <p>Check In:</p>
+                      <p>
+                        {new Intl.DateTimeFormat("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: true,
+                        }).format(
+                          new Date(selectedGuest.reservations[0].check_in_date)
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p>Check Out:</p>
+                      <p>
+                        {new Intl.DateTimeFormat("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: true,
+                        }).format(
+                          new Date(selectedGuest.reservations[0].check_out_date)
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="p-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="status">Status</Label>
+                  <div className="flex-1 flex-row flex gap-2">
+                    <Select
+                      value={selectedGuest.reservations[0]?.status || "default"}
+                      onValueChange={handleStatusChange}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <SelectTrigger
+                        id="status"
+                        className={getStatusColorBadge(
+                          selectedGuest.reservations[0]?.status || "default"
+                        )}
+                      >
+                        <SelectValue
+                          placeholder={
+                            selectedGuest.reservations[0]?.status ||
+                            "Please select"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ready">Ready</SelectItem>
+                        <SelectItem value="waiting">Waiting</SelectItem>
+                        <SelectItem value="onUse">On Use</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                        <SelectItem value="onCleaning">On Cleaning</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        handleSaveStatus(selectedGuest.reservationType)
+                      }
+                    >
+                      Save Changes
                     </Button>
                   </div>
                 </div>
+              </Card>
+            </div>
+
+            <div className="w-2/6 flex flex-col gap-2">
+              <Card className="w-full bg-yellow-50 border-yellow-200 shadow-md relative">
+                <div className="absolute -top-3 -right-3 text-red-500 transform rotate-12">
+                  <PushPin className="w-6 h-6" />
+                </div>
+
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <Label htmlFor="notes" className="text-lg font-semibold">
+                      Additional Notes
+                    </Label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSaveNotes}
+                      className="bg-white"
+                    >
+                      <Save className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Textarea
+                    id="notes"
+                    placeholder="Type your notes here..."
+                    className="w-full h-28 bg-yellow-50 border-yellow-200 focus:border-yellow-300 focus:ring-yellow-200"
+                    value={notes}
+                    onChange={handleNotesChange}
+                  />
+                </CardContent>
+              </Card>
+
+              <ScrollArea className="h-[calc(2/4vh-8rem)] w-full">
+                <Card className="bg-white text-gray-800  rounded-xl shadow-lg">
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <h3 className="text-xl font-bold">Partial Receipt</h3>
+                        <p className="text-sm text-gray-500">
+                          {selectedGuest.guestType}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Date:{" "}
+                          {new Date(
+                            selectedGuest.receiptDate
+                          ).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Separator />
+                      <ScrollArea className="h-[calc(3/4vh-8rem)] w-full">
+                        {(selectedGuest.reservationType === "room" ||
+                          selectedGuest.reservationType === "both") && (
+                          <div className="space-y-2 text-sm">
+                            <h4 className="font-semibold">Room Charges:</h4>
+                            {Object.entries(
+                              selectedGuest.reservations.reduce(
+                                (acc, reservation) => {
+                                  if (reservation.room_type) {
+                                    const roomType = reservation.room_type;
+                                    const numberOfNights =
+                                      calculateNumberOfNights(
+                                        reservation.check_in_date,
+                                        reservation.check_out_date
+                                      );
+
+                                    if (!acc[roomType]) {
+                                      acc[roomType] = {
+                                        count: 0,
+                                        nights: numberOfNights,
+                                        total: 0,
+                                      };
+                                    }
+                                    acc[roomType].count += 1;
+                                  }
+                                  return acc;
+                                },
+                                {}
+                              )
+                            ).map(([roomType, data]) => (
+                              <div
+                                key={roomType}
+                                className="flex justify-between"
+                              >
+                                <span>
+                                  {roomType} ({data.count}) x {data.nights}{" "}
+                                  nights
+                                </span>
+                                <span>
+                                  {formatCurrency(
+                                    data.count *
+                                      data.nights *
+                                      roomRates[roomType]
+                                  )}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {(selectedGuest.reservationType === "venue" ||
+                          selectedGuest.reservationType === "both") && (
+                          <div className="space-y-2 text-sm">
+                            <h4 className="font-semibold">Venue Charges:</h4>
+                            {Object.entries(
+                              selectedGuest.reservations.reduce(
+                                (acc, venue) => {
+                                  if (!venue.reservation.includes("Room")) {
+                                    const venueType = venue.reservation;
+                                    const venueRate =
+                                      venueRates[venueType] || 0;
+
+                                    if (!acc[venueType]) {
+                                      acc[venueType] = {
+                                        count: 0,
+                                        total: 0,
+                                      };
+                                    }
+                                    acc[venueType].count += 1;
+                                    acc[venueType].total += venueRate;
+                                  }
+                                  return acc;
+                                },
+                                {}
+                              )
+                            ).map(([venueType, data]) => (
+                              <div
+                                key={venueType}
+                                className="flex justify-between"
+                              >
+                                <span>{venueType}</span>
+                                <span>{formatCurrency(data.total)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </ScrollArea>
+                      <Separator />
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Subtotal:</span>
+                          <span>
+                            {formatCurrency(selectedGuest.receiptSubTotal)}
+                          </span>
+                        </div>
+                        {selectedGuest.receiptDiscounts.map(
+                          (discount, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between text-green-600"
+                            >
+                              <span>{discount.discount_name}:</span>
+                              <span>
+                                -
+                                {formatCurrency(
+                                  (selectedGuest.receiptSubTotal *
+                                    discount.discount_percentage) /
+                                    100
+                                )}
+                              </span>
+                            </div>
+                          )
+                        )}
+                        <div className="flex justify-between font-bold">
+                          <span>Total:</span>
+                          <span>
+                            {formatCurrency(selectedGuest.receiptTotal)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </ScrollArea>
+            </div>
+{/* buttons */}
+            <div className="relative bottom-0">
+              <div className="flex justify-between flex-col h-full items-center gap-2">
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClose}
+                    className="bg-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGeneratePDF}
+                    className="bg-white"
+                  >
+                    <Files className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="flex relative bottom-0">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(selectedGuest)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </Card>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent>

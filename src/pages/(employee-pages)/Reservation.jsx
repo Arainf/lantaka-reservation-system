@@ -507,13 +507,17 @@ export default function Component() {
               key={roomId}
               variant={isAvailable && isReady ? "default" : "outline"}
               className={`h-15 poppins-semibold ${
-                isAvailable
-                  ? isSelected
-                    ? "bg-slate-900 text-white"
-                    : "bg-green-400 text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                isAvailable 
+                  ? (isSelected 
+                      ? "bg-sky-500 text-white" 
+                      : !isReady 
+                        ? "bg-red-500 text-white" 
+                        : "bg-green-500 text-primary-foreground")
+                  : isReady 
+                    ? "bg-muted text-muted-foreground" 
+                    : "bg-red-500 text-white"
               }`}
-              disabled={!isAvailable}
+              disabled={!isReady || !isAvailable}
               onClick={() => handleRoomClick(roomId, roomType)}
             >
               {formatRoomName(roomId)}
@@ -570,13 +574,15 @@ export default function Component() {
               key={venueId}
               variant={isAvailable && isReady ? "default" : "outline"}
               className={`h-15 w-auto poppins-semibold ${
-                isAvailable
-                  ? isSelected
-                    ? "bg-sky-500 text-white"
-                    : "bg-green-500 text-primary-foreground"
-                  : isReady
-                  ? "bg-muted text-muted-foreground"
-                  : "bg-red-500 text-white"
+                isAvailable 
+                  ? (isSelected 
+                      ? "bg-sky-500 text-white" 
+                      : isReady 
+                        ? "bg-red-500 text-white" 
+                        : "bg-green-500 text-primary-foreground")
+                  : isReady 
+                    ? "bg-muted text-muted-foreground" 
+                    : "bg-red-500 text-white"
               }`}
               disabled={!isReady || !isAvailable}
               onClick={() => handleVenueClick(venueId)}

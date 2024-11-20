@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
 import { useReservationsContext } from "@/context/reservationContext"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -131,7 +132,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
         <NavigationTop onSidebarToggle={toggleSidebar} />
 
         <main className="p-6 space-y-6">
-          <h1 className="text-2xl font-bold">Reservations Management</h1>
+          <h1 className="text-xl font-bold">Reservations Management</h1>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="relative">
@@ -189,13 +190,16 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
             </div>
           )}
           <div>
-            <ReservationsTable
-              key={tableKey}
-              data={filteredReservations}
-              onDelete={handleDelete}
-              onSort={handleSort}
-              sortConfig={sortConfig}
-            />
+
+                <ReservationsTable
+                key={tableKey}
+                data={filteredReservations}
+                onDelete={handleDelete}
+                onSort={handleSort}
+                sortConfig={sortConfig}
+              />
+
+            
           </div>
         </main>
       </div>
