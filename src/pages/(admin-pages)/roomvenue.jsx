@@ -1,4 +1,22 @@
+<<<<<<< HEAD
 "use client";
+=======
+'use client'
+
+import React, { useState, useEffect, useRef } from "react"
+import { createIcons, icons } from "lucide"
+import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
+import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
+import { Filter, Search, X, RefreshCw, Plus, Edit, Trash2, UserRound, Loader2 } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import DeleteModal from "@/components/ui/deletemodal"
+import { useForm, FormProvider } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import roomTypeImage from "@/assets/images/hotel_room.jpg"
+import * as z from "zod"
+import { cn } from "@/lib/utils"
+>>>>>>> 0ed7cafcb63a3ce668b6ddef8fd74c7b94f73c4d
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -74,6 +92,7 @@ export default function VenueRoomManagement({
   const [newItemRoomType, setNewItemRoomType] = useState("");
   const [newItemId, setNewItemId] = useState("");
 
+<<<<<<< HEAD
   const [newItemCapacity, setNewItemCapacity] = useState("");
   const [newItemInternalPrice, setNewItemInternalPrice] = useState("");
   const [newItemExternalPrice, setNewItemExternalPrice] = useState("");
@@ -85,6 +104,60 @@ export default function VenueRoomManagement({
     ...rooms.map((room) => ({ ...room, type: "Room" })),
     ...venues.map((venue) => ({ ...venue, type: "Venue" })),
   ];
+=======
+const dummyItems = [
+  { id: "VENUE001", name: "Old Talisay Bar", type: "Venue",  capacity: 0, status: "Ready" },
+  { id: "VENUE002", name: "Seaside Area", type: "Venue",  capacity: 0, status: "Maintenance"},
+  { id: "ROOM001", name: "Room301", type: "Room",  capacity: 2, roomType: "Double Bed", status: "Cleaning" },
+  { id: "ROOM002", name: "Room302", type: "Room",  capacity: 3, roomType: "Triple Bed" , status: "Maintenance"},
+  { id: "ROOM003", name: "Room303", type: "Room", capacity: 2, roomType: "Matrimonial", status: "Ready"},
+  { id: "ROOMTYPE001", name: "Double Bed", type: "roomType",internalPrice: 1600, externalPrice: 1800, capacity: 2 },
+  { id: "ROOMTYPE002", name: "Triple Bed", type: "roomType",internalPrice: 1900, externalPrice: 1900, capacity: 3 },
+  { id: "ROOMTYPE003", name: "Matrimonial", type: "roomType",internalPrice: 2200, externalPrice: 2500, capacity: 4},
+]
+
+export default function VenueRoomManagement({ sidebarOpen = false, toggleSidebar = () => {} }) {
+  const [items, setItems] = useState(dummyItems)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filters, setFilters] = useState({
+    type: [],
+  })
+  const [tempFilters, setTempFilters] = useState({
+    type: [],
+  })  
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const filterRef = useRef(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [isAddSidebarOpen, setIsAddSidebarOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [editingItem, setEditingItem] = useState(null)
+  const [isAddRoomTypeModalOpen, setIsAddRoomTypeModalOpen] = useState(false);
+
+  const formMethods = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      type: "Room",
+      internalPrice: 0,
+      externalPrice: 0,
+      capacity: 1,
+      roomType: "",
+      status: "Ready",
+    },
+  })
+
+  const roomTypeFormMethods = useForm({
+    resolver: zodResolver(roomTypeFormSchema),
+    defaultValues: {
+      name: "",
+      capacity: 1,
+      internalPrice: 0,
+      externalPrice: 0,
+    },
+  })
+>>>>>>> 0ed7cafcb63a3ce668b6ddef8fd74c7b94f73c4d
 
   useEffect(() => {
     fetchRoomAndVenue();
