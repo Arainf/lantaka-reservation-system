@@ -32,15 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Edit,
-  Save,
-  Trash2,
-  X,
-  Upload,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit, Save, Trash2, X, Upload } from 'lucide-react';
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
 import { useRoomVenueContentsContext } from "@/context/roomandVenueContext";
@@ -61,7 +53,11 @@ export default function VenueRoomManagement({
   const [editedName, setEditedName] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [editedImageUrl, setEditedImageUrl] = useState("");
-  const { rooms, venues, setRooms, setVenues, fetchRoomAndVenue, room_Types } =
+  const [editedCapacity, setEditedCapacity] = useState("");
+  const [editedInternalPrice, setEditedInternalPrice] = useState("");
+  const [editedExternalPrice, setEditedExternalPrice] = useState("");
+  const [editedRoomType, setEditedRoomType] = useState("");
+  const { rooms, venues, setRooms, setVenues, fetchRoomAndVenue, room_Types, fetchRoomTypes  } =
     useRoomVenueContentsContext();
   const itemsPerPage = 8;
   const [filterType, setFilterType] = useState("all");
@@ -88,11 +84,12 @@ export default function VenueRoomManagement({
 
   useEffect(() => {
     fetchRoomAndVenue();
+    fetchRoomTypes();
   }, [renders]);
 
   useEffect(() => {
     setRoomTypes(room_Types);
-  }, []);
+  }, [renders]);
 
   const filteredItems = allItems.filter((item) => {
     const matchesSearch =
@@ -145,6 +142,10 @@ export default function VenueRoomManagement({
       item.room_type?.room_type_description || item.venue_description
     );
     setEditedImageUrl(item.room_type?.room_type_img_url || item.venue_img_url);
+    setEditedCapacity(item.venue_capacity || item.room_type?.room_type_capacity || "");
+    setEditedInternalPrice(item.venue_pricing_internal || item.room_type?.room_type_price_internal || "");
+    setEditedExternalPrice(item.venue_pricing_external || item.room_type?.room_type_price_external || "");
+    setEditedRoomType(item.room_type?.room_type_id || "");
     setIsDialogOpen(true);
     setIsEditing(false);
   };
@@ -164,9 +165,17 @@ export default function VenueRoomManagement({
       status: status,
     };
 
+    if (selectedItem.type === "Venue") {
+      updatedItem.capacity = parseInt(editedCapacity);
+      updatedItem.pricing_internal = parseFloat(editedInternalPrice);
+      updatedItem.pricing_external = parseFloat(editedExternalPrice);
+    } else if (selectedItem.type === "Room") {
+      updatedItem.room_type_id = editedRoomType;
+    }
+
     if (
       editedImageUrl !==
-      (selectedItem.room_type?.room_type_img_url || selectedItem.venue_img_url)
+      selectedItem.venue_img_url
     ) {
       updatedItem.image_url = editedImageUrl;
     }
@@ -203,10 +212,12 @@ export default function VenueRoomManagement({
       setIsDialogOpen(false);
 
       toast({
-        title: "success",
+        title: "Success",
         description: "Item updated successfully",
-        variant: "default",
+        variant: "success",
       });
+
+      setRenderers((prevKey) => prevKey + 1);
     } catch (error) {
       console.error("Error updating item:", error);
       toast({
@@ -245,7 +256,7 @@ export default function VenueRoomManagement({
       toast({
         title: "success",
         description: "Item deleted successfully",
-        variant: "default",
+        variant: "success",
       });
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -359,9 +370,9 @@ export default function VenueRoomManagement({
       setRenderers((prevKey) => prevKey + 1);
 
       toast({
-        title: "success",
+        title: "Success",
         description: "New item added successfully",
-        variant: "default",
+        variant: "success",
       });
     } catch (error) {
       console.error("Error adding new item:", error);
@@ -373,7 +384,7 @@ export default function VenueRoomManagement({
     }
   };
 
-  console.log("available roomTypes:", roomTypes);
+  console.log("room Type: " , roomTypes)
 
   return (
     <>
@@ -469,43 +480,70 @@ export default function VenueRoomManagement({
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
-                  Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                  {Math.min(currentPage * itemsPerPage, filteredItems.length)}{" "}
-                  of {filteredItems.length} entries
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                  {[...Array(totalPages)].map((_, index) => (
-                    <Button
-                      key={index}
-                      variant={
-                        currentPage === index + 1 ? "default" : "outline"
-                      }
-                      size="sm"
-                      onClick={() => handlePageChange(index + 1)}
-                    >
-                      {index + 1}
-                    </Button>
-                  ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+  <div className="text-sm text-muted-foreground">
+    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+    {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
+    {filteredItems.length} entries
+  </div>
+  <div className="flex items-center space-x-2">
+    {/* Previous Button */}
+    <Button
+      variant="outline"
+      onClick={() => handlePageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      Previous
+    </Button>
+
+    {/* Dynamic Pagination */}
+    {Array.from({ length: totalPages }, (_, index) => {
+      const page = index + 1;
+      const isEllipsis = 
+        (page > 2 && page < currentPage - 1) || 
+        (page < totalPages - 1 && page > currentPage + 1);
+
+      if (isEllipsis) {
+        return (
+          <span key={`ellipsis-${page}`} className="text-muted-foreground">
+            ...
+          </span>
+        );
+      }
+
+      if (
+        page === 1 || 
+        page === totalPages || 
+        Math.abs(currentPage - page) <= 1
+      ) {
+        return (
+          <Button
+            key={page}
+            variant={currentPage === page ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePageChange(page)}
+          >
+            {page}
+          </Button>
+        );
+      }
+
+      return null;
+    })}
+
+    {/* Next Button */}
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => handlePageChange(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      Next
+      <ChevronRight className="h-4 w-4" />
+    </Button>
+  </div>
+</div>
+
             </div>
           </div>
         </div>
@@ -549,9 +587,24 @@ export default function VenueRoomManagement({
                             <div className="flex flex-row gap-4 w-full justify-between">
                               <div className="px-6">
                                 <p className="font-medium">Room Type</p>
-                                <p className="text-muted-foreground">
-                                  {selectedItem?.room_type?.room_type_name}
-                                </p>
+                                {isEditing ? (
+                                  <Select value={editedRoomType} onValueChange={setEditedRoomType}>
+                                    <SelectTrigger className="w-[180px]">
+                                      <SelectValue placeholder="Select room type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {roomTypes.map((type) => (
+                                        <SelectItem key={type.room_type_id} value={type.room_type_id}>
+                                          {type.room_type_name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <p className="text-muted-foreground">
+                                    {selectedItem?.room_type?.room_type_name}
+                                  </p>
+                                )}
                               </div>
                               <div className="px-6">
                                 <p className="font-medium">Capacity</p>
@@ -587,25 +640,59 @@ export default function VenueRoomManagement({
                           <>
                             <div>
                               <p className="font-medium">Capacity</p>
-                              <p className="text-muted-foreground">
-                                {selectedItem?.venue_capacity} persons
-                              </p>
+                              {isEditing ? (
+                                <Input
+                                  type="number"
+                                  value={editedCapacity}
+                                  onChange={(e) => setEditedCapacity(e.target.value)}
+                                  className="mt-1"
+                                />
+                              ) : (
+                                <p className="text-muted-foreground">
+                                  {selectedItem?.venue_capacity} persons
+                                </p>
+                              )}
                             </div>
                             <div>
                               <p className="font-medium">Pricing</p>
                               <div className="space-y-1">
-                                <p className="text-sm">
-                                  Internal:{" "}
-                                  {formatPrice(
-                                    selectedItem?.venue_pricing_internal
-                                  )}
-                                </p>
-                                <p className="text-sm">
-                                  External:{" "}
-                                  {formatPrice(
-                                    selectedItem?.venue_pricing_external
-                                  )}
-                                </p>
+                                {isEditing ? (
+                                  <>
+                                    <div className="flex items-center space-x-2">
+                                      <Label htmlFor="internal-price">Internal:</Label>
+                                      <Input
+                                        id="internal-price"
+                                        type="number"
+                                        value={editedInternalPrice}
+                                        onChange={(e) => setEditedInternalPrice(e.target.value)}
+                                      />
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <Label htmlFor="external-price">External:</Label>
+                                      <Input
+                                        id="external-price"
+                                        type="number"
+                                        value={editedExternalPrice}
+                                        onChange={(e) => setEditedExternalPrice(e.target.value)}
+                                      />
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p className="text-sm">
+                                      Internal:{" "}
+                                      {formatPrice(
+                                        selectedItem?.venue_pricing_internal
+                                      )}
+                                    </p>
+                                    <p className="text-sm">
+                                      External:{" "}
+                                      {formatPrice(
+                                        selectedItem?.venue_pricing_external
+                                      )}
+                                    </p>
+                                  </>
+                                )}
                               </div>
                             </div>
                           </>
@@ -670,7 +757,7 @@ export default function VenueRoomManagement({
                         Description
                       </Label>
                     </div>
-                    {isEditing ? (
+                    {isEditing && selectedItem?.type === "Venue" ?  (
                       <Textarea
                         value={editedDescription}
                         onChange={(e) => setEditedDescription(e.target.value)}
@@ -683,44 +770,44 @@ export default function VenueRoomManagement({
                     )}
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Images</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-square relative">
-                      {isEditing ? (
-                        <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
-                          <div className="text-center">
-                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                            <p className="mt-1 text-sm text-gray-600">
-                              Click to upload or drag and drop
-                            </p>
-                            <Input
-                              type="file"
-                              className="sr-only h-full"
-                              onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = (e) =>
-                                    setEditedImageUrl(e.target.result);
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                            />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Images</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="aspect-square relative">
+                        {isEditing && selectedItem?.type === "Venue" ? (
+                          <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
+                            <div className="text-center">
+                              <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                              <p className="mt-1 text-sm text-gray-600">
+                                Click to upload an image
+                              </p>
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                className="mt-2"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => setEditedImageUrl(e.target.result);
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <img
-                          src={editedImageUrl}
-                          alt={`Image of ${editedName}`}
-                          className="object-cover rounded-lg w-full h-full"
-                        />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                        ) : (
+                          <img
+                            src={editedImageUrl}
+                            alt={`Image of ${editedName}`}
+                            className="object-cover rounded-lg w-full h-full"
+                          />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
               </div>
               <div className="flex flex-col justify-between items-center gap-2">
                 <div className="flex flex-col gap-2">

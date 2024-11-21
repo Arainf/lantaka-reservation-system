@@ -4,7 +4,7 @@ import LoginPage from "@/auth/login/login-page";
 import { AccountProvider } from "@/context/contexts";
 
 // import Test Files here
-import DashboardRegistrationForm from "@/pages/Rainier-Test/RegistrationForm";
+import DashboardRegistrationForm from "@/components/common/login-form/RegistrationForm";
 
 import { Component as BarChartComponent } from "@/components/common/charts/BarChartComponent";
 import { UserContext } from "@/context/contexts";

@@ -48,6 +48,7 @@ export const RoomVenueContentsProvider = ({ children }) => {
     setVenues,
     fetchRoomAndVenue,
     room_Types,
+    fetchRoomTypes
   };
 
   return (
