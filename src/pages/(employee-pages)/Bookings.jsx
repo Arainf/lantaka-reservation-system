@@ -1,23 +1,28 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import axios from 'axios'
 import moment from 'moment'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import NavigationTop from '@/components/common/navigatin-side-top/clientNavigationTop'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarIcon, ActivityIcon } from 'lucide-react'
+import { CalendarIcon, ActivityIcon, Search, RefreshCw } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import NavigationTop from '@/components/common/navigatin-side-top/clientNavigationTop'
 import ReservationsTable from "@/components/common/cards/ReservationsTable"
 import { useReservationsContext } from "@/context/reservationContext"
+import BookingSummary from "@/components/common/cards/BookingSummary"
+import UpcomingBooking from "@/components/common/cards/UpcomingBooking"
+import UpcomingBookingdue from "@/components/common/cards/UpcomingBookingdue"
 
-export default function Calendar() {
-  const { reservationsData } = useReservationsContext()
+export default function ReservationCalendar() {
+  const { reservationsData, fetchReservations, deleteData, saveNote } = useReservationsContext()
   const [events, setEvents] = useState([])
   const [bookingSummary, setBookingSummary] = useState({ total: 0, rooms: 0, venues: 0 })
   const [upcomingBookings, setUpcomingBookings] = useState([])
@@ -25,10 +30,10 @@ export default function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [editedEvent, setEditedEvent] = useState(null)
-  const [bookingFilter, setBookingFilter] = useState('all')
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filters, setFilters] = useState({ guest_type: "all", status: "all" })
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' })
   const [tableKey, setTableKey] = useState(0)
 
   useEffect(() => {
@@ -37,10 +42,7 @@ export default function Calendar() {
     fetchUpcomingBookings()
     fetchRecentActivities()
   }, [])
-  const handleDelete = (reservation) => {
-    setReservationToDelete(reservation)
-    setDeleteModalOpen(true)
-  }
+
   const fetchEvents = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/events')
@@ -113,27 +115,63 @@ export default function Calendar() {
     }
   }
 
-  const filteredData = useMemo(() => {
-    return reservationsData.filter((item) => {
-      const typeMatch =
-        bookingFilter === "all" ||
-        (bookingFilter === "room" && item.type === "room") ||
-        (bookingFilter === "event" && item.type === "event");
+  const filteredReservations = useMemo(() => {
+    return reservationsData.filter((reservation) => {
+      const matchesSearch = reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+             reservation.account_name.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesGuestType = filters.guest_type === "all" || reservation.guest_type === filters.guest_type
+      const matchesStatus = filters.status === "all" || reservation.status === filters.status
+      return matchesSearch && matchesGuestType && matchesStatus
+    })
+  }, [reservationsData, searchTerm, filters])
 
-      const searchMatch =
-        searchQuery === "" ||
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.room?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.event?.toLowerCase().includes(searchQuery.toLowerCase());
+  const sortedReservations = useMemo(() => {
+    let sortableItems = [...filteredReservations]
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1
+        }
+        return 0
+      })
+    }
+    return sortableItems.sort((a, b) => {
+      if (a.status === 'Waiting' && b.status !== 'Waiting') return -1
+      if (a.status !== 'Waiting' && b.status === 'Waiting') return 1
+      return 0
+    })
+  }, [filteredReservations, sortConfig])
 
-      return typeMatch && searchMatch;
-    });
-  }, [reservationsData, bookingFilter, searchQuery]);
+  const handleSort = (key) => {
+    let direction = 'ascending'
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending'
+    }
+    setSortConfig({ key, direction })
+  }
 
-  const handleSearch = () => {
-    // The search is already being handled by the useMemo hook above
-    console.log("Searching for:", searchQuery);
-  };
+  const handleDelete = (reservation) => {
+    // Implement delete functionality
+    console.log(`Deleting reservation for ${reservation.guest_name}`)
+  }
+
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prevFilters => ({ ...prevFilters, [filterType]: value }))
+  }
+
+  const resetFilters = () => {
+    setFilters({ guest_type: "all", status: "all" })
+    setSearchTerm("")
+    setSortConfig({ key: null, direction: 'ascending' })
+  }
+
+  const guestTypes = ["internal", "external"]
+  const statuses = ["waiting", "confirmed", "cancelled", "onUse", "onCleaning", "done"]
+
+  const activeFilters = Object.entries(filters).filter(([_, value]) => value !== "all")
 
   return (
     <main className="h-screen overflow-hidden bg-background pt-[65px]">
@@ -143,58 +181,53 @@ export default function Calendar() {
       <div className="flex flex-row pt-[6px] pl-[30px]">
         <div className="space-y-4 flex-grow">
           <h1 className="text-2xl pt-[20px] font-bold">Reservations Management</h1>
-          <div className="flex space-x-2 fixed top-[125px]">
-            <Button
-              variant={bookingFilter === "all" ? "default" : "outline"}
-              onClick={() => setBookingFilter("all")}
-            >
-              All
-            </Button>
-            <Button
-              variant={bookingFilter === "room" ? "default" : "outline"}
-              onClick={() => setBookingFilter("room")}
-            >
-              Room
-            </Button>
-            <Button
-              variant={bookingFilter === "event" ? "default" : "outline"}
-              onClick={() => setBookingFilter("event")}
-            >
-              Event
-            </Button>
-          </div>
-
-          <div className="flex items-center space-x-2 mt-6 pl-[230px]">
-            <input
-              type="text"
-              placeholder="Search bookings..."
-              className="border p-2 rounded bg-white text-black placeholder-gray-500"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button
-              className="bg-white text-black border border-gray-300"
-              onClick={handleSearch}
-            >
-              Search
-            </Button>
-          </div>
-
-          <div className="flex w-[110%] h-[510px] relative top-[20px] pr-[140px] drop-shadow-[0_10px_20px_rgba(0,0,0,0.15)] overflow-hidden">
-            <div className="w-full h-full overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-              <ReservationsTable 
-                data={reservationsData}
-                              keys={tableKey}
-
-                onDelete={handleDelete}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
-
-              />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by name or account..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
+                />
+                <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                  <Search className="text-gray-900" size={18} />
+                </div>
+              </div>
+              <Select value={filters.guest_type} onValueChange={(value) => handleFilterChange('guest_type', value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Guest Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Guest Types</SelectItem>
+                  {guestTypes.map((type) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(activeFilters.length > 0 || searchTerm) && (
+                <Button
+                  variant="ghost"
+                  onClick={resetFilters}
+                  title="Reset all filters"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              )}
             </div>
-          </div>
-
-          <div className="flex justify-center p-4 relative -top-[609px] left-[440px]">
+            <div className="flex justify-center  p-4">
             <Button
               onClick={() => setIsCalendarModalOpen(true)}
               className="px-6 py-2 text-sm rounded-lg"
@@ -203,10 +236,41 @@ export default function Calendar() {
               Open Calendar
             </Button>
           </div>
+          </div>
+          {activeFilters.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {activeFilters.map(([key, value]) => (
+                <Badge key={key} variant="default">
+                  {value}
+                </Badge>
+              ))}
+            </div>
+          )}
+          
+          <div className="w-[1103px]">
+            <ReservationsTable
+              key={tableKey}
+              data={sortedReservations}
+              onDelete={handleDelete}
+              onSort={handleSort}
+              sortConfig={sortConfig}
+            />
+          </div>
+        
         </div>
 
-        <div className="w-[320px] flex flex-col">
-          <Card className="mb-4 shadow-md">
+        <div className="fixed w-[320px] ml-[1120px] mt-3 flex flex-col">
+        <BookingSummary
+        data={sortedReservations}
+        />
+        <UpcomingBooking
+        data={sortedReservations}
+        />
+         <UpcomingBookingdue
+        data={sortedReservations}
+        />
+
+        {/* <Card className="mb-4 shadow-md">
             <CardHeader>
               <CardTitle>Booking Summary</CardTitle>
             </CardHeader>
@@ -226,9 +290,9 @@ export default function Calendar() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          <Card className="mb-4 shadow-md">
+          {/* <Card className="mb-4 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5" />
@@ -247,9 +311,9 @@ export default function Calendar() {
                 ))}
               </ScrollArea>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          <Card className="mb-4 shadow-md">
+          {/* <Card className="mb-4 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ActivityIcon className="w-5 h-5" />
@@ -268,7 +332,7 @@ export default function Calendar() {
                 ))}
               </ScrollArea>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
 
@@ -298,19 +362,44 @@ export default function Calendar() {
         </DialogContent>
       </Dialog>
 
-      {isEventDialogOpen && (
-        <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
-          <DialogContent className="max-w-[600px]">
+         {isEventDialogOpen && (
+        <Dialog open={isEventDialogOpen} onOpenChange={handleCloseEventDialog}>
+          <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit Event</DialogTitle>
-              <DialogDescription>Edit booking details below.</DialogDescription>
+              <DialogTitle>Edit Reservation</DialogTitle>
+              <DialogDescription>
+                Modify the reservation details as needed and save changes.
+              </DialogDescription>
             </DialogHeader>
-            <div>
-              <p className="text-sm">Status: {editedEvent?.status}</p>
+            <div className="space-y-4">
+              {/* Add form inputs here to edit the reservation */}
+              <div>
+                <label className="block text-sm font-medium">Status</label>
+                <Select
+                  value={editedEvent?.status || ''}
+                  onValueChange={(value) => 
+                    setEditedEvent((prev) => ({ ...prev, status: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statuses.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Additional form fields for other editable properties */}
             </div>
             <DialogFooter>
+              <Button variant="secondary" onClick={handleCloseEventDialog}>
+                Cancel
+              </Button>
               <Button onClick={handleEditSubmit}>Save Changes</Button>
-              <Button variant="outline" onClick={handleCloseEventDialog}>Cancel</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

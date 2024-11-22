@@ -852,6 +852,7 @@ export default function ReservationsTable({ data = [], keys }) {
                             )
                           )}
                         </p>
+                        
                       </div>
                       <div className="flex justify-between">
                         <p>Check Out:</p>
