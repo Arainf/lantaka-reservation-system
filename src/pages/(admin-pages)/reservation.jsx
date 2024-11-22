@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
 import { useReservationsContext } from "@/context/reservationContext"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -56,13 +57,34 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
     fetchReservationsAttachment()
   }, [deleteData, saveNote])
 
-  const filteredReservations = reservationsData.filter((reservation) => {
-    const matchesSearch = reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           reservation.account_name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesGuestType = filters.guest_type === "all" || reservation.guest_type === filters.guest_type
-    const matchesStatus = filters.status === "all" || reservation.status === filters.status
-    return matchesSearch && matchesGuestType && matchesStatus
+// Importance order for statuses
+const statusOrder = {
+  waiting: 1,
+  ready: 2,
+  onUse: 3,
+  onCleaning: 4,
+  done: 5,
+  cancelled: 6,
+};
+
+// Filter and sort the reservations
+const filteredReservations = reservationsData
+  .filter((reservation) => {
+    const matchesSearch =
+      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.account_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGuestType =
+      filters.guest_type === "all" || reservation.guest_type === filters.guest_type;
+    const matchesStatus =
+      filters.status === "all" || reservation.status === filters.status;
+
+    return matchesSearch && matchesGuestType && matchesStatus;
   })
+  .sort((a, b) => {
+    // Sort by the importance of status
+    return statusOrder[a.status] - statusOrder[b.status];
+  });
+
 
   const sortedReservations = React.useMemo(() => {
     let sortableItems = [...filteredReservations]
@@ -98,6 +120,8 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
     setDeleteModalOpen(true)
   }
 
+  
+
   const confirmDelete = () => {
     console.log(`Deleting reservation for ${reservationToDelete.guest_name}`)
     setDeleteModalOpen(false)
@@ -131,7 +155,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
         <NavigationTop onSidebarToggle={toggleSidebar} />
 
         <main className="p-6 space-y-6">
-          <h1 className="text-2xl font-bold">Reservations Management</h1>
+          <h1 className="text-xl font-bold">Reservations Management</h1>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="relative">
@@ -189,13 +213,16 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
             </div>
           )}
           <div>
-            <ReservationsTable
-              key={tableKey}
-              data={filteredReservations}
-              onDelete={handleDelete}
-              onSort={handleSort}
-              sortConfig={sortConfig}
-            />
+
+                <ReservationsTable
+                key={tableKey}
+                data={filteredReservations}
+                onDelete={handleDelete}
+                onSort={handleSort}
+                sortConfig={sortConfig}
+              />
+
+            
           </div>
         </main>
       </div>

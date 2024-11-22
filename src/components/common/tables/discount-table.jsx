@@ -1,0 +1,409 @@
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { usePriceContext } from "@/context/priceContext";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
+
+export default function DiscountTable({ searchTerm }) {
+  const { discountsData, fetchDiscount } = usePriceContext();
+  const [discounts, setDiscounts] = useState([]);
+  const [selectedDiscount, setSelectedDiscount] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newDiscount, setNewDiscount] = useState({
+    name: "",
+    percentage: "",
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const { toast } = useToast();
+  const [renders, setRenderers] = useState(0);
+
+  useEffect(() => {
+    fetchDiscount();
+    if (Array.isArray(discountsData)) {
+      setDiscounts(discountsData);
+    } else {
+      setDiscounts([]);
+    }
+  }, [renders, discountsData, fetchDiscount]);
+
+  useEffect(() => {
+    fetchDiscount();
+  }, [renders, fetchDiscount]);
+
+  const filteredDiscounts = discounts.filter((discount) =>
+    discount.discount_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredDiscounts.length / itemsPerPage);
+  const currentData = filteredDiscounts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleRowClick = (discount) => {
+    setSelectedDiscount(discount);
+    setIsDialogOpen(true);
+  };
+
+  // Add Discount
+  const handleAddDiscount = async () => {
+    // Check if discount name already exists
+    const discountExists = discounts.some(
+      (discount) => discount.discount_name.toLowerCase() === newDiscount.name.toLowerCase()
+    );
+
+    if (discountExists) {
+      toast({
+        title: "Error",
+        description: "A discount with this name already exists",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/discountAdd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          discount_name: newDiscount.name,
+          discount_percentage: parseFloat(newDiscount.percentage),
+        }),
+      });
+
+      if (response.ok) {
+        setRenderers((prevKey) => prevKey + 1);
+        setIsAddDialogOpen(false);
+        setNewDiscount({ name: "", percentage: "" });
+        toast({
+          title: "Success",
+          description: "Discount added successfully",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add discount",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding discount:", error);
+      toast({
+        title: "Error",
+        description: "Error adding discount",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Edit Discount
+  const handleEditDiscount = async () => {
+    // Check if the new name already exists (excluding the current discount)
+    const discountExists = discounts.some(
+      (discount) => 
+        discount.discount_name.toLowerCase() === newDiscount.name.toLowerCase() &&
+        discount.discount_id !== selectedDiscount.discount_id
+    );
+
+    if (discountExists) {
+      toast({
+        title: "Error",
+        description: "A discount with this name already exists",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/discountEdit", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedDiscount.discount_id,
+          discount_name: newDiscount.name,
+          discount_percentage: parseFloat(newDiscount.percentage),
+        }),
+      });
+
+      if (response.ok) {
+        setRenderers((prevKey) => prevKey + 1);
+        setIsEditing(false);
+        setIsDialogOpen(false);
+        toast({
+          title: "Success",
+          description: "Discount updated successfully",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update discount",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error editing discount:", error);
+      toast({
+        title: "Error",
+        description: "Error updating discount",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Delete Discount
+  const handleDeleteDiscount = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/discountDelete?id=${selectedDiscount.discount_id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setRenderers((prevKey) => prevKey + 1);
+        setIsDialogOpen(false);
+        setIsEditing(false);  // Add this line
+        toast({
+          title: "Success",
+          description: "Discount deleted successfully",
+          variant: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to delete discount",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting discount:", error);
+      toast({
+        title: "Error",
+        description: "Error deleting discount",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  return (
+    <>
+      <Toaster />
+      <div className="flex flex-row gap-3 my-5">
+        <h1 className="text-2xl poppins-semibold">Discounts</h1>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Plus className="h-4 w-4 text-black" />
+        </Button>
+      </div>
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-bg-[#0f172a]">
+            <TableHead className="w-[180px] text-white">Name</TableHead>
+            <TableHead className="w-[180px] text-white">Percentage</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {currentData.map((discount) => (
+            <TableRow
+              key={discount.discount_id}
+              className="cursor-pointer"
+              onClick={() => handleRowClick(discount)}
+            >
+              <TableCell className="font-medium">{discount.discount_name}</TableCell>
+              <TableCell>{discount.discount_percentage}%</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <div className="flex items-center justify-between mt-4">
+        <div className="text-sm text-muted-foreground">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredDiscounts.length)} of{" "}
+          {filteredDiscounts.length} entries
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <Button
+              key={index}
+              variant={currentPage === index + 1 ? "default" : "outline"}
+              size="sm"
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </Button>
+          ))}
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Edit/Delete Dialog */}
+      <Dialog 
+        open={isDialogOpen} 
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setIsEditing(false);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{isEditing ? "Edit Discount" : selectedDiscount?.discount_name}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {isEditing ? (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={newDiscount.name}
+                    onChange={(e) =>
+                      setNewDiscount({ ...newDiscount, name: e.target.value })
+                    }
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="percentage" className="text-right">
+                    Percentage
+                  </Label>
+                  <Input
+                    id="percentage"
+                    value={newDiscount.percentage}
+                    onChange={(e) =>
+                      setNewDiscount({ ...newDiscount, percentage: e.target.value })
+                    }
+                    className="col-span-3"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="font-medium">Percentage:</span>
+                  <span className="col-span-3">{selectedDiscount?.discount_percentage}%</span>
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            {isEditing ? (
+              <Button onClick={handleEditDiscount}>Save</Button>
+            ) : (
+              <>
+                <Button variant="destructive" onClick={handleDeleteDiscount}>
+                  Delete
+                </Button>
+                <Button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setNewDiscount({
+                      name: selectedDiscount?.discount_name,
+                      percentage: selectedDiscount?.discount_percentage,
+                    });
+                  }}
+                >
+                  Edit
+                </Button>
+              </>
+            )}
+            <Button onClick={() => {
+              setIsDialogOpen(false);
+              setIsEditing(false);
+            }}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Discount</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input
+                id="name"
+                value={newDiscount.name}
+                onChange={(e) =>
+                  setNewDiscount({ ...newDiscount, name: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="percentage" className="text-right">
+                Percentage
+              </Label>
+              <Input
+                id="percentage"
+                value={newDiscount.percentage}
+                onChange={(e) =>
+                  setNewDiscount({ ...newDiscount, percentage: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleAddDiscount}>Add</Button>
+            <Button onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+

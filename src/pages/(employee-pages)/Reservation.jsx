@@ -152,6 +152,8 @@ export default function Component() {
     },
   })
 
+
+
   useEffect(() => {
     setCapacity({
       "Double capacity": price.double_capacity || 0,
@@ -507,13 +509,17 @@ export default function Component() {
               key={roomId}
               variant={isAvailable && isReady ? "default" : "outline"}
               className={`h-15 poppins-semibold ${
-                isAvailable
-                  ? isSelected
-                    ? "bg-slate-900 text-white"
-                    : "bg-green-400 text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                isAvailable 
+                  ? (isSelected 
+                      ? "bg-sky-500 text-white" 
+                      : !isReady 
+                        ? "bg-red-200 text-white" 
+                        : "bg-green-500 text-primary-foreground")
+                  : isReady 
+                    ? "bg-muted text-muted-foreground" 
+                    : "bg-red-200 text-white"
               }`}
-              disabled={!isAvailable}
+              disabled={!isReady || !isAvailable}
               onClick={() => handleRoomClick(roomId, roomType)}
             >
               {formatRoomName(roomId)}
@@ -570,13 +576,15 @@ export default function Component() {
               key={venueId}
               variant={isAvailable && isReady ? "default" : "outline"}
               className={`h-15 w-auto poppins-semibold ${
-                isAvailable
-                  ? isSelected
-                    ? "bg-sky-500 text-white"
-                    : "bg-green-500 text-primary-foreground"
-                  : isReady
-                  ? "bg-muted text-muted-foreground"
-                  : "bg-red-500 text-white"
+                isAvailable 
+                  ? (isSelected 
+                      ? "bg-sky-500 text-white" 
+                      : !isReady 
+                        ? "bg-red-200 text-white" 
+                        : "bg-green-500 text-primary-foreground")
+                  : isReady 
+                    ? "bg-muted text-muted-foreground" 
+                    : "bg-red-200 text-white"
               }`}
               disabled={!isReady || !isAvailable}
               onClick={() => handleVenueClick(venueId)}
@@ -1331,7 +1339,38 @@ export default function Component() {
 
           <div className="w-1/3 flex flex-col gap-2">
 
-                <CostCalculator
+<Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <IoIosBriefcase className="mr-2" />
+                  Price Rundown
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Initial Total:</span>
+                  <span>{formatCurrency(initialTotalPrice)}</span>
+                </div>
+                {discounts &&
+                  discounts.map((d, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between text-green-600"
+                    >
+                      <span>{d.type} Discount:</span>
+                      <span>- {formatCurrency(Number(d.Amount))}</span>
+                    </div>
+                  ))}
+                <Separator />
+                <div className="flex justify-between font-bold">
+                  <span>Final Total:</span>
+                  <span>{formatCurrency(formData.totalPrice)}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+
+                {/* <CostCalculator
                   clientType={clientType}
                   selectedRooms={getSelectedRooms()}
                   selectedVenues={selectedVenues}
@@ -1339,8 +1378,8 @@ export default function Component() {
                     form.getValues("dateRangeRoom") ||
                     form.getValues("dateRangeVenue")
                   )}
-                  showDiscount={false}
-                />
+                  showDiscount={true}
+                /> */}
 
 
             <div className="flex justify-end mt-4 space-x-2">

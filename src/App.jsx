@@ -5,12 +5,17 @@ import { UserProvider, AccountProvider, ReservationProvider, RoomandVenueProvide
 import { PriceProvider } from './context/priceContext';
 import { GuestProvider } from './context/guestContext';
 import { ReservationsProvider } from './context/reservationContext';
-import { DashboardProvider } from './context/dashboardContext'; // Import the context setup
+import { DashboardProvider } from './context/dashboardContext';
+import  { RoomVenueContentsProvider } from './context/roomandVenueContext';
+import { RegistrationProvider } from './context/registrationContext';
+
+
 
 
 function App() {
   return (
     <>
+    <RegistrationProvider>
     <UserProvider>
       <AccountProvider>
         <ReservationProvider>
@@ -18,9 +23,11 @@ function App() {
             <PriceProvider>
               <GuestProvider>
                 <DashboardProvider>
-                <ReservationsProvider>
-                  <AppRoutes />
-                </ReservationsProvider>
+                  <ReservationsProvider>
+                    <RoomVenueContentsProvider>
+                      <AppRoutes />
+                    </RoomVenueContentsProvider>
+                  </ReservationsProvider>
                 </DashboardProvider>
               </GuestProvider>
             </PriceProvider>
@@ -28,6 +35,7 @@ function App() {
         </ReservationProvider>
       </AccountProvider>
     </UserProvider> 
+    </RegistrationProvider>
     </>
   );
 }
