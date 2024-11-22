@@ -5,18 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search } from "lucide-react"; // Make sure to import Search icon
 
 export default function ReservationsTable({ data = [] }) {
   const [filter, setFilter] = useState("all");
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("newest");
+  const [searchTerm, setSearchTerm] = useState(""); // New state for search term
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
     let dataToFilter = data;
+
+    // Apply search filter
+    if (searchTerm) {
+      dataToFilter = dataToFilter.filter((reservation) =>
+        reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply type filter
     if (filter !== "all") {
-      dataToFilter = data.filter((reservation) =>
+      dataToFilter = dataToFilter.filter((reservation) =>
         filter === "room"
           ? reservation.reservation_type === "room"
           : filter === "venue"
@@ -75,7 +87,7 @@ export default function ReservationsTable({ data = [] }) {
       const dateB = new Date(b.receiptDate);
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
-  }, [data, filter, sortOrder]);
+  }, [data, filter, sortOrder, searchTerm]);
 
   const getStatusColorBadge = (status) => {
     const statusColors = {
@@ -107,35 +119,25 @@ export default function ReservationsTable({ data = [] }) {
 
     return (
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-        <div className="bg-white p-6 rounded-lg w-1/2 max-h-[90vh] overflow-y-auto">
+       
+        <div className="bg-white p-6 rounded-lg w-1/2  w-[1000px] max-h-[90vh] overflow-y-auto">
         <button
-            onClick={onClose}
-            className="absolute top-[80px] right-[320px] bg-red-500 text-white"
-          >
-            X
-          </button>
-          <h2 className="text-xl font-bold mb-4">Reservation Details</h2>
+  onClick={() => setIsModalOpen(false)}
+  className="absolute top-[90px] left-[360px] text-white text-sm font-bold bg-red-500 p-4 w-10 h-10  flex items-center justify-center"
+>
+  X
+</button>
+
+          <h2 className="text-xl font-bold">Reservation Details</h2>
           <div className="space-y-2 ">
-            
-          <p><strong className="font-semibold ">Guest Name:</strong> {toSentenceCase(reservation.guestName)}</p>
-          <p><strong className="font-semibold ">Guest Email:</strong> {toSentenceCase(reservation.guestEmail)}</p>
-          <p><strong className="font-semibold ">Guest Type:</strong> {toSentenceCase(reservation.guestType)}</p>
-          <p><strong className="font-semibold ">Reservation Type:</strong> {toSentenceCase(reservation.reservationType)}</p>
-          <p><strong className="font-semibold ">Receipt Date:</strong> {new Date(reservation.receiptDate).toLocaleDateString()}</p>
-          <p><strong className="font-semibold ">Receipt Total:</strong> ${reservation.receiptTotal}</p>
-          <p><strong className="font-semibold ">Receipt Subtotal:</strong> ${reservation.receiptSubTotal}</p>
-          <p><strong className="font-semibold ">Additional Notes:</strong> {reservation.additionalNotes ? toSentenceCase(reservation.additionalNotes) : 'N/A'}</p>
-
-
-            <div>
+                    <div>
               <h4 className="font-semibold my-2">
                 {toSentenceCase(reservation.reservationType)} Reservations ({reservation.reservations.length}):
               </h4>
-              <ScrollArea className="h-[200px] w-full p-2 border rounded">
+              <ScrollArea className="h-[200px] p-2 border rounded">
                 {reservation.reservations.map((res, index) => (
                   <div key={index} className="mb-2 p-2 bg-gray-50 rounded">
                     <p className="font-medium">{res.reservation || `Reservation ${index + 1}`}</p>
-                    
                   </div>
                 ))}
               </ScrollArea>
@@ -148,52 +150,39 @@ export default function ReservationsTable({ data = [] }) {
 
   return (
     <>
-      <CardContent className="p-6">
-        <div className="mb-4 flex space-x-2">
-          <Button
-            onClick={() => setFilter("all")}
-            variant={filter === "all" ? "default" : "outline"}
-          >
-            All
-          </Button>
-          <Button
-            onClick={() => setFilter("room")}
-            variant={filter === "room" ? "default" : "outline"}
-          >
-            Room
-          </Button>
-          <Button
-            onClick={() => setFilter("venue")}
-            variant={filter === "venue" ? "default" : "outline"}
-          >
-            Event
-          </Button>
-          <Button
-            onClick={() => setSortOrder(sortOrder === "newest" ? "oldest" : "newest")}
-            variant="outline"
-          >
-            Sort {sortOrder === "newest" ? "Oldest" : "Newest"}
-          </Button>
-        </div>
+      <div className="fixed top- left-[50px] mb-4">
+  <input
+    type="text"
+    placeholder="Search by name or account..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
+  />
+  <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+    <Search className="text-gray-900" size={18} />
+  </div>
+</div>
 
+
+      <CardContent className="pt-[50px]">
         <div className="space-y-4">
           {filteredData.map((reservation, index) => (
             <Card key={index} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => openModal(reservation)}>
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold">
+              <div className="flex items-center justify-between relative">
+                <div className="font-bold">
                     {toSentenceCase(reservation.guestName)} - {toSentenceCase(reservation.reservationType)}
-                  </div>
-                  <div className="text-sm text-gray-500">
+                    <div className="mt-2 -py-[50px]">
                     {new Date(reservation.receiptDate).toLocaleDateString()}
-                  </div>
+                    </div>
                 </div>
-                <div className="mt-2 text-sm text-gray-500">
-                  {reservation.guestEmail}
+
+                {/* Absolute positioning for the button */}
+                <div className="absolute top-[px] right-0 text-sm px-[0px] text-gray-500">
+                    <Button>pay then hm yun</Button>
                 </div>
-                <div className="mt-2">
-                  <Badge variant="secondary">{reservation.guestType}</Badge>
                 </div>
+
               </CardContent>
             </Card>
           ))}
@@ -210,4 +199,3 @@ export default function ReservationsTable({ data = [] }) {
     </>
   );
 }
-
