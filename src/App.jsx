@@ -8,6 +8,9 @@ import { ReservationsProvider } from './context/reservationContext';
 import { DashboardProvider } from './context/dashboardContext';
 import  { RoomVenueContentsProvider } from './context/roomandVenueContext';
 import { RegistrationProvider } from './context/registrationContext';
+import { RoomTypeProvider } from './context/RoomTypeContext';
+import { DiscountProvider } from './context/discountContext';
+import { AdditionalFeeProvider } from './context/additionalFeeContext';
 
 
 
@@ -25,7 +28,13 @@ function App() {
                 <DashboardProvider>
                   <ReservationsProvider>
                     <RoomVenueContentsProvider>
-                      <AppRoutes />
+                      <DiscountProvider>
+                      <RoomTypeProvider>
+                        < AdditionalFeeProvider>
+                          <AppRoutes />
+                        </AdditionalFeeProvider>
+                      </RoomTypeProvider>
+                      </DiscountProvider>
                     </RoomVenueContentsProvider>
                   </ReservationsProvider>
                 </DashboardProvider>

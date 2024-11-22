@@ -30,7 +30,7 @@ export default function ReservationsTable({ data = [] }) {
             </div>
             <div>
               <div className="text-2xl font-bold">{bookingSummary.venues}</div>
-              <div className="text-sm text-muted-foreground">Events</div>
+              <div className="text-sm text-muted-foreground">Venues</div>
             </div>
           </div>
         </CardContent>

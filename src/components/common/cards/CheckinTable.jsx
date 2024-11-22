@@ -1,72 +1,43 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search } from "lucide-react"; // Make sure to import Search icon
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Calendar, User, DollarSign, X } from 'lucide-react';
 
-export default function ReservationsTable({ data = [] }) {
-  const [filter, setFilter] = useState("all");
+const ReservationsTable = ({ data = [] }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedReservation, setSelectedReservation] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState("newest");
-  const [searchTerm, setSearchTerm] = useState(""); // New state for search term
   const { toast } = useToast();
 
   const filteredData = useMemo(() => {
-    let dataToFilter = data;
+    return data.filter((reservation) =>
+      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [data, searchTerm]);
 
-    // Apply search filter
-    if (searchTerm) {
-      dataToFilter = dataToFilter.filter((reservation) =>
-        reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Apply type filter
-    if (filter !== "all") {
-      dataToFilter = dataToFilter.filter((reservation) =>
-        filter === "room"
-          ? reservation.reservation_type === "room"
-          : filter === "venue"
-          ? reservation.reservation_type === "venue"
-          : true
-      );
-    }
-
-    const groupedData = dataToFilter.reduce((acc, reservation) => {
+  const groupedData = useMemo(() => {
+    return filteredData.reduce((acc, reservation) => {
       const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.reservation_checkin}-${reservation.reservation_checkout}-${reservation.receipt_total_amount}`;
 
       if (!acc[key]) {
         acc[key] = {
-          guestId: reservation.guest_id,
-          guestName: reservation.guest_name,
-          guestEmail: reservation.guest_email,
-          guestType: reservation.guest_type,
-          reservationType: reservation.reservation_type,
-          receiptDate: reservation.receipt_date,
-          receiptTotal: reservation.receipt_total_amount,
-          receiptSubTotal: reservation.receipt_initial_total,
-          additionalNotes: reservation.additional_notes,
+          ...reservation,
           receiptDiscounts: [],
           reservations: [],
           reservationRoomID: [],
           reservationVenueID: [],
-          reservationCheckin: reservation.reservation_checkin,
-          reservationCheckout: reservation.reservation_checkout,
         };
       }
 
       reservation.receipt_discounts.forEach((discount) => {
-        if (
-          discount &&
-          !acc[key].receiptDiscounts.some(
-            (d) => d.discount_id === discount.discount_id
-          )
-        ) {
+        if (discount && !acc[key].receiptDiscounts.some((d) => d.discount_id === discount.discount_id)) {
           acc[key].receiptDiscounts.push(discount);
         }
       });
@@ -81,121 +52,150 @@ export default function ReservationsTable({ data = [] }) {
 
       return acc;
     }, {});
+  }, [filteredData]);
 
-    return Object.values(groupedData).sort((a, b) => {
-      const dateA = new Date(a.receiptDate);
-      const dateB = new Date(b.receiptDate);
-      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-    });
-  }, [data, filter, sortOrder, searchTerm]);
+  const sortedData = useMemo(() => {
+    return Object.values(groupedData).sort((a, b) => new Date(b.receipt_date).getTime() - new Date(a.receipt_date).getTime());
+  }, [groupedData]);
 
-  const getStatusColorBadge = (status) => {
-    const statusColors = {
-      ready: "bg-green-200 text-green-800",
-      waiting: "bg-yellow-200 text-yellow-800",
-      onUse: "bg-blue-200 text-blue-800",
-      cancelled: "bg-red-200 text-red-800",
-      done: "bg-purple-200 text-purple-800",
-      onCleaning: "bg-orange-200 text-orange-800",
-    };
-    return statusColors[status] || "bg-gray-100 text-gray-800";
-  };
+  const ReservationCard = ({ reservation }) => (
+    <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <User className="text-gray-400" size={24} />
+            <div>
+              <h3 className="font-bold text-lg">{reservation.guest_name}</h3>
+              <p className="text-sm text-gray-500">{reservation.guest_email}</p>
+            </div>
+          </div>
+          <Badge variant={reservation.reservation_type === "room" ? "default" : "secondary"}>
+            {reservation.reservation_type.charAt(0).toUpperCase() + reservation.reservation_type.slice(1)}
+          </Badge>
+        </div>
+        <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+          <div className="flex items-center">
+            <Calendar className="mr-2" size={16} />
+            {new Date(reservation.receipt_date).toLocaleDateString()}
+          </div>
+          <div className="flex items-center">
+            <DollarSign className="mr-2" size={16} />
+            {reservation.receipt_total_amount.toFixed(2)}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
-  function toSentenceCase(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
-
-  const openModal = (reservation) => {
-    setSelectedReservation(reservation);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const Modal = ({ isOpen, reservation, onClose }) => {
-    if (!isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
-       
-        <div className="bg-white p-6 rounded-lg w-1/2  w-[1000px] max-h-[90vh] overflow-y-auto">
-        <button
-  onClick={() => setIsModalOpen(false)}
-  className="absolute top-[90px] left-[360px] text-white text-sm font-bold bg-red-500 p-4 w-10 h-10  flex items-center justify-center"
->
-  X
-</button>
-
-          <h2 className="text-xl font-bold">Reservation Details</h2>
-          <div className="space-y-2 ">
-                    <div>
-              <h4 className="font-semibold my-2">
-                {toSentenceCase(reservation.reservationType)} Reservations ({reservation.reservations.length}):
-              </h4>
-              <ScrollArea className="h-[200px] p-2 border rounded">
+  const ReservationModal = ({ reservation, onClose }) => (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Reservation Details</DialogTitle>
+      </DialogHeader>
+      <Tabs defaultValue="details" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="reservations">Reservations</TabsTrigger>
+          <TabsTrigger value="discounts">Discounts</TabsTrigger>
+        </TabsList>
+        <TabsContent value="details">
+          <Card>
+            <CardHeader>
+              <CardTitle>Guest Information</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p><strong>Name:</strong> {reservation.guest_name}</p>
+              <p><strong>Email:</strong> {reservation.guest_email}</p>
+              <p><strong>Type:</strong> {reservation.guest_type}</p>
+              <p><strong>Check-in:</strong> {reservation.reservation_checkin}</p>
+              <p><strong>Check-out:</strong> {reservation.reservation_checkout}</p>
+              <p><strong>Total Amount:</strong> ${reservation.receipt_total_amount.toFixed(2)}</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="reservations">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reservations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[200px]">
                 {reservation.reservations.map((res, index) => (
                   <div key={index} className="mb-2 p-2 bg-gray-50 rounded">
-                    <p className="font-medium">{res.reservation || `Reservation ${index + 1}`}</p>
+                    <p className="font-medium">
+                      {res.reservation || `Reservation ${index + 1}`}
+                    </p>
                   </div>
                 ))}
               </ScrollArea>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="discounts">
+          <Card>
+            <CardHeader>
+              <CardTitle>Discounts Applied</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {reservation.receiptDiscounts.length > 0 ? (
+                <ul>
+                  {reservation.receiptDiscounts.map((discount, index) => (
+                    <li key={index}>Discount ID: {discount.discount_id}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No discounts applied to this reservation.</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      <div className="mt-4 flex justify-end">
+        <Button onClick={onClose}>Close</Button>
       </div>
-    );
-  };
+    </DialogContent>
+  );
 
   return (
-    <>
-      <div className="fixed top- left-[50px] mb-4">
-  <input
-    type="text"
-    placeholder="Search by name or account..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
-  />
-  <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-    <Search className="text-gray-900" size={18} />
-  </div>
-</div>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Reservations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Input
+              type="text"
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 w-full"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-
-      <CardContent className="pt-[50px]">
-        <div className="space-y-4">
-          {filteredData.map((reservation, index) => (
-            <Card key={index} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => openModal(reservation)}>
-              <CardContent className="p-4">
-              <div className="flex items-center justify-between relative">
-                <div className="font-bold">
-                    {toSentenceCase(reservation.guestName)} - {toSentenceCase(reservation.reservationType)}
-                    <div className="mt-2 -py-[50px]">
-                    {new Date(reservation.receiptDate).toLocaleDateString()}
-                    </div>
-                </div>
-
-                {/* Absolute positioning for the button */}
-                <div className="absolute top-[px] right-0 text-sm px-[0px] text-gray-500">
-                    <Button>Check-in</Button>
-                </div>
-                </div>
-
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </CardContent>
-
-      <Modal
-        isOpen={isModalOpen}
-        reservation={selectedReservation}
-        onClose={closeModal}
-      />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {sortedData.map((reservation, index) => (
+          <Dialog key={index}>
+            <DialogTrigger asChild>
+              <div onClick={() => setSelectedReservation(reservation)}>
+                <ReservationCard reservation={reservation} />
+              </div>
+            </DialogTrigger>
+            <ReservationModal 
+              reservation={reservation}
+              onClose={() => setSelectedReservation(null)}
+            />
+          </Dialog>
+        ))}
+      </div>
 
       <Toaster />
-    </>
+    </div>
   );
-}
+};
+
+export default ReservationsTable;
+

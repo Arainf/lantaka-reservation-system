@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster"
 import DiscountTable from "@/components/common/tables/discount-table"
 import AdditionalFeeTable from "@/components/common/tables/additional-fee-table"
 import RoomTypeTable from "@/components/common/tables/room-type-table"
+import { useRegistrationContext } from "@/context/registrationContext"
 
 export default function AdminUtilies({
   sidebarOpen = false,
@@ -18,6 +19,7 @@ export default function AdminUtilies({
 }) {
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
+  const { renders , setRenderers } = useRegistrationContext();
 
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
@@ -52,9 +54,8 @@ export default function AdminUtilies({
             </Card>
 
             <Card>
-             
               <CardContent>
-                <RoomTypeTable searchTerm={searchTerm} />
+                <RoomTypeTable searchTerm={searchTerm} render={renders} />
               </CardContent>
             </Card>
           </div>

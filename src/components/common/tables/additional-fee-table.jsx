@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -6,65 +6,119 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-
-const initialAdditionalFees = [
-  { id: 1, name: "City Tax", amount: 5, type: "Per Night" },
-  { id: 2, name: "Resort Fee", amount: 20, type: "Per Stay" },
-  { id: 3, name: "Parking", amount: 15, type: "Per Night" },
-  { id: 4, name: "Late Check-out", amount: 50, type: "One-time" },
-  { id: 5, name: "Pet Fee", amount: 25, type: "Per Stay" },
-]
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronLeft, ChevronRight, Plus, Edit, Save } from 'lucide-react';
+import { useAdditionalFees } from "@/context/additionalFeeContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdditionalFeeTable({ searchTerm }) {
-  const [additionalFees, setAdditionalFees] = useState(initialAdditionalFees)
-  const [selectedFee, setSelectedFee] = useState(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [newFee, setNewFee] = useState({ name: "", amount: "", type: "" })
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const { additionalFees, fetchAddFees, addFee, updateFee, deleteFee } = useAdditionalFees();
+  const [selectedFee, setSelectedFee] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newFee, setNewFee] = useState({ additional_fee_name: "", additional_fee_amount: "" });
+  const [editingFee, setEditingFee] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchAddFees();
+  }, [fetchAddFees]);
 
   const filteredFees = additionalFees.filter(fee =>
-    fee.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+    fee && fee.additional_fee_name && fee.additional_fee_name.toLowerCase().includes((searchTerm || "").toLowerCase())
+  );
 
-  const totalPages = Math.ceil(filteredFees.length / itemsPerPage)
-  const currentData = filteredFees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+  const totalPages = Math.ceil(filteredFees.length / itemsPerPage);
+  const currentData = filteredFees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleRowClick = (fee) => {
-    setSelectedFee(fee)
-    setIsDialogOpen(true)
-  }
+    setSelectedFee(fee);
+    setEditingFee({ ...fee });
+    setIsEditing(false);
+    setIsDialogOpen(true);
+  };
 
-  const handleAddFee = () => {
-    const id = additionalFees.length > 0 ? Math.max(...additionalFees.map(f => f.id)) + 1 : 1
-    setAdditionalFees([...additionalFees, { id, ...newFee, amount: parseFloat(newFee.amount) }])
-    setIsAddDialogOpen(false)
-    setNewFee({ name: "", amount: "", type: "" })
-  }
+  const handleAddFee = async () => {
+    try {
+      await addFee({ ...newFee, additional_fee_amount: parseFloat(newFee.additional_fee_amount) });
+      setIsAddDialogOpen(false);
+      setNewFee({ additional_fee_name: "", additional_fee_amount: "" });
+      toast({
+        title: "Success",
+        description: "New fee added successfully.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add new fee.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateFee = async () => {
+    try {
+      await updateFee(editingFee.additional_fee_id, editingFee);
+      setIsDialogOpen(false);
+      setIsEditing(false);
+      fetchAddFees();
+      toast({
+        title: "Success",
+        description: "Fee updated successfully.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update fee.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteFee = async (id) => {
+    try {
+      await deleteFee(id);
+      setIsDialogOpen(false);
+      fetchAddFees();
+      toast({
+        title: "Success",
+        description: "Fee deleted successfully.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete fee.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   return (
     <>
       <div className="flex flex-row gap-3 my-5">
         <h1 className="text-2xl poppins-semibold">Additional Fees</h1>
         <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className=" h-4 w-4 text-black" /> 
+          <Plus className="h-4 w-4 text-black" />
         </Button>
       </div>
       <Table>
@@ -77,12 +131,12 @@ export default function AdditionalFeeTable({ searchTerm }) {
         <TableBody>
           {currentData.map((fee) => (
             <TableRow
-              key={fee.id}
-              className="cursor-pointer "
+              key={fee.additional_fee_id}
+              className="cursor-pointer"
               onClick={() => handleRowClick(fee)}
             >
-              <TableCell className="font-medium">{fee.name}</TableCell>
-              <TableCell>${fee.amount}</TableCell>
+              <TableCell className="font-medium">{fee.additional_fee_name}</TableCell>
+              <TableCell>₱{fee.additional_fee_amount.toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -152,20 +206,64 @@ export default function AdditionalFeeTable({ searchTerm }) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{selectedFee?.name}</DialogTitle>
+            <DialogTitle>{isEditing ? "Edit Fee" : "Fee Details"}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="font-medium">Amount:</span>
-              <span className="col-span-3">${selectedFee?.amount}</span>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="font-medium">Type:</span>
-              <span className="col-span-3">{selectedFee?.type}</span>
-            </div>
+            {isEditing ? (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="edit_fee_name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="edit_fee_name"
+                    value={editingFee?.additional_fee_name || ""}
+                    onChange={(e) => setEditingFee({ ...editingFee, additional_fee_name: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="edit_fee_amount" className="text-right">
+                    Amount (₱)
+                  </Label>
+                  <Input
+                    id="edit_fee_amount"
+                    value={editingFee?.additional_fee_amount || ""}
+                    onChange={(e) => setEditingFee({ ...editingFee, additional_fee_amount: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="font-medium text-right">Name:</span>
+                  <span className="col-span-3">{selectedFee?.additional_fee_name}</span>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="font-medium text-right">Amount:</span>
+                  <span className="col-span-3">₱{selectedFee?.additional_fee_amount.toFixed(2)}</span>
+                </div>
+              </>
+            )}
           </div>
           <DialogFooter>
-            <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+            {isEditing ? (
+              <Button onClick={handleUpdateFee}>
+                <Save className="mr-2 h-4 w-4" />
+                Save
+              </Button>
+            ) : (
+              <Button onClick={() => setIsEditing(true)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            )}
+            <Button onClick={() => handleDeleteFee(selectedFee.additional_fee_id)} variant="destructive">Delete</Button>
+            <Button onClick={() => {
+              setIsEditing(false);
+              setIsDialogOpen(false);
+            }}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -177,35 +275,24 @@ export default function AdditionalFeeTable({ searchTerm }) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
+              <Label htmlFor="additional_fee_name" className="text-right">
                 Name
               </Label>
               <Input
-                id="name"
-                value={newFee.name}
-                onChange={(e) => setNewFee({ ...newFee, name: e.target.value })}
+                id="additional_fee_name"
+                value={newFee.additional_fee_name}
+                onChange={(e) => setNewFee({ ...newFee, additional_fee_name: e.target.value })}
                 className="col-span-3"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="amount" className="text-right">
-                Amount
+              <Label htmlFor="additional_fee_amount" className="text-right">
+                Amount (₱)
               </Label>
               <Input
-                id="amount"
-                value={newFee.amount}
-                onChange={(e) => setNewFee({ ...newFee, amount: e.target.value })}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="type" className="text-right">
-                Type
-              </Label>
-              <Input
-                id="type"
-                value={newFee.type}
-                onChange={(e) => setNewFee({ ...newFee, type: e.target.value })}
+                id="additional_fee_amount"
+                value={newFee.additional_fee_amount}
+                onChange={(e) => setNewFee({ ...newFee, additional_fee_amount: e.target.value })}
                 className="col-span-3"
               />
             </div>
@@ -216,6 +303,6 @@ export default function AdditionalFeeTable({ searchTerm }) {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
 
