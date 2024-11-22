@@ -88,6 +88,7 @@ export default function VenueRoomManagement({
   }, [renders]);
 
   useEffect(() => {
+    fetchRoomTypes();
     setRoomTypes(room_Types);
   }, [renders]);
 
@@ -443,7 +444,7 @@ export default function VenueRoomManagement({
                     {paginatedItems.map((item) => (
                       <TableRow
                         key={item.room_id || item.venue_id}
-                        className="cursor-pointer hover:bg-muted/50"
+                        className="cursor-pointer hover:bg-blue-100"
                         onClick={() => handleRowClick(item)}
                       >
                         <TableCell className="font-medium">

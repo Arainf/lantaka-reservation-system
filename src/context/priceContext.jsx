@@ -25,7 +25,7 @@ export const PriceProvider = ({ children }) => {
     }
   };
 
-  const fetchDisount = async () => {
+  const fetchDiscount = async () => {
     try {
       const response = await fetch(`http://localhost:5000/api/getDiscounts`);
       if (!response.ok) {
@@ -66,7 +66,7 @@ export const PriceProvider = ({ children }) => {
       }
       const data = await response.json();
       // Optionally, refetch the discounts after successful insertion
-      fetchDisount();
+      fetchDiscount();
     } catch (error) {
       console.error("Error inserting discount:", error);
     }
@@ -93,7 +93,7 @@ export const PriceProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchDisount();
+    fetchDiscount();
     fetchAddFees();
   }, []);
 
@@ -114,6 +114,7 @@ export const PriceProvider = ({ children }) => {
     addFeesData,
     insertDiscount,
     insertAddFee,
+    fetchDiscount,
   };
 
   return (

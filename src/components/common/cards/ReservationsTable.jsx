@@ -111,9 +111,10 @@ export default function ReservationsTable({ data = [], keys }) {
       }
 
       acc[key].reservations.push(reservation);
-
+     
       return acc;
     }, {});
+   
 
     const groupedArray = Object.values(result);
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -132,6 +133,8 @@ export default function ReservationsTable({ data = [], keys }) {
       setCurrentPage(newPage);
     }
   };
+
+  // console.log("grouped data:" , groupedData);
 
   // const handleGeneratePDF = async () => {
   //   try {

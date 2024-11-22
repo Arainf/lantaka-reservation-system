@@ -23,7 +23,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Slogo from '@/assets/images/SchoolLogo.png'
-import { toast } from "@/components/ui/toast" // Import toast from ShadCN
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast"; // Import toast from ShadCN
 
 function AccountsTable({ accounts, onDelete }) {
   const [selectedAccount, setSelectedAccount] = useState(null)
@@ -32,6 +33,7 @@ function AccountsTable({ accounts, onDelete }) {
   const itemsPerPage = 5
   const totalPages = Math.ceil(accounts.length / itemsPerPage)
   const currentAccounts = accounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+  const { toast } = useToast();
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -66,12 +68,27 @@ function AccountsTable({ accounts, onDelete }) {
         // Trigger the onDelete callback if deletion is successful
         onDelete(selectedAccount)
         setIsDetailsDialogOpen(false)
-        toast.success('Account deleted successfully') // Show success toast
+        
+        toast({
+          title: "Success",
+          description: "Item updated successfully",
+          variant: "success",
+        });
+ // Show success toast
       } else {
-        toast.error('Failed to delete account') // Show error toast
+        toast({
+          title: "Error",
+          description: "Failed to delete Account",
+          variant: "destructive",
+        }); // Show error toast
       }
     } catch (error) {
-      toast.error('An error occurred while deleting the account') // Show error toast on failure
+      toast({
+        title: "Error",
+        description: "An error occurred while deleting the account",
+        variant: "destructive",
+      });
+  
     }
   }
 
@@ -95,7 +112,7 @@ function AccountsTable({ accounts, onDelete }) {
             <TableRow
               key={account.account_id}
               onClick={() => handleRowClick(account)}
-              className="cursor-pointer hover:bg-gray-100"
+              className="cursor-pointer hover:bg-blue-100"
             >
               <TableCell className="flex items-center space-x-3 py-4">
                 <img src={Slogo} alt="" width={32} height={32} className="rounded-full" />
@@ -241,6 +258,7 @@ function AccountsTable({ accounts, onDelete }) {
           </div>
         </DialogContent>
       </Dialog>
+      <Toaster/>
     </>
   )
 }
