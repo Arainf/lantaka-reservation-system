@@ -111,9 +111,10 @@ export default function ReservationsTable({ data = [], keys }) {
       }
 
       acc[key].reservations.push(reservation);
-
+     
       return acc;
     }, {});
+   
 
     const groupedArray = Object.values(result);
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -126,6 +127,14 @@ export default function ReservationsTable({ data = [], keys }) {
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
   }, [data, currentPage, itemsPerPage]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= itemsPerPage) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  // console.log("grouped data:" , groupedData);
 
   // const handleGeneratePDF = async () => {
   //   try {
@@ -402,7 +411,7 @@ export default function ReservationsTable({ data = [], keys }) {
   };
 
   const handleStatusChange = (value) => {
-    if (selectedGuest) {
+    if (selectedGuest && selectedGuest.reservations[0]?.status !== "done") {
       setSelectedGuest((prevGuest) => ({
         ...prevGuest,
         reservations: prevGuest.reservations.map((res) => ({
@@ -612,7 +621,9 @@ export default function ReservationsTable({ data = [], keys }) {
           <TableRow className="hover:bg-bg-[#0f172a]">
             <TableHead className="w-[25%] text-white">Guest Details</TableHead>
             <TableHead className="w-[15%] text-white">Guest Type</TableHead>
-            <TableHead className="w-[15%] text-white">Reservation Type</TableHead>
+            <TableHead className="w-[15%] text-white">
+              Reservation Type
+            </TableHead>
             <TableHead className="w-[20%] text-white">Check-in</TableHead>
             <TableHead className="w-[15%] text-white">Total Amount</TableHead>
             <TableHead className="w-[10%] text-white">Status</TableHead>
@@ -639,8 +650,22 @@ export default function ReservationsTable({ data = [], keys }) {
                   className="rounded-full"
                 />
                 <div>
-                  <div className="font-medium">{guest.guestName}</div>
-                  <div className="text-sm text-gray-500">
+                  <div
+                    className={`font-medium ${
+                      guest.reservations[0]?.status === "done"
+                        ? "line-through"
+                        : ""
+                    }`}
+                  >
+                    {guest.guestName}
+                  </div>
+                  <div
+                    className={`text-sm text-gray-500 ${
+                      guest.reservations[0]?.status === "done"
+                        ? "line-through"
+                        : ""
+                    }`}
+                  >
                     {guest.guestEmail}
                   </div>
                 </div>
@@ -662,7 +687,11 @@ export default function ReservationsTable({ data = [], keys }) {
                   guest.reservations[0]?.status || "default"
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell
+                className={
+                  guest.reservations[0]?.status === "done" ? "line-through" : ""
+                }
+              >
                 {new Intl.DateTimeFormat("en-US", {
                   month: "long",
                   day: "numeric",
@@ -672,7 +701,13 @@ export default function ReservationsTable({ data = [], keys }) {
                   hour12: true,
                 }).format(new Date(guest.reservations[0].check_in_date))}
               </TableCell>
-              <TableCell>{formatCurrency(guest.receiptTotal)}</TableCell>
+              <TableCell
+                className={
+                  guest.reservations[0]?.status === "done" ? "line-through" : ""
+                }
+              >
+                {formatCurrency(guest.receiptTotal)}
+              </TableCell>
               <TableCell>
                 <Badge
                   variant="secondary"
@@ -689,42 +724,72 @@ export default function ReservationsTable({ data = [], keys }) {
       </Table>
 
       <div className="flex items-center justify-between px-2 py-4">
-        <div className="text-sm text-gray-700">
-          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-          {Math.min(currentPage * itemsPerPage, groupedData.allItems.length)} of{" "}
-          {groupedData.allItems.length} entries
-        </div>
-        <div className="flex items-center space-x-2">
+      <div className="text-sm text-muted-foreground">
+    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+    {Math.min(currentPage * itemsPerPage, groupedData.allItems.length)} of{" "}
+    {groupedData.allItems.length} entries
+  </div>
+  <div className="flex items-center space-x-2">
+    {/* Previous Button */}
+    <Button
+      variant="outline"
+      onClick={() => handlePageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      Previous
+    </Button>
+
+    {/* Dynamic Pagination */}
+    {Array.from({ length: groupedData.totalPages }, (_, index) => {
+      const page = index + 1;
+      const isEllipsis = 
+        (page > 2 && page < currentPage - 1) || 
+        (page < groupedData.totalPages - 1 && page > currentPage + 1);
+
+      if (isEllipsis) {
+        return (
+          <span key={`ellipsis-${page}`} className="text-muted-foreground">
+            ...
+          </span>
+        );
+      }
+
+      if (
+        page === 1 || 
+        page === groupedData.totalPages || 
+        Math.abs(currentPage - page) <= 1
+      ) {
+        return (
           <Button
-            variant="outline"
+            key={page}
+            variant={currentPage === page ? "default" : "outline"}
             size="sm"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={() => handlePageChange(page)}
           >
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Previous
+            {page}
           </Button>
-          {[...Array(groupedData.totalPages)].map((_, index) => (
-            <Button
-              key={index}
-              variant={currentPage === index + 1 ? "default" : "outline"}
-              size="sm"
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === groupedData.totalPages}
-          >
-            Next
-            <ChevronRight className="h-4 w-4 ml-2" />
-          </Button>
-        </div>
+        );
+      }
+
+      return null;
+    })}
+
+    {/* Next Button */}
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => handlePageChange(currentPage + 1)}
+      disabled={currentPage === groupedData.totalPages}
+    >
+      Next
+      <ChevronRight className="h-4 w-4" />
+    </Button>
+  </div>
       </div>
+
+      
+
 
       {selectedGuest && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -732,7 +797,7 @@ export default function ReservationsTable({ data = [], keys }) {
             className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3"
             showCloseButton={false}
           >
-            <div className="w-3/6 flex flex-col gap-2">
+            <div className="w-3/6 flex flex-col gap-3">
               <Card className="flex-1 flex flex-col">
                 <CardContent className="p-4 flex flex-col h-full">
                   <div className="flex items-center space-x-3 py-3">
@@ -761,7 +826,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           Room Reservations (
                           {selectedGuest.reservationRoomID.length}):
                         </h4>
-                        <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
+                        <ScrollArea className="max-h-[200px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations
                             .filter(
                               (reservation) =>
@@ -783,7 +848,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           Venue Reservations (
                           {selectedGuest.reservationVenueID.length}):
                         </h4>
-                        <ScrollArea className="h-[calc(27.5vh-4rem)] w-[95%] p-2">
+                        <ScrollArea className="max-h-[200px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations
                             .filter(
                               (reservation) =>
@@ -808,7 +873,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           {selectedGuest.reservationType} Reservations (
                           {selectedGuest.reservations.length}):
                         </h4>
-                        <ScrollArea className="h-[calc(55vh-8rem)] w-[95%] p-2">
+                        <ScrollArea className="max-h-[400px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations.map(
                             (reservation, index) => (
                               <div
@@ -864,49 +929,69 @@ export default function ReservationsTable({ data = [], keys }) {
               </Card>
 
               <Card className="p-4">
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="status">Status</Label>
-                  <div className="flex-1 flex-row flex gap-2">
-                    <Select
-                      value={selectedGuest.reservations[0]?.status || "default"}
-                      onValueChange={handleStatusChange}
-                    >
-                      <SelectTrigger
-                        id="status"
-                        className={getStatusColorBadge(
-                          selectedGuest.reservations[0]?.status || "default"
-                        )}
-                      >
-                        <SelectValue
-                          placeholder={
-                            selectedGuest.reservations[0]?.status ||
-                            "Please select"
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ready">Ready</SelectItem>
-                        <SelectItem value="waiting">Waiting</SelectItem>
-                        <SelectItem value="onUse">On Use</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
-                        <SelectItem value="onCleaning">On Cleaning</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        handleSaveStatus(selectedGuest.reservationType)
-                      }
-                    >
-                      Save Changes
-                    </Button>
-                  </div>
-                </div>
-              </Card>
+  <div className="flex flex-col gap-3">
+    <Label htmlFor="status">Status</Label>
+    <div className="flex-1 flex-row flex gap-3">
+      <Select
+        value={selectedGuest.reservations[0]?.status || "default"}
+        onValueChange={handleStatusChange}
+      >
+        <SelectTrigger
+          id="status"
+          className={getStatusColorBadge(
+            selectedGuest.reservations[0]?.status || "default"
+          )}
+          disabled={
+            selectedGuest.reservations[0]?.status === "done" ? true : false
+          }
+        >
+          <SelectValue
+            placeholder={
+              selectedGuest.reservations[0]?.status || "Please select"
+            }
+          />
+        </SelectTrigger>
+        { selectedGuest.reservations[0]?.status === "done" ? (
+          <SelectContent>
+          {/* Exclude "done" from selectable options */}
+          {["done"].map(
+            (status) => (
+              <SelectItem key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </SelectItem>
+            )
+          )}
+        </SelectContent>
+          
+        ) : (
+          <SelectContent>
+          {/* Exclude "done" from selectable options */}
+          {["ready", "waiting", "onUse", "cancelled", "onCleaning"].map(
+            (status) => (
+              <SelectItem key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </SelectItem>
+            )
+          )}
+        </SelectContent>)}
+        
+      </Select>
+      <Button
+        variant="outline"
+        onClick={() => handleSaveStatus(selectedGuest.reservationType)}
+        disabled={
+          selectedGuest.reservations[0]?.status === "done" ? true : false
+        }
+      >
+        Save Changes
+      </Button>
+    </div>
+  </div>
+</Card>
+
             </div>
 
-            <div className="w-2/6 flex flex-col gap-2">
+            <div className="w-2/6 flex flex-col gap-3">
               <Card className="w-full bg-yellow-50 border-yellow-200 shadow-md relative">
                 <div className="absolute -top-3 -right-3 text-red-500 transform rotate-12">
                   <PushPin className="w-6 h-6" />
@@ -937,7 +1022,7 @@ export default function ReservationsTable({ data = [], keys }) {
               </Card>
 
               <ScrollArea className="h-[calc(2/4vh-8rem)] w-full">
-                <Card className="bg-white text-gray-800  rounded-xl shadow-lg">
+                <Card className="bg-white text-gray-800 rounded-xl shadow-lg">
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <div className="text-center">
@@ -1077,38 +1162,34 @@ export default function ReservationsTable({ data = [], keys }) {
                 </Card>
               </ScrollArea>
             </div>
-{/* buttons */}
+            {/* buttons */}
             <div className="relative bottom-0">
-              <div className="flex justify-between flex-col h-full items-center gap-2">
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClose}
-                    className="bg-white"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+              <div className="flex  flex-col h-full items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClose}
+                  className="bg-white"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGeneratePDF}
-                    className="bg-white"
-                  >
-                    <Files className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGeneratePDF}
+                  className="bg-white"
+                >
+                  <Files className="h-4 w-4" />
+                </Button>
 
-                <div className="flex relative bottom-0">
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(selectedGuest)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(selectedGuest)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </DialogContent>

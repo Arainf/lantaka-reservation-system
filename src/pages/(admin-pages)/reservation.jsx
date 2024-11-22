@@ -57,13 +57,34 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
     fetchReservationsAttachment()
   }, [deleteData, saveNote])
 
-  const filteredReservations = reservationsData.filter((reservation) => {
-    const matchesSearch = reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-           reservation.account_name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesGuestType = filters.guest_type === "all" || reservation.guest_type === filters.guest_type
-    const matchesStatus = filters.status === "all" || reservation.status === filters.status
-    return matchesSearch && matchesGuestType && matchesStatus
+// Importance order for statuses
+const statusOrder = {
+  waiting: 1,
+  ready: 2,
+  onUse: 3,
+  onCleaning: 4,
+  done: 5,
+  cancelled: 6,
+};
+
+// Filter and sort the reservations
+const filteredReservations = reservationsData
+  .filter((reservation) => {
+    const matchesSearch =
+      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.account_name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGuestType =
+      filters.guest_type === "all" || reservation.guest_type === filters.guest_type;
+    const matchesStatus =
+      filters.status === "all" || reservation.status === filters.status;
+
+    return matchesSearch && matchesGuestType && matchesStatus;
   })
+  .sort((a, b) => {
+    // Sort by the importance of status
+    return statusOrder[a.status] - statusOrder[b.status];
+  });
+
 
   const sortedReservations = React.useMemo(() => {
     let sortableItems = [...filteredReservations]
@@ -98,6 +119,8 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
     setReservationToDelete(reservation)
     setDeleteModalOpen(true)
   }
+
+  
 
   const confirmDelete = () => {
     console.log(`Deleting reservation for ${reservationToDelete.guest_name}`)

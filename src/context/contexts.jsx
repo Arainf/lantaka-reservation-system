@@ -58,7 +58,6 @@ export const useAccountContext = () => useContext(AccountContext);
 export const AccountProvider = ({ children }) => {
   const [accountData, setAccountData] = useState(null);
 
-  useEffect(() => {
     const fetchAccountData = async () => {
       try {
         const res = await fetch('http://localhost:5000/api/accounts');
@@ -73,11 +72,14 @@ export const AccountProvider = ({ children }) => {
       }
     };
 
-    fetchAccountData();
-  }, []); // Empty dependency array to run only once on mount
+  
+    useEffect(() => {
+      fetchAccountData();
+    }, []);
+   // Empty dependency array to run only once on mount
 
   return (
-    <AccountContext.Provider value={{ accountData }}>
+    <AccountContext.Provider value={{ accountData, fetchAccountData }}>
       {children}
     </AccountContext.Provider>
   );

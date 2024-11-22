@@ -91,7 +91,7 @@ export default function Component() {
               }`}
             >
               <span
-                className="mr-2 transition-colors duration-300 cursor-pointer block  text-white text-lg  py-3 px-5 rounded shadow "
+                className="mr-2 transition-colors duration-300 cursor-pointer block  text-white text-lg  py-3 px-3 rounded shadow "
                 onClick={() => {
                   const reservationSection =
                     document.getElementById("reservation");

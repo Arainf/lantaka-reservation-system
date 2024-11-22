@@ -1,15 +1,22 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import GuestTable from "@/components/common/cards/GuestTable"
-import { Filter, Search, RefreshCw } from 'lucide-react'
+import { Search, RefreshCw } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
 import { useGuestContext } from "@/context/guestContext"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => {} }) {
   const { guestsData } = useGuestContext()
@@ -17,31 +24,13 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState({
-    room: [],
-    status: []
+    guest_type: 'All Guest Types'
   })
-  const [tempFilters, setTempFilters] = useState({
-    room: [],
-    status: []
-  })
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const filterRef = useRef(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [guestToDelete, setGuestToDelete] = useState(null)
 
   useEffect(() => {
     createIcons({ icons })
-
-    const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
-        setIsFilterOpen(false)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
   }, [])
 
   useEffect(() => {
@@ -49,10 +38,6 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
       setGuests(guestsData)
     }
   }, [guestsData])
-
-  useEffect(() => {
-    setTempFilters(filters)
-  }, [filters])
 
   const filteredGuests = guests.filter((guest) => {
     if (!guest) return false
@@ -63,9 +48,9 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
     const searchTermLower = searchTerm.toLowerCase()
 
     const matchesSearch = guestName.includes(searchTermLower) || guestEmail.includes(searchTermLower)
-    const matchesRoom = filters.room.length === 0 || (guest.room && filters.room.includes(guest.room))
-    const matchesStatus = filters.status.length === 0 || (guest.status && filters.status.includes(guest.status))
-    return matchesSearch && matchesRoom && matchesStatus
+    const matchesGuestType = filters.guest_type === 'All Guest Types' || guest.guest_type === filters.guest_type
+
+    return matchesSearch && matchesGuestType
   })
 
   const handleDelete = (id) => {
@@ -86,37 +71,30 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
     console.log(`Edit guest with id: ${id}`)
   }
 
-  const handleTempFilterChange = (filterType, value) => {
-    setTempFilters(prevFilters => {
-      const updatedFilter = prevFilters[filterType].includes(value)
-        ? prevFilters[filterType].filter(item => item !== value)
-        : [...prevFilters[filterType], value]
-      return { ...prevFilters, [filterType]: updatedFilter }
-    })
-  }
-
-  const applyFilters = () => {
-    setFilters(tempFilters)
-    setIsFilterOpen(false)
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prevFilters => ({ ...prevFilters, [filterType]: value }))
   }
 
   const resetFilters = () => {
-    setFilters({
-      room: [],
-      status: []
-    })
-    setTempFilters({
-      room: [],
-      status: []
-    })
+    setFilters({ guest_type: 'All Guest Types' })
     setSearchTerm("")
     setCurrentPage(1)
   }
 
-  const rooms = [...new Set(guests.filter(g => g && g.room).map(g => g.room))]
-  const statuses = [...new Set(guests.filter(g => g && g.status).map(g => g.status))]
+  const guestTypes = ['All Guest Types', ...new Set(guests.filter(g => g && g.guest_type).map(g => g.guest_type))]
 
-  const activeFilters = [...filters.room, ...filters.status]
+  const activeFilters = Object.entries(filters).filter(([key, value]) => value !== 'All Guest Types')
+
+  const getGuestTypeColor = (type) => {
+    switch (type.toLowerCase()) {
+      case 'internal':
+        return 'bg-blue-100 text-blue-800'
+      case 'external':
+        return 'bg-yellow-100 text-yellow-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
 
   return (
     <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">
@@ -128,11 +106,11 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
         <main className="p-6 space-y-6">
           <h1 className="text-2xl font-bold">Guest List Management</h1>
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-2">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search by name or email..."
+                  placeholder="Search by name or account..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
@@ -141,59 +119,20 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
                   <Search className="text-gray-900" size={18} />
                 </div>
               </div>
-              <div className="relative" ref={filterRef}>
-                <Button
-                  variant="outline"
-                  className="ml-2"
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                >
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                </Button>
-                {isFilterOpen && (
-                  <div className="absolute z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-4">
-                    <h3 className="text-lg font-semibold mb-2">Filters</h3>
-                    <div className="space-y-2">
-                      <div>
-                        <h4 className="font-medium">Room</h4>
-                        {rooms.map(room => (
-                          <label key={room} className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={tempFilters.room.includes(room)}
-                              onChange={() => handleTempFilterChange('room', room)}
-                              className="mr-2"
-                            />
-                            {room}
-                          </label>
-                        ))}
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Status</h4>
-                        {statuses.map(status => (
-                          <label key={status} className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={tempFilters.status.includes(status)}
-                              onChange={() => handleTempFilterChange('status', status)}
-                              className="mr-2"
-                            />
-                            {status}
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mt-4 flex justify-end space-x-2">
-                      <Button variant="outline" onClick={() => setIsFilterOpen(false)}>Cancel</Button>
-                      <Button onClick={applyFilters}>Apply</Button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <Select value={filters.guest_type} onValueChange={(value) => handleFilterChange('guest_type', value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Guest Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Guest Types">All Guest Types</SelectItem>
+                  {guestTypes.filter(type => type !== 'All Guest Types').map((type) => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {(activeFilters.length > 0 || searchTerm) && (
                 <Button
                   variant="ghost"
-                  className="ml-2"
                   onClick={resetFilters}
                   title="Reset all filters"
                 >
@@ -204,9 +143,13 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
           </div>
           {activeFilters.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {activeFilters.map((filter) => (
-                <Badge key={filter} variant="secondary">
-                  {filter}
+              {activeFilters.map(([key, value]) => (
+                <Badge 
+                  key={key} 
+                  variant="secondary" 
+                  className={`px-2 py-1 ${getGuestTypeColor(value)}`}
+                >
+                  {key}: {value}
                 </Badge>
               ))}
             </div>
@@ -230,3 +173,4 @@ export default function AdminGuest({ sidebarOpen = false, toggleSidebar = () => 
     </div>
   )
 }
+

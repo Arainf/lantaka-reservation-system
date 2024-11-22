@@ -7,6 +7,7 @@ import { GuestProvider } from './context/guestContext';
 import { ReservationsProvider } from './context/reservationContext';
 import { DashboardProvider } from './context/dashboardContext';
 import  { RoomVenueContentsProvider } from './context/roomandVenueContext';
+import { RegistrationProvider } from './context/registrationContext';
 
 
 
@@ -14,6 +15,7 @@ import  { RoomVenueContentsProvider } from './context/roomandVenueContext';
 function App() {
   return (
     <>
+    <RegistrationProvider>
     <UserProvider>
       <AccountProvider>
         <ReservationProvider>
@@ -33,6 +35,7 @@ function App() {
         </ReservationProvider>
       </AccountProvider>
     </UserProvider> 
+    </RegistrationProvider>
     </>
   );
 }

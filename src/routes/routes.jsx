@@ -4,7 +4,7 @@ import LoginPage from "@/auth/login/login-page";
 import { AccountProvider } from "@/context/contexts";
 
 // import Test Files here
-import DashboardRegistrationForm from "@/pages/Rainier-Test/RegistrationForm";
+import DashboardRegistrationForm from "@/components/common/login-form/RegistrationForm";
 
 import { Component as BarChartComponent } from "@/components/common/charts/BarChartComponent";
 import { UserContext } from "@/context/contexts";
@@ -18,6 +18,7 @@ import AdminReservation from "@/pages/(admin-pages)/reservation";
 import AdminGuestList from "@/pages/(admin-pages)/guestlist";
 import AdminAccounts from "@/pages/(admin-pages)/accounts";
 import AdminRoomVenue from "@/pages/(admin-pages)/roomvenue";
+import AdminUtilies from "@/pages/(admin-pages)/utilities";
 // employee pages import routes
 import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
@@ -140,6 +141,24 @@ const AppRoutes = () => {
           />
         }
       />
+
+      <Route
+        path="/utilities"
+        element={
+          <ProtectedRoute
+            element={
+              <AdminUtilies
+                sidebarOpen={sidebarOpen}
+                toggleSidebar={toggleSidebar}
+              />
+            }
+            allowedRoles={["Administrator"]}
+            isDevMode={isDevMode}
+          />
+        }
+      />
+
+
 
       {/* Admin Dashboard: Protected, but bypassable in Dev Mode */}
       <Route

@@ -37,7 +37,11 @@ import { Input } from "@/components/ui/input"
 import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa"
 import { MdOutlinePayment } from "react-icons/md"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useReservationsContext } from "@/context/reservationContext";
+import CheckoutTable from "@/components/common/cards/CheckoutTable"
+import ProcessPayment from "@/components/common/cards/ProcessPayment"
 
+import CheckinTable from "@/components/common/cards/CheckinTable"
 const Reservation = () => {
   const { bookingSummary } = useReservations()
   const navigate = useNavigate()
@@ -54,6 +58,8 @@ const Reservation = () => {
   const [checkOutModalOpen, setCheckOutModalOpen] = useState(false)
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const { reservationsData } = useReservationsContext();
+
   const [guests, setGuests] = useState([
     { id: 1, name: 'John Doe', room: '101', checkInDate: '2023-06-01', checkOutDate: '2023-06-05', balance: 500 },
     { id: 2, name: 'Jane Smith', room: '202', checkInDate: '2023-06-02', checkOutDate: '2023-06-07', balance: 750 },
@@ -200,32 +206,13 @@ const Reservation = () => {
                   <DialogHeader>
                     <DialogTitle>Check-in Guest</DialogTitle>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="flex items-center space-x-2">
-                      <Search className="h-4 w-4 text-gray-500" />
-                      <Input
-                        placeholder="Search guest name..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-grow"
-                      />
-                    </div>
-                    <ScrollArea className="h-[300px] rounded-md border">
-                      <div className="p-4">
-                        {filteredGuests.map(guest => (
-                          <div key={guest.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
-                            <div>
-                              <p className="font-medium">{guest.name}</p>
-                              <p className="text-sm text-gray-500">Room: {guest.room}</p>
-                            </div>
-                            <Button onClick={() => handleCheckIn(guest.id)} size="sm">
-                              Check-in
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
+                  
+                  <div style={{ overflowY: 'auto', maxHeight: '400px' }}>
+  <CheckinTable
+    data={reservationsData}
+  />
+</div>
+
                 </DialogContent>
               </Dialog>
               <Dialog open={checkOutModalOpen} onOpenChange={setCheckOutModalOpen}>
@@ -238,33 +225,11 @@ const Reservation = () => {
                   <DialogHeader>
                     <DialogTitle>Check-out Guest</DialogTitle>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="flex items-center space-x-2">
-                      <Search className="h-4 w-4 text-gray-500" />
-                      <Input
-                        placeholder="Search guest name..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-grow"
-                      />
-                    </div>
-                    <ScrollArea className="h-[300px] rounded-md border">
-                      <div className="p-4">
-                        {filteredGuests.map(guest => (
-                          <div key={guest.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
-                            <div>
-                              <p className="font-medium">{guest.name}</p>
-                              <p className="text-sm text-gray-500">Room: {guest.room}</p>
-                              <p className="text-xs text-gray-400">Check-in: {guest.checkInDate}</p>
-                            </div>
-                            <Button onClick={() => handleCheckOut(guest.id)} size="sm">
-                              Check-out
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
+                  <div style={{ overflowY: 'auto', maxHeight: '400px' }}>
+  <CheckoutTable
+    data={reservationsData}
+  />
+</div>
                 </DialogContent>
               </Dialog>
               <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
@@ -277,33 +242,11 @@ const Reservation = () => {
                   <DialogHeader>
                     <DialogTitle>Process Payment</DialogTitle>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="flex items-center space-x-2">
-                      <Search className="h-4 w-4 text-gray-500" />
-                      <Input
-                        placeholder="Search guest name..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-grow"
-                      />
-                    </div>
-                    <ScrollArea className="h-[300px] rounded-md border">
-                      <div className="p-4">
-                        {filteredGuests.map(guest => (
-                          <div key={guest.id} className="flex items-center justify-between py-4 border-b last:border-b-0">
-                            <div>
-                              <p className="font-medium">{guest.name}</p>
-                              <p className="text-sm text-gray-500">Room: {guest.room}</p>
-                              <p className="text-xs text-gray-400">Balance: ${guest.balance}</p>
-                            </div>
-                            <Button onClick={() => handlePayment(guest.id, guest.balance)} size="sm">
-                              Pay ${guest.balance}
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
+                  <div style={{ overflowY: 'auto', maxHeight: '400px' }}>
+  <ProcessPayment
+    data={reservationsData}
+  />
+</div>
                 </DialogContent>
               </Dialog>
             </CardContent>

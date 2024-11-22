@@ -6,6 +6,8 @@ import { FaPeopleGroup } from "react-icons/fa6"; // Import people group icon
 import { IoPerson } from "react-icons/io5"; // Import person icon
 import { BiLogOut } from "react-icons/bi"; // Import logout icon
 import { IoMdArrowDropdown } from "react-icons/io"; // Import dropdown arrow icon
+import { MdOutlineRoomService } from "react-icons/md";
+import { RiListSettingsFill } from "react-icons/ri";
 
 
 import sidebarBg from '@/assets/images/sidebar.png'; // Sidebar background image
@@ -42,9 +44,15 @@ const navLinks = [
   },
 
   {
-    icon: <SquareMenu style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Venue
+    icon: <MdOutlineRoomService style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Venue
     display: "Room/Venue", // Text displayed for Accounts
     url: "/roomvenue" // URL for Accounts
+  },
+
+  {
+    icon: <RiListSettingsFill style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Venue
+    display: "Utilities", // Text displayed for Accounts
+    url: "/Utilities" // URL for Accounts
   },
   
 ];
