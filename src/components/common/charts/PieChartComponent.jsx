@@ -1,6 +1,6 @@
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+import React from "react"
+import { TrendingUp, TrendingDown } from 'lucide-react'
+import { Label, Pie, PieChart, Cell } from "recharts"
 import {
   Card,
   CardContent,
@@ -18,25 +18,26 @@ import {
 } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 
+const COLORS = {
+  Room: "#7BA7E9",
+  Venue: "#246DDB"
+};
+
 const chartConfig = {
   visitors: {
     label: "Visitors",
   },
-  Venue: {
-    label: "Venue",
-    color: "hsl(var(--chart-1))",
-  },
   Room: {
     label: "Room",
-    color: "hsl(var(--chart-2))",
+    color: COLORS.Room,
   },
-  Other: {
-    label: "Other",
-    color: "hsl(var(--chart-3))",
+  Venue: {
+    label: "Venue",
+    color: COLORS.Venue,
   },
 }
 
-export function Component({ data, isLoading }) {
+export function Component({ data, isLoading, trending }) {
   const totalVisitors = React.useMemo(() => {
     return data ? data.reduce((acc, curr) => acc + curr.visitors, 0) : 0
   }, [data])
@@ -61,7 +62,7 @@ export function Component({ data, isLoading }) {
     <Card className="flex flex-col h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>Visitors</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>Room vs Venue</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -80,7 +81,11 @@ export function Component({ data, isLoading }) {
               innerRadius={60}
               outerRadius={80}
               strokeWidth={5}
+              fill="#8884d8"
             >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
+              ))}
               <Label
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -117,12 +122,18 @@ export function Component({ data, isLoading }) {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          {trending > 0 ? 'Trending up' : 'Trending down'} by {Math.abs(trending)}% this month{' '}
+          {trending > 0 ? (
+            <TrendingUp className="h-4 w-4 text-green-500" />
+          ) : (
+            <TrendingDown className="h-4 w-4 text-red-500" />
+          )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing total visitors for rooms and venues
         </div>
       </CardFooter>
     </Card>
   )
 }
+

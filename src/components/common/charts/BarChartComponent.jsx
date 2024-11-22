@@ -1,5 +1,4 @@
-"use client"
-
+import React from "react"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -12,7 +11,7 @@ const chartConfig = {
   },
 }
 
-export function Component({ data, isLoading }) {
+export function Component({ data, isLoading, viewMode }) {
   if (isLoading) {
     return (
       <Card className="w-full h-[400px]">
@@ -33,18 +32,25 @@ export function Component({ data, isLoading }) {
     <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Occupancy</CardTitle>
-        <p className="text-sm text-muted-foreground">Occupancy from 1-12 Dec, 2024</p>
+        <p className="text-sm text-muted-foreground">
+          Occupancy from {viewMode === 'monthly' ? 'monthly' : 'daily'} data
+        </p>
       </CardHeader>
       <CardContent className="p-0">
         <ChartContainer config={chartConfig} className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 10, right: 25, left: 25, bottom: 20 }}>
               <XAxis 
-                dataKey="month" 
+                dataKey="date" 
                 axisLine={false}
                 tickLine={false}
                 tickMargin={10}
-                tickFormatter={(value) => value.slice(0, 3)}
+                tickFormatter={(value) => {
+                  if (viewMode === 'monthly') {
+                    return new Date(value + '-01').toLocaleString('default', { month: 'short' });
+                  }
+                  return new Date(value).toLocaleDateString();
+                }}
               />
               <YAxis 
                 axisLine={false}
@@ -60,3 +66,4 @@ export function Component({ data, isLoading }) {
     </Card>
   )
 }
+

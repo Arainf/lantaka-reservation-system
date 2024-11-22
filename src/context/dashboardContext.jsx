@@ -1,83 +1,101 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create the Dashboard context
 const DashboardContext = createContext();
 
-// Custom hook to use the Dashboard context
 export const useDashboardContext = () => useContext(DashboardContext);
 
-// Dashboard provider to wrap the application with context data
 export const DashboardProvider = ({ children }) => {
-  // State for various dashboard data
-  const [occupancyData, setOccupancyData] = useState([]);
-  const [visitorData, setVisitorData] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
-  const [roomTypeData, setRoomTypeData] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState('daily');
+  const [startDate, setStartDate] = useState(() => {
+    // Ensure consistent date handling by setting time to start of day
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    if (viewMode === 'monthly') {
+      date.setMonth(date.getMonth() - 2);
+      date.setDate(1);
+    } else {
+      date.setDate(date.getDate() - 7);
+    }
+    return date;
+  });
+  
+  const [endDate, setEndDate] = useState(() => {
+    // Ensure consistent date handling by setting time to end of day
+    const date = new Date();
+    date.setHours(23, 59, 59, 999);
+    if (viewMode === 'monthly') {
+      date.setMonth(date.getMonth() + 1);
+      date.setDate(0);
+    }
+    return date;
+  });
 
-  // Example: Fetching data from an API (you can replace this with your actual API call)
-  const fetchDashboardData = async () => {
+  // Update date range when view mode changes
+  useEffect(() => {
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+    
+    if (viewMode === 'monthly') {
+      const newStartDate = new Date(now);
+      newStartDate.setMonth(now.getMonth() - 2);
+      newStartDate.setDate(1);
+      newStartDate.setHours(0, 0, 0, 0);
+      setStartDate(newStartDate);
+
+      const newEndDate = new Date(now);
+      newEndDate.setMonth(newEndDate.getMonth() + 1);
+      newEndDate.setDate(0);
+      newEndDate.setHours(23, 59, 59, 999);
+      setEndDate(newEndDate);
+    } else {
+      const newStartDate = new Date(now);
+      newStartDate.setDate(now.getDate() - 7);
+      newStartDate.setHours(0, 0, 0, 0);
+      setStartDate(newStartDate);
+      setEndDate(now);
+    }
+  }, [viewMode]);
+
+  const fetchDashboardData = async (start, end) => {
+    setLoading(true);
     try {
-      // Simulating fetching data with setTimeout
-      setTimeout(() => {
-        setOccupancyData([
-          { month: "Jan", occupancy: 65 },
-          { month: "Feb", occupancy: 70 },
-          { month: "Mar", occupancy: 75 },
-          { month: "Apr", occupancy: 80 },
-          { month: "May", occupancy: 85 },
-          { month: "Jun", occupancy: 90 },
-          { month: "Jul", occupancy: 95 },
-          { month: "Aug", occupancy: 100 },
-          { month: "Sep", occupancy: 90 },
-          { month: "Oct", occupancy: 85 },
-          { month: "Nov", occupancy: 80 },
-          { month: "Dec", occupancy: 75 },
-        ]);
-        setVisitorData([
-          { name: "Venue", visitors: 275, fill: "hsl(216, 72%, 50%)" },
-          { name: "Room", visitors: 200, fill: "hsl(216, 72%, 60%)" },
-          { name: "Other", visitors: 287, fill: "hsl(216, 72%, 70%)" },
-        ]);
-        setRevenueData([
-          { month: "Jan", revenue: 10000 },
-          { month: "Feb", revenue: 12000 },
-          { month: "Mar", revenue: 11000 },
-          { month: "Apr", revenue: 15000 },
-          { month: "May", revenue: 18000 },
-          { month: "Jun", revenue: 24000 },
-          { month: "Jul", revenue: 22000 },
-          { month: "Aug", revenue: 19000 },
-          { month: "Sep", revenue: 17000 },
-          { month: "Oct", revenue: 16000 },
-          { month: "Nov", revenue: 20000 },
-          { month: "Dec", revenue: 22000 },
-        ]);
-        setRoomTypeData([
-          { roomType: "Double Bed", bookingFrequency: 75, avgStayDuration: 3.1 },
-          { roomType: "Triple Bed", bookingFrequency: 45, avgStayDuration: 4.2 },
-          { roomType: "Matrimonial", bookingFrequency: 35, avgStayDuration: 3.8 },
-        ]);
-        setLoading(false); // Stop loading once data is fetched
-      }, 300); 
+      // Ensure consistent date format for API calls
+      const formattedStartDate = start.toISOString().split('T')[0];
+      const formattedEndDate = end.toISOString().split('T')[0];
+      
+      const response = await fetch(
+        `http://localhost:5000/api/dashboardData?startDate=${formattedStartDate}&endDate=${formattedEndDate}&viewMode=${viewMode}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard data');
+      }
+      
+      const data = await response.json();
+      setDashboardData(data);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      setDashboardData(null);
+    } finally {
       setLoading(false);
     }
   };
 
-  // Call the fetch function on mount
   useEffect(() => {
-    fetchDashboardData();
-  }, []); // Empty dependency array means this runs once after the initial render
+    fetchDashboardData(startDate, endDate);
+  }, [startDate, endDate, viewMode]);
 
-  // The value provided to the context consumers
   const contextValue = {
-    occupancyData,
-    visitorData,
-    revenueData,
-    roomTypeData,
+    dashboardData,
     loading,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    viewMode,
+    setViewMode,
   };
 
   return (
@@ -86,3 +104,4 @@ export const DashboardProvider = ({ children }) => {
     </DashboardContext.Provider>
   );
 };
+

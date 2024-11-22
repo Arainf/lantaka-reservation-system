@@ -1,18 +1,17 @@
-"use client"
-
-import { Bar, ComposedChart, Line, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import React from "react"
+import { Bar, ComposedChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const chartConfig = {
   bookingFrequency: {
     label: "Booking Frequency",
-    color: "hsl(var(--chart-2))",
+    color: "#5AACFF",
   },
   avgStayDuration: {
     label: "Average Stay Duration (days)",
-    color: "hsl(216, 72%, 50%)",
+    color: "#246DDB",
   },
 }
 
@@ -20,7 +19,7 @@ export function Component({ data, isLoading }) {
   if (isLoading) {
     return (
       <Card className="w-full h-[400px]">
-        <Skeleton className="w-full h-[400px]" />
+        <Skeleton className="w-full h-full" />
       </Card>
     )
   }
@@ -62,28 +61,36 @@ export function Component({ data, isLoading }) {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                label={{ value: "Booking Frequency (%)", angle: -90, position: 'insideRight', fill: 'hsl(var(--muted-foreground))' }}
+                label={{ value: "Booking Frequency", angle: -90, position: 'insideRight', fill: 'hsl(var(--muted-foreground))' }}
               />
-              <ChartTooltip
+              <Tooltip
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <ChartTooltipContent hide>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="font-medium">{payload[0].payload.roomType}</div>
-                          <div className="text-muted-foreground">Booking Rate</div>
-                          <div className="text-right text-muted-foreground">{payload[0].value}%</div>
-                          <div className="text-muted-foreground">Avg. Stay</div>
-                          <div className="text-right text-muted-foreground">{payload[1].value} days</div>
-                        </div>
-                      </ChartTooltipContent>
-                    )
+                      <div className="bg-white p-2 border rounded shadow">
+                        <p className="font-semibold">{payload[0].payload.roomType}</p>
+                        <p>Bookings: {payload[1].value}</p>
+                        <p>Avg. Stay: {payload[0].value.toFixed(1)} days</p>
+                      </div>
+                    );
                   }
-                  return null
+                  return null;
                 }}
               />
-              <Bar dataKey="avgStayDuration" yAxisId="left" fill="var(--color-avgStayDuration)" radius={[4, 4, 0, 0]} maxBarSize={60} />
-              <Line type="monotone" dataKey="bookingFrequency" yAxisId="right" stroke="var(--color-bookingFrequency)" strokeWidth={2} />
+              <Bar 
+                dataKey="avgStayDuration" 
+                yAxisId="left" 
+                fill={chartConfig.avgStayDuration.color}
+                radius={[4, 4, 0, 0]} 
+                maxBarSize={60} 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="bookingFrequency" 
+                yAxisId="right" 
+                stroke={chartConfig.bookingFrequency.color}
+                strokeWidth={2} 
+              />
             </ComposedChart>
           </ResponsiveContainer>
         </ChartContainer>
