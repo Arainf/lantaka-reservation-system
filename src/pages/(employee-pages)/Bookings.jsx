@@ -280,7 +280,7 @@ const filteredReservations = reservationsData
           </div>
         </div>
 
-        <div className="w-full lg:w-[320px] mt-4 lg:mt-3 lg:ml-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4">
+        <div className="w-full lg:w-[320px] mt-4 lg:mt-3 lg:ml-8 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3">
           <BookingSummary data={sortedReservations} />
           <UpcomingBooking data={sortedReservations} />
           <UpcomingBookingdue data={sortedReservations} />

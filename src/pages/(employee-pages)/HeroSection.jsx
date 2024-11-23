@@ -50,6 +50,7 @@ const Reservation = () => {
   const [calendarKey, setCalendarKey] = useState(0);
   const [isFancyMode, setIsFancyMode] = useState(false);
   const [checkInModalOpen, setCheckInModalOpen] = useState(false);
+ 
   const [checkOutModalOpen, setCheckOutModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,8 +138,10 @@ const Reservation = () => {
 
   const handleCheckIn = (guestId) => {
     console.log(`Checking in guest with ID: ${guestId}`);
-    setCheckInModalOpen(false);
+    setCheckInModalOpen(false); 
   };
+ 
+ 
 
   const handleCheckOut = (guestId) => {
     console.log(`Checking out guest with ID: ${guestId}`);
@@ -257,12 +260,22 @@ const Reservation = () => {
                     <FaCalendarCheck className="mr-2 h-4 w-4" /> Check-in Guest
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent showCloseButton={false} >
+                <button
+                    onClick={() => setCheckInModalOpen(false)}
+                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
+                  >
+                    <X className="h-7 w-4" />
+                  </button>
                   <DialogHeader>
                     <DialogTitle>Check-in Guest</DialogTitle>
+                    
                   </DialogHeader>
-                  
+                  <div style={{ overflowY: "auto", maxHeight: "400px" }}>
+
                     <CheckinTable data={reservationsData} />
+                    </div>
+
                 </DialogContent>
               </Dialog>
               <Dialog
@@ -274,10 +287,19 @@ const Reservation = () => {
                     <FaCalendarTimes className="mr-2 h-4 w-4" /> Check-out Guest
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="w-auto bg-gray-100">
+                
+                <DialogContent showCloseButton={false}>
+                <button
+                    onClick={() => setCheckOutModalOpen(false)}
+                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
+                  >
+                    <X className="h-7 w-4" />
+                  </button>
                   <DialogHeader>
                     <DialogTitle>Check-out Guest</DialogTitle>
+                    
                   </DialogHeader>
+                  
                   <div style={{ overflowY: "auto", maxHeight: "400px" }}>
                     <CheckoutTable data={reservationsData} />
                   </div>
@@ -293,7 +315,13 @@ const Reservation = () => {
                     Payment
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] bg-gray-100">
+                <DialogContent showCloseButton={false}>
+                <button
+                    onClick={() => setPaymentModalOpen(false)}
+                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
+                  >
+                    <X className="h-7 w-4" />
+                  </button>
                   <DialogHeader>
                     <DialogTitle>Process Payment</DialogTitle>
                   </DialogHeader>

@@ -1,201 +1,208 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Calendar, User, DollarSign, X } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search } from "lucide-react";
 
-const ReservationsTable = ({ data = [] }) => {
+export default function ReservationsTable({ data = [] }) {
+  const [filter, setFilter] = useState("all");
+  const [selectedReservationIndex, setSelectedReservationIndex] = useState(0);
+  const [sortOrder, setSortOrder] = useState("newest");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedReservation, setSelectedReservation] = useState(null);
   const { toast } = useToast();
 
+  // Memoized filtered data
   const filteredData = useMemo(() => {
-    return data.filter((reservation) =>
-      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [data, searchTerm]);
+    let dataToFilter = data;
 
-  const groupedData = useMemo(() => {
-    return filteredData.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.reservation_checkin}-${reservation.reservation_checkout}-${reservation.receipt_total_amount}`;
+    // Apply search filter
+    if (searchTerm) {
+      dataToFilter = dataToFilter.filter((reservation) =>
+        reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply type filter
+    if (filter !== "all") {
+      dataToFilter = dataToFilter.filter((reservation) =>
+        filter === "room"
+          ? reservation.reservation_type === "room"
+          : filter === "venue"
+          ? reservation.reservation_type === "venue"
+          : true
+      );
+    }
+
+    // Group data by guest details (excluding reservation type)
+    const groupedData = dataToFilter.reduce((acc, reservation) => {
+      const key = `${reservation.guest_name}-${reservation.guest_email}`;
 
       if (!acc[key]) {
         acc[key] = {
-          ...reservation,
-          receiptDiscounts: [],
+          guestName: reservation.guest_name,
+          guestEmail: reservation.guest_email,
           reservations: [],
-          reservationRoomID: [],
-          reservationVenueID: [],
+          receiptDate: reservation.receipt_date,
+          checkinDate: reservation.check_in_date,
         };
       }
 
-      reservation.receipt_discounts.forEach((discount) => {
-        if (discount && !acc[key].receiptDiscounts.some((d) => d.discount_id === discount.discount_id)) {
-          acc[key].receiptDiscounts.push(discount);
-        }
-      });
-
-      if (reservation.reservation_type === "room") {
-        acc[key].reservationRoomID.push(reservation.reservation_id);
-      } else if (reservation.reservation_type === "venue") {
-        acc[key].reservationVenueID.push(reservation.reservation_id);
-      }
-
       acc[key].reservations.push(reservation);
-
       return acc;
     }, {});
-  }, [filteredData]);
 
-  const sortedData = useMemo(() => {
-    return Object.values(groupedData).sort((a, b) => new Date(b.receipt_date).getTime() - new Date(a.receipt_date).getTime());
-  }, [groupedData]);
+    return Object.values(groupedData).sort((a, b) => {
+      const dateA = new Date(a.receiptDate);
+      const dateB = new Date(b.receiptDate);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
+  }, [data, filter, sortOrder, searchTerm]);
 
-  const ReservationCard = ({ reservation }) => (
-    <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <User className="text-gray-400" size={24} />
-            <div>
-              <h3 className="font-bold text-lg">{reservation.guest_name}</h3>
-              <p className="text-sm text-gray-500">{reservation.guest_email}</p>
-            </div>
-          </div>
-          <Badge variant={reservation.reservation_type === "room" ? "default" : "secondary"}>
-            {reservation.reservation_type.charAt(0).toUpperCase() + reservation.reservation_type.slice(1)}
-          </Badge>
-        </div>
-        <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-          <div className="flex items-center">
-            <Calendar className="mr-2" size={16} />
-            {new Date(reservation.receipt_date).toLocaleDateString()}
-          </div>
-          <div className="flex items-center">
-            <DollarSign className="mr-2" size={16} />
-            {reservation.receipt_total_amount.toFixed(2)}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  const selectedGuest = filteredData[selectedReservationIndex];
 
-  const ReservationModal = ({ reservation, onClose }) => (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Reservation Details</DialogTitle>
-      </DialogHeader>
-      <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="reservations">Reservations</TabsTrigger>
-          <TabsTrigger value="discounts">Discounts</TabsTrigger>
-        </TabsList>
-        <TabsContent value="details">
-          <Card>
-            <CardHeader>
-              <CardTitle>Guest Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p><strong>Name:</strong> {reservation.guest_name}</p>
-              <p><strong>Email:</strong> {reservation.guest_email}</p>
-              <p><strong>Type:</strong> {reservation.guest_type}</p>
-              <p><strong>Check-in:</strong> {reservation.reservation_checkin}</p>
-              <p><strong>Check-out:</strong> {reservation.reservation_checkout}</p>
-              <p><strong>Total Amount:</strong> ${reservation.receipt_total_amount.toFixed(2)}</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="reservations">
-          <Card>
-            <CardHeader>
-              <CardTitle>Reservations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[200px]">
-                {reservation.reservations.map((res, index) => (
-                  <div key={index} className="mb-2 p-2 bg-gray-50 rounded">
-                    <p className="font-medium">
-                      {res.reservation || `Reservation ${index + 1}`}
-                    </p>
-                  </div>
-                ))}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="discounts">
-          <Card>
-            <CardHeader>
-              <CardTitle>Discounts Applied</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {reservation.receiptDiscounts.length > 0 ? (
-                <ul>
-                  {reservation.receiptDiscounts.map((discount, index) => (
-                    <li key={index}>Discount ID: {discount.discount_id}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No discounts applied to this reservation.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      <div className="mt-4 flex justify-end">
-        <Button onClick={onClose}>Close</Button>
-      </div>
-    </DialogContent>
-  );
+  const Checkin = async (type) => {
+    if (!selectedGuest) return;
+
+    try {
+      const reservation = selectedGuest.reservations[0];
+      if (!reservation) throw new Error("No reservation found for the selected guest.");
+
+      let payload = {
+        guest_id: reservation.guest_id,
+        status: reservation.status,
+        type,
+      };
+
+      if (type === "room") payload.reservation_room_ids = reservation.room_ids;
+      if (type === "venue") payload.reservation_venue_ids = reservation.venue_ids;
+      if (type === "both") {
+        payload.reservation_room_ids = reservation.room_ids;
+        payload.reservation_venue_ids = reservation.venue_ids;
+      }
+
+      const response = await fetch("http://localhost:5000/api/change_status", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Failed to update reservation status.");
+
+      const result = await response.json();
+      toast({
+        title: "Status Updated",
+        description: "Reservation status has been updated successfully.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update the reservation status. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const goToNextReservation = () => {
+    if (selectedReservationIndex < filteredData.length - 1) {
+      setSelectedReservationIndex(selectedReservationIndex + 1);
+    }
+  };
+
+  const goToPreviousReservation = () => {
+    if (selectedReservationIndex > 0) {
+      setSelectedReservationIndex(selectedReservationIndex - 1);
+    }
+  };
+
 
   return (
-    <div className="space-y-4">
+    <>
       <Card>
-        <CardHeader>
-          <CardTitle>Reservations</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <div className="fixed -top-[100px] left-[80px] mb-4 bg-white  rounded-lg border border-white/30 p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <Input
+            <input
               type="text"
-              placeholder="Search by name or email..."
+              placeholder="Search by name or account..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full"
+              className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 text-black border-black bg-transparent rounded-3xl focus:outline-none focus:border-black"
             />
+            <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+              <Search className="text-black" size={18} />
+            </div>
           </div>
-        </CardContent>
+        </div>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {sortedData.map((reservation, index) => (
-          <Dialog key={index}>
-            <DialogTrigger asChild>
-              <div onClick={() => setSelectedReservation(reservation)}>
-                <ReservationCard reservation={reservation} />
+      {searchTerm ? (
+        <div className="space-y-4 mt-4">
+          {filteredData.length > 0 ? (
+            <>
+              {/* Show the current reservation */}
+              <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="font-bold">
+                      {filteredData[selectedReservationIndex].guestName} 
+                      {filteredData[selectedReservationIndex].reservationType}
+                      <div className="mt-2">
+                        {/* dapat checkin date ito */}
+                        {new Date(
+                          filteredData[selectedReservationIndex].checkinDate
+                        ).toLocaleDateString()}
+                      </div>
+                      <div className="absolute top-[100px] right-[40px] text-sm px-[0px] text-gray-500">
+                      <div className="mt-4">
+                        <Button onClick={() => Checkin(type)}>Check-in</Button>
+                        </div>
+                    </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <ScrollArea className="h-[200px] p-2 border rounded">
+                  {filteredData[selectedReservationIndex].reservations.map((res, index) => (
+                    <div key={index} className="mb-2 p-2 bg-gray-50 rounded">
+                      <p className="font-medium">
+                        {res.reservation || `Reservation ${index + 1}`}
+                      </p>
+                    </div>
+                  ))}
+                </ScrollArea>
+              </Card>
+
+              {/* Navigation buttons */}
+              <div className="flex justify-between mt-4">
+                <Button
+                  onClick={goToPreviousReservation}
+                  disabled={selectedReservationIndex === 0}
+                >
+                  Prev
+                </Button>
+                <Button
+                  onClick={goToNextReservation}
+                  disabled={selectedReservationIndex === filteredData.length - 1}
+                >
+                  Next
+                </Button>
               </div>
-            </DialogTrigger>
-            <ReservationModal 
-              reservation={reservation}
-              onClose={() => setSelectedReservation(null)}
-            />
-          </Dialog>
-        ))}
-      </div>
+            </>
+          ) : (
+            <p className="text-gray-500 text-center">
+              No reservations found for "{searchTerm}"
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-gray-500 text-center mt-6">
+          Start searching to view reservations.
+        </p>
+      )}
 
       <Toaster />
-    </div>
+    </>
   );
-};
-
-export default ReservationsTable;
-
+}
