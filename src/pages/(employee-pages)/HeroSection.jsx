@@ -250,7 +250,31 @@ const Reservation = () => {
               >
                 <Plus className="mr-2 h-4 w-4" /> New Reservation
               </Button>
-              
+              <Dialog
+                open={paymentModalOpen}
+                onOpenChange={setPaymentModalOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button className="w-full justify-start" variant="outline">
+                    <MdOutlinePayment className="mr-2 h-4 w-4" /> Process
+                    Payment
+                  </Button>
+                </DialogTrigger>
+                <DialogContent showCloseButton={false}>
+                <button
+                    onClick={() => setPaymentModalOpen(false)}
+                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
+                  >
+                    <X className="h-7 w-4" />
+                  </button>
+                  <DialogHeader>
+                    <DialogTitle>Process Payment</DialogTitle>
+                  </DialogHeader>
+                  <div style={{ overflowY: "auto", maxHeight: "400px" }}>
+                    <ProcessPayment data={reservationsData} />
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Dialog
                 open={checkInModalOpen}
                 onOpenChange={setCheckInModalOpen}
@@ -305,31 +329,7 @@ const Reservation = () => {
                   </div>
                 </DialogContent>
               </Dialog>
-              <Dialog
-                open={paymentModalOpen}
-                onOpenChange={setPaymentModalOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button className="w-full justify-start" variant="outline">
-                    <MdOutlinePayment className="mr-2 h-4 w-4" /> Process
-                    Payment
-                  </Button>
-                </DialogTrigger>
-                <DialogContent showCloseButton={false}>
-                <button
-                    onClick={() => setPaymentModalOpen(false)}
-                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
-                  >
-                    <X className="h-7 w-4" />
-                  </button>
-                  <DialogHeader>
-                    <DialogTitle>Process Payment</DialogTitle>
-                  </DialogHeader>
-                  <div style={{ overflowY: "auto", maxHeight: "400px" }}>
-                    <ProcessPayment data={reservationsData} />
-                  </div>
-                </DialogContent>
-              </Dialog>
+              
             </CardContent>
           </Card>
 
