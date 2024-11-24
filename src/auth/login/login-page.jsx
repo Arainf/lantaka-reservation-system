@@ -1,6 +1,6 @@
 "use client"
 
-import { LoginForm } from "@/components/common/login-form/LoginForm";
+import LoginForm from "../../components/common/login-form/LoginForm";
 import LogoLRRS from "@/assets/images/LRSlogo.png";
 import '../../components/common/login-form/LoginForm';
 import LantakaBg from "../../assets/images/LantakaBG.jpg";
@@ -20,10 +20,6 @@ const LoginPage = () => {
           className="w-96 p-6 z-10 form-title">
           <img src={LogoLRRS} className="mb-[-8%]"/>
           <LoginForm />
-          <h5
-            className="italic poppins-light text-center mt-5 text-slate-300"
-          >Forgot Password?
-          </h5>
         </div>
       </div>
     </div>

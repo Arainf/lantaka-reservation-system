@@ -222,8 +222,8 @@ export default function ReservationsTable({ data = [], onClose }) {
                 </>
               ) : (
                 <div className="border-dashed h-auto w-auto rounded-xl  border-2 border-gray-300">
-                  <p className="text-gray-500 text-center mt-6">
-                    Start searching to view reservations.
+                  <p className="text-gray-500 text-center m-20">
+                    No reservations found for "{searchTerm}"
                   </p>
                 </div>
               )}

@@ -111,8 +111,7 @@
   transition: all 0.3s ease;
   overflow: hidden;
   position: relative;
-  margin-top: 50px;
-  font-family: "Poppins", sans-serif;
+  margin-top: 10px;
   font-weight: 300;
   font-style: normal;
 }
@@ -127,13 +126,15 @@
   background: #e4e6e745;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
+  transition: all 0.6s ease, height 0.6s ease;
   color: #FFFFFF;
   z-index: 0;
+  font-style: italic;
 }
 
 .LoginForm_button:hover {
   background: var(--primary-dark);
+  font-style: italic;
 }
 
 .LoginForm_button:hover::after {

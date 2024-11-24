@@ -7,7 +7,7 @@ import { GuestProvider } from './context/guestContext';
 import { ReservationsProvider } from './context/reservationContext';
 import { DashboardProvider } from './context/dashboardContext';
 import  { RoomVenueContentsProvider } from './context/roomandVenueContext';
-import { RegistrationProvider } from './context/registrationContext';
+import { RegistrationProvider } from './context/utilContext';
 import { RoomTypeProvider } from './context/RoomTypeContext';
 import { DiscountProvider } from './context/discountContext';
 import { AdditionalFeeProvider } from './context/additionalFeeContext';
