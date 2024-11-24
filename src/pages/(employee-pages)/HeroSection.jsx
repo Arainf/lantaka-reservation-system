@@ -244,7 +244,7 @@ const Reservation = () => {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="flex flex-col bg-transparent border-none" showCloseButton={false}>
-                  <ProcessPayment data={filteredData} onClose={handleClosePaymentModal} />
+                  <ProcessPayment data={reservationsData} onClose={handleClosePaymentModal} />
                 </DialogContent>
               </Dialog>
 

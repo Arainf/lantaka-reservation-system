@@ -15,24 +15,18 @@ export default function ReservationsTable({ data = [], onClose }) {
   const { toast } = useToast();
   const { setPaymentModalOpen} = useRegistrationContext();
 
-  // Memoized filtered data
   const filteredData = useMemo(() => {
-    let dataToFilter = data;
+    let dataToFilter = data.filter(reservation => reservation.status === "waiting")
 
-    // Apply search filter
+
     if (searchTerm) {
       dataToFilter = dataToFilter.filter(
         (reservation) =>
-          reservation.guest_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          reservation.guest_email
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-      );
+          reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     }
 
-    // Apply type filter
     if (filter !== "all") {
       dataToFilter = dataToFilter.filter((reservation) =>
         filter === "room"
@@ -40,70 +34,114 @@ export default function ReservationsTable({ data = [], onClose }) {
           : filter === "venue"
           ? reservation.reservation_type === "venue"
           : true
-      );
+      )
     }
 
-    // Group data by guest details (excluding reservation type)
     const groupedData = dataToFilter.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}`;
+      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}`
 
       if (!acc[key]) {
         acc[key] = {
+          guestId: reservation.guest_id,
           guestName: reservation.guest_name,
           guestEmail: reservation.guest_email,
-          reservations: [],
+          guestType: reservation.guest_type,
+          reservationType: reservation.reservation_type,
           receiptDate: reservation.receipt_date,
           receiptTotal: reservation.receipt_total_amount,
-        };
+          receiptSubTotal: reservation.receipt_initial_total,
+          additionalNotes: reservation.additional_notes,
+          receiptDiscounts: [],
+          reservations: [],
+          reservationRoomID: [],
+          reservationVenueID: [],
+        }
       }
 
-      acc[key].reservations.push(reservation);
+      reservation.receipt_discounts.forEach((discount) => {
+        if (
+          discount &&
+          !acc[key].receiptDiscounts.some(
+            (d) => d.discount_id === discount.discount_id
+          )
+        ) {
+          acc[key].receiptDiscounts.push(discount)
+        }
+      })
 
-      return acc;
-    }, {});
+      if (reservation.reservation_type === "room") {
+        acc[key].reservationRoomID.push(reservation.reservation_id)
+      } else if (reservation.reservation_type === "venue") {
+        acc[key].reservationVenueID.push(reservation.reservation_id)
+      } else if (reservation.reservation_type === "both") {
+        if (reservation.room_type) {
+          acc[key].reservationRoomID.push(reservation.reservation_id)
+        } else {
+          acc[key].reservationVenueID.push(reservation.reservation_id)
+        }
+      }
+
+      acc[key].reservations.push(reservation)
+      
+      return acc
+    }, {})
 
     return Object.values(groupedData).sort((a, b) => {
-      const dateA = new Date(a.receiptDate);
-      const dateB = new Date(b.receiptDate);
-      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-    });
-  }, [data, filter, sortOrder, searchTerm]);
+      const dateA = new Date(a.receiptDate)
+      const dateB = new Date(b.receiptDate)
+      return sortOrder === "newest" ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime()
+    })
+  }, [data, filter, sortOrder, searchTerm])
 
-  // Handle next and previous navigation
   const goToNextReservation = () => {
     if (selectedReservationIndex < filteredData.length - 1) {
-      setSelectedReservationIndex(selectedReservationIndex + 1);
+      setSelectedReservationIndex(selectedReservationIndex + 1)
     }
-  };
+  }
 
   const goToPreviousReservation = () => {
     if (selectedReservationIndex > 0) {
-      setSelectedReservationIndex(selectedReservationIndex - 1);
+      setSelectedReservationIndex(selectedReservationIndex - 1)
     }
-  };
+  }
 
   const handleCloseModal = () => {
     console.log("Clicked")
-    setPaymentModalOpen(true);
-  };
+    setPaymentModalOpen(true)
+  }
 
-  // Handle Proceed to Payment (Check-in)
   const handleProceedToPayment = async () => {
+    console.log("Clicked")
     if (!filteredData[selectedReservationIndex]) return;
 
-    const reservation = filteredData[selectedReservationIndex].reservations[0]; // Assume first reservation for the guest
+    const reservation = filteredData[selectedReservationIndex];
     if (!reservation) return;
 
     try {
       const payload = {
-        guest_id: reservation.guest_id,
-        status: "paid", // Set the status to "paid"
+        guest_id: reservation.guestId,
+        status: "paid",
+        type: reservation.reservationType,
       };
 
-      // Send PUT request to update the reservation status
+      if (reservation.reservationType === "room") {
+        payload.reservation_room_ids = reservation.reservationRoomID;
+      } else if (reservation.reservationType === "venue") {
+        payload.reservation_venue_ids = reservation.reservationVenueID;
+      } else if (reservation.reservationType === "both") {
+        payload.reservation_room_ids = reservation.reservationRoomID;
+        payload.reservation_venue_ids = reservation.reservationVenueID;
+      } else {
+        throw new Error("Invalid reservation type.");
+      }
+
+      console.log("Sending status update:", payload);
+
       const response = await fetch("http://localhost:5000/api/change_status", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
 
@@ -155,38 +193,31 @@ export default function ReservationsTable({ data = [], onClose }) {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="pl-6 pb-2">
           <CardTitle> Process Payment </CardTitle>
         </CardHeader>
         <CardContent>
           {searchTerm ? (
-            <div className="space-y-4 mt-4">
+            <div className="space-y-4">
               {filteredData.length > 0 ? (
                 <>
                   {/* Show the current reservation */}
                   <Card className="cursor-pointer hover:shadow-lg transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
-                        <div className="font-bold">
-                          {filteredData[selectedReservationIndex].guestName}
-                          <div className="mt-2">
-                            {new Intl.NumberFormat("en-US", {
-                              style: "currency",
-                              currency: "PHP",
-                            }).format(
-                              filteredData[selectedReservationIndex]
-                                .receiptTotal
-                            )}
+                          <div className="font-semibold">
+                            {filteredData[selectedReservationIndex].guestName}
                           </div>
-                          <div className="absolute top-[100px] right-[40px] text-sm px-[0px] text-gray-500">
-                            <Button onClick={handleProceedToPayment}>
-                              Proceed to Payment
-                            </Button>
-                          </div>
-                        </div>
+                          
+                    
+                          <Button onClick={handleProceedToPayment}>
+                            Pay Registration Fee
+                          </Button>
+                         
+      
                       </div>
                     </CardContent>
-                    <ScrollArea className="h-[200px] p-2 border rounded">
+                    <ScrollArea className="h-[100px] m-2 border rounded">
                       {filteredData[selectedReservationIndex].reservations.map(
                         (res, index) => (
                           <div
@@ -200,6 +231,10 @@ export default function ReservationsTable({ data = [], onClose }) {
                         )
                       )}
                     </ScrollArea>
+                    <div className="text-sm text-muted-foreground m-2 ">
+                      {Math.min(selectedReservationIndex + 1, filteredData.length)} of{" "}
+                      {filteredData.length} entries
+                    </div>
                   </Card>
 
                   {/* Navigation buttons */}
