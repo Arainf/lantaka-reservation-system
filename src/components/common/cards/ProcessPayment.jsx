@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
@@ -114,23 +114,11 @@ export default function ReservationsTable({ data = [] }) {
 
   return (
     <>
-      <Card>
-        <div className="fixed -top-[100px] left-[80px] mb-4 bg-white rounded-lg border border-white/30 p-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search by name or account..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 text-black border-black bg-transparent rounded-3xl focus:outline-none focus:border-black"
-            />
-            <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-              <Search className="text-black" size={18} />
-            </div>
-          </div>
-        </div>
-      </Card>
-
+    <Card>
+      <CardHeader>
+        <CardTitle> Process Payment </CardTitle>
+      </CardHeader>
+      <CardContent>
       {searchTerm ? (
         <div className="space-y-4 mt-4">
           {filteredData.length > 0 ? (
@@ -183,16 +171,23 @@ export default function ReservationsTable({ data = [] }) {
               </div>
             </>
           ) : (
-            <p className="text-gray-500 text-center">
-              No reservations found for "{searchTerm}"
-            </p>
+            <div className="border-dashed h-auto w-auto rounded-xl  border-2 border-gray-300">
+              <p className="text-gray-500 text-center mt-6">
+                Start searching to view reservations.
+              </p>
+            </div>
           )}
         </div>
       ) : (
-        <p className="text-gray-500 text-center mt-6">
-          Start searching to view reservations.
-        </p>
+        <div className="border-dashed h-auto w-auto rounded-xl  border-2 border-gray-300">
+          <p className="text-gray-500 text-center m-20 ">
+            Start searching to view reservations.
+          </p>
+        </div>
       )}
+      </CardContent>
+    </Card>
+      
 
       <Toaster />
     </>
