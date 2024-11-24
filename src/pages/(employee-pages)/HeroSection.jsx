@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import FirstFloor from "@/components/common/cards/FirstFloor";
 import SecondFloorr from "@/components/common/cards/SecondFloorr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useReservations, useRoomVenueProvider } from "@/context/contexts";
+
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useReservationsContext } from "@/context/reservationContext";
 import CheckoutTable from "@/components/common/cards/CheckoutTable";
 import ProcessPayment from "@/components/common/cards/ProcessPayment";
+
 
 import CheckinTable from "@/components/common/cards/CheckinTable";
 const Reservation = () => {
@@ -55,49 +57,18 @@ const Reservation = () => {
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { reservationsData } = useReservationsContext();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [guests, setGuests] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      room: "101",
-      checkInDate: "2023-06-01",
-      checkOutDate: "2023-06-05",
-      balance: 500,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      room: "202",
-      checkInDate: "2023-06-02",
-      checkOutDate: "2023-06-07",
-      balance: 750,
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      room: "303",
-      checkInDate: "2023-06-03",
-      checkOutDate: "2023-06-06",
-      balance: 600,
-    },
-    {
-      id: 4,
-      name: "Alice Brown",
-      room: "404",
-      checkInDate: "2023-06-04",
-      checkOutDate: "2023-06-08",
-      balance: 800,
-    },
-    {
-      id: 5,
-      name: "Charlie Davis",
-      room: "505",
-      checkInDate: "2023-06-05",
-      checkOutDate: "2023-06-09",
-      balance: 550,
-    },
-  ]);
+  // Memoized filtered data
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return [];
+
+    return reservationsData.filter((reservation) =>
+      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [reservationsData, searchTerm]);
+
 
   useEffect(() => {
     const initialDate = new Date();
@@ -132,9 +103,9 @@ const Reservation = () => {
     }, 0);
   };
 
-  const filteredGuests = guests.filter((guest) =>
-    guest.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredGuests = guests.filter((guest) =>
+  //   guest.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   const handleCheckIn = (guestId) => {
     console.log(`Checking in guest with ID: ${guestId}`);
@@ -250,31 +221,48 @@ const Reservation = () => {
               >
                 <Plus className="mr-2 h-4 w-4" /> New Reservation
               </Button>
-              <Dialog
-                open={paymentModalOpen}
-                onOpenChange={setPaymentModalOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button className="w-full justify-start" variant="outline">
-                    <MdOutlinePayment className="mr-2 h-4 w-4" /> Process
-                    Payment
-                  </Button>
-                </DialogTrigger>
-                <DialogContent showCloseButton={false}>
-                <button
-                    onClick={() => setPaymentModalOpen(false)}
-                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
-                  >
-                    <X className="h-7 w-4" />
-                  </button>
-                  <DialogHeader>
-                    <DialogTitle>Process Payment</DialogTitle>
-                  </DialogHeader>
-                  <div style={{ overflowY: "auto", maxHeight: "400px" }}>
-                    <ProcessPayment data={reservationsData} />
+
+
+{/* Process Payment */}
+<Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full justify-start" variant="outline">
+          <MdOutlinePayment className="mr-2 h-4 w-4" /> 
+          Process Payment
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="flex flex-col bg-transparent border-none" showCloseButton={false}>
+        <Card className="flex">
+          <CardContent className="p-4">
+            <div className="flex flex-row gap-10 justify-between"> 
+              <div className="bg-white rounded-lg border border-white/30 ">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by name or account..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2 w-60 md:w-80 border-2 text-black border-black bg-transparent rounded-3xl focus:outline-none focus:border-black"
+                  />
+                  <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                    <Search className="text-black" size={18} />
                   </div>
-                </DialogContent>
-              </Dialog>
+                </div>
+              </div>
+              <button onClick={() => setPaymentModalOpen(false)} className="text-white text-lg font-bold bg-red-500">
+                <X className="h-4 w-4"/>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+        <div style={{ overflowY: "auto", maxHeight: "400px" }}>
+          <ProcessPayment data={filteredData} />
+        </div>
+      </DialogContent>
+    </Dialog>
+
+
+
               <Dialog
                 open={checkInModalOpen}
                 onOpenChange={setCheckInModalOpen}
