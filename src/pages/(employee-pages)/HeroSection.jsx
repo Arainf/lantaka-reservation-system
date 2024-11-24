@@ -34,6 +34,7 @@ import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
 import { MdOutlinePayment } from "react-icons/md";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useReservationsContext } from "@/context/reservationContext";
+import { useRegistrationContext } from "@/context/utilContext";
 import CheckoutTable from "@/components/common/cards/CheckoutTable";
 import ProcessPayment from "@/components/common/cards/ProcessPayment";
 
@@ -54,7 +55,8 @@ const Reservation = () => {
   const [checkInModalOpen, setCheckInModalOpen] = useState(false);
  
   const [checkOutModalOpen, setCheckOutModalOpen] = useState(false);
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [ paymentModalOpen, setPaymentModalOpen ] = useState(false);
+  const [ paymentOpen , setPaymentOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("");
   const { reservationsData } = useReservationsContext();
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,28 +103,38 @@ const Reservation = () => {
     setTimeout(() => {
       setResetTrigger(false);
     }, 0);
-  };
+  };  
+
+
 
   // const filteredGuests = guests.filter((guest) =>
   //   guest.name.toLowerCase().includes(searchQuery.toLowerCase())
   // );
 
-  const handleCheckIn = (guestId) => {
-    console.log(`Checking in guest with ID: ${guestId}`);
-    setCheckInModalOpen(false); 
-  };
+  // const handleCheckIn = (guestId) => {
+  //   console.log(`Checking in guest with ID: ${guestId}`);
+  //   setCheckInModalOpen(false); 
+  // };
  
  
 
-  const handleCheckOut = (guestId) => {
-    console.log(`Checking out guest with ID: ${guestId}`);
-    setCheckOutModalOpen(false);
+  // const handleCheckOut = (guestId) => {
+  //   console.log(`Checking out guest with ID: ${guestId}`);
+  //   setCheckOutModalOpen(false);
+  // };
+
+  // const handlePayment = (guestId, amount) => {
+  //   console.log(
+  //     `Processing payment of $${amount} for guest with ID: ${guestId}`
+  //   );
+  //   setPaymentModalOpen(false);
+  // };
+
+  const handleOpenPaymentModal = () => {
+    setPaymentModalOpen(true);
   };
 
-  const handlePayment = (guestId, amount) => {
-    console.log(
-      `Processing payment of $${amount} for guest with ID: ${guestId}`
-    );
+  const handleClosePaymentModal = () => {
     setPaymentModalOpen(false);
   };
 
@@ -223,43 +235,18 @@ const Reservation = () => {
               </Button>
 
 
-{/* Process Payment */}
-<Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
-      <DialogTrigger asChild>
-        <Button className="w-full justify-start" variant="outline">
-          <MdOutlinePayment className="mr-2 h-4 w-4" /> 
-          Process Payment
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="flex flex-col bg-transparent border-none" showCloseButton={false}>
-        <Card className="flex">
-          <CardContent className="p-4">
-            <div className="flex flex-row gap-10 justify-between"> 
-              <div className="bg-white rounded-lg border border-white/30 ">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search by name or account..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2 w-60 md:w-80 border-2 text-black border-black bg-transparent rounded-3xl focus:outline-none focus:border-black"
-                  />
-                  <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
-                    <Search className="text-black" size={18} />
-                  </div>
-                </div>
-              </div>
-              <button onClick={() => setPaymentModalOpen(false)} className="text-white text-lg font-bold bg-red-500">
-                <X className="h-4 w-4"/>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
-        <div style={{ overflowY: "auto", maxHeight: "400px" }}>
-          <ProcessPayment data={filteredData} />
-        </div>
-      </DialogContent>
-    </Dialog>
+              {/* Process Payment */}
+              <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full justify-start" variant="outline">
+                    <MdOutlinePayment className="mr-2 h-4 w-4" /> 
+                    Process Payment
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="flex flex-col bg-transparent border-none" showCloseButton={false}>
+                  <ProcessPayment data={filteredData} onClose={handleClosePaymentModal} />
+                </DialogContent>
+              </Dialog>
 
 
 
