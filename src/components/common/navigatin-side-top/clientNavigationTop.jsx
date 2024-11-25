@@ -73,8 +73,11 @@ const NavigationTop = memo(({ handleBackToHome }) => {
         )}
 
         {/* Dropdown Menu */}
-        {dropdownVisible && (
-          <div className="absolute right-0 mt-2 w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3">
+       {/* Dropdown Menu */}
+       {dropdownVisible && (
+          <div
+            className="absolute right-0 mt-[330px] w-60 bg-white text-black rounded-lg shadow-lg z-20 p-3 "
+          >
             <img src={Slogo} alt="LOGO" className="h-14 w-14 mx-auto mb-2" />
             <p className="text-center font-medium text-lg mb-2">
               {userData.first_name} {userData.last_name}
@@ -82,7 +85,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             {userRole === "Administrator" && (
               <Link
                 to="/dashboard"
-                className="text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all mb-3 rounded-lg"
+                className="text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 hover:text-white data-[state=active]:bg-blue-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center mb-3 rounded-lg"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Dashboard
@@ -90,14 +93,14 @@ const NavigationTop = memo(({ handleBackToHome }) => {
             )}
             <Link
               to="/account"
-              className="text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all mb-3 rounded-lg"
+              className=" text-center py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 hover:text-white data-[state=active]:bg-blue-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center mb-3 rounded-lg"
             >
               Account
             </Link>
             <button
               onClick={handleLogout}
               disabled={isLoading}
-              className={`w-full text-center py-2 px-4 bg-[#FCB813] text-white hover:bg-yellow-450 rounded-lg shadow-lg hover:shadow-xl transition-shadow ${
+              className={`w-full text-center py-2 px-4 shadow-lg hover:shadow-xl transition-shadow bg-[#FCB813] text-white hover:bg-yellow-450 rounded-lg ${
                 isLoading ? "cursor-not-allowed opacity-70" : ""
               }`}
             >
@@ -113,6 +116,9 @@ const NavigationTop = memo(({ handleBackToHome }) => {
           </div>
         )}
       </div>
+
+
+     
 
       {/* Modal for Reservations */}
       {isModalOpen && (

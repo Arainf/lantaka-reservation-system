@@ -5,12 +5,15 @@ const RegistrationContext = createContext();
 export const useRegistrationContext = () => useContext(RegistrationContext);
 
 export const RegistrationProvider = ({ children }) => {
-  const [ renders , setRenderers] = useState()
+  const [ renders , setRenderers] = useState(0)
+  const [PaymentModalOpen , setPaymentModalOpen] = useState(false)
 
 
   const contextValue = {
     renders,
     setRenderers,
+    PaymentModalOpen ,
+    setPaymentModalOpen
   };
 
   return (

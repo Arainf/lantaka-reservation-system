@@ -1,11 +1,12 @@
-"use client";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState, useContext } from 'react';
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, useContext } from "react"; // Import useContext
-import './loginform.css';
-import { FaUser, FaLock } from "react-icons/fa"; // Import icons
+import { FaUser, FaLock } from "react-icons/fa";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { UserContext } from '@/context/contexts';
+import CustomToast from './CustomToast';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,10 +15,8 @@ import {
   FormItem,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
-import { UserContext } from '@/context/contexts'; // Import UserContext
+import './loginform.css';
 
-// Define the validation schema using Zod for login
 const loginSchema = z.object({
   username: z.string().nonempty({
     message: "Username is required",
@@ -27,13 +26,12 @@ const loginSchema = z.object({
   }),
 });
 
-export function LoginForm() {
-  // State for backend error message
-  const [backendError, setBackendError] = useState(null);
-  const { setUserRole, setUserData } = useContext(UserContext); // Get setUserRole from context
-  const navigate = useNavigate(); // Initialize useNavigate
+const LoginForm = () => {
+  const [toastMessage, setToastMessage] = useState(null);
+  const [toastType, setToastType] = useState('error');
+  const { setUserRole, setUserData } = useContext(UserContext);
+  const navigate = useNavigate();
 
-  // Set up the form with react-hook-form and zodResolver for validation
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -42,124 +40,115 @@ export function LoginForm() {
     },
   });
 
-  // Define the onSubmit handler
   const onSubmit = async (values) => {
     try {
       const response = await axios.post('http://localhost:5000/login', {
         username: values.username,
         password: values.password,
       });
-  
-      // Check for successful login
+
       if (response.status === 200) {
-        console.log('Full response:', response);
+        const { account_id, role, imageUrl, ...userData } = response.data;
         
-        // Destructure account_id, role, and other userData properly
-        const { account_id, role, imageUrl, ...userData } = response.data; 
-        
-        // Print role before storing to ensure it's captured
-        console.log('Role before storing:', role);
-        // Store role and userData in localStorage
         localStorage.setItem('account_id', account_id);
         localStorage.setItem('userRole', role);
         localStorage.setItem('userData', JSON.stringify(userData));
-  
-        // Print stored role in localStorage for validation
-        console.log('Stored role in localStorage:', localStorage.getItem('userRole'));
         
-        // Update UserContext with the role and userData
         setUserRole(role);
         setUserData(userData);
         
-        // Print the updated role from the context for debugging
-        console.log('Role after context update:', userData.role);
-        console.log('Role after context update:', userData.first_name);
+        setToastType('success');
+        setToastMessage('Login successful!');
 
-        if (role === 'Administrator') {
-          navigate('/dashboard');
-        } else if (role === 'Employee') {
-          navigate('/home');
-        } else {
-          navigate('/unathorize')
-        }
-
-
+        setTimeout(() => {
+          if (role === 'Administrator') {
+            navigate('/dashboard');
+          } else if (role === 'Employee') {
+            navigate('/home');
+          } else {
+            navigate('/unauthorized');
+          }
+        }, 1000);
       }
     } catch (error) {
+      let errorMessage = 'Something went wrong. Please try again.';
       if (error.response && error.response.data) {
-        setBackendError(error.response.data.message || 'Invalid credentials');
-      } else {
-        setBackendError('Something went wrong. Please try again.');
+        errorMessage = error.response.data.message || 'Invalid credentials';
       }
+      setToastType('error');
+      setToastMessage(errorMessage);
       console.error('Login failed', error);
     }
   };
-  
-  
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        {/* Username Input with User Icon */}
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem className="space-y-8">
-              <FormControl>
-                <div className="relative form-field">
-                  <span className="focus-input"></span>
-                  {/* Icon */}
-                  <FaUser className="absolute left-5 top-3 z-10 icon" />
-                  {/* Input Field */}
-                  <div className="input-container">
-                    <Input
-                      id="username"
-                      className="input-field bg-white "
-                      placeholder="Username"
-                      {...field}
-                    />
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="relative form-field">
+                    <span className="focus-input"></span>
+                    <FaUser className="absolute left-5 top-3 z-10 icon" />
+                    <div className="input-container">
+                      <Input
+                        id="username"
+                        className="input-field bg-white"
+                        placeholder="Username"
+                        {...field}
+                      />
+                    </div>
                   </div>
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        {/* Password Input with Lock Icon */}
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <div className="relative form-field">
-                  <span className="focus-input"></span>
-                  {/* Icon */}
-                  <FaLock className="absolute left-5 top-3 z-10 icon" />
-                  {/* Password Input */}
-                  <div className="input-container">
-                    <Input
-                      id="password"
-                      type="password"
-                      className="input-field bg-white"
-                      placeholder="Password"
-                      {...field}
-                    />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="relative form-field">
+                    <span className="focus-input"></span>
+                    <FaLock className="absolute left-5 top-3 z-10 icon" />
+                    <div className="input-container">
+                      <Input
+                        id="password"
+                        type="password"
+                        className="input-field bg-white"
+                        placeholder="Password"
+                        {...field}
+                      />
+                    </div>
                   </div>
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-center">
+            <Button className="LoginForm_button " type="submit">
+              <span className='poppins-semibold'>Login</span>
+            </Button>
+          </div>
+        </form>
+      </Form>
+      {toastMessage && (
+        <CustomToast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
         />
-
-        {/* Display backend error below form */}
-        {backendError && <p className="text-red-600">{backendError}</p>}
-
-        <Button className="LoginForm_button" type="submit">
-          <span>Login</span>
-        </Button>
-      </form>
-    </Form>
+      )}
+    </>
   );
-}
+};
+
+export default LoginForm;
+

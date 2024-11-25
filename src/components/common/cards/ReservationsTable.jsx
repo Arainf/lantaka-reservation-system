@@ -64,6 +64,13 @@ export default function ReservationsTable({ data = [], keys }) {
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [userRole, setUserRole] = useState("");
+
+  useEffect(() => {
+    // Get the user role from local storage
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
+  }, []);
 
   const groupedData = useMemo(() => {
     const result = data.reduce((acc, reservation) => {
@@ -111,9 +118,11 @@ export default function ReservationsTable({ data = [], keys }) {
       }
 
       acc[key].reservations.push(reservation);
-     
+      
       return acc;
     }, {});
+
+   
    
 
     const groupedArray = Object.values(result);
@@ -127,6 +136,8 @@ export default function ReservationsTable({ data = [], keys }) {
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
   }, [data, currentPage, itemsPerPage]);
+
+   console.log("grouped data" , groupedData);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= itemsPerPage) {
@@ -328,18 +339,12 @@ export default function ReservationsTable({ data = [], keys }) {
     setIsDialogOpen(true);
   };
 
-  const handleEdit = () => {
-    console.log("Edit clicked for guest:", selectedGuest);
-    toast({
-      title: "Edit Functionality",
-      description: "Edit functionality is not yet implemented.",
-      variant: "default",
-    });
-  };
 
   const handleDelete = (guest) => {
-    setAccountToDelete(guest);
-    setDeleteModalOpen(true);
+    if (userRole === "Administrator") {
+      setAccountToDelete(guest);
+      setDeleteModalOpen(true);
+    }
   };
 
   const confirmDelete = async (type) => {
@@ -942,8 +947,10 @@ export default function ReservationsTable({ data = [], keys }) {
             selectedGuest.reservations[0]?.status || "default"
           )}
           disabled={
-            selectedGuest.reservations[0]?.status === "done" ? true : false
+            selectedGuest.reservations[0]?.status === "done" ? true : userRole !== "Administrator"
           }
+          
+          
         >
           <SelectValue
             placeholder={
@@ -951,7 +958,7 @@ export default function ReservationsTable({ data = [], keys }) {
             }
           />
         </SelectTrigger>
-        { selectedGuest.reservations[0]?.status === "done" ? (
+        { selectedGuest.reservations[0]?.status === "done"  ? (
           <SelectContent>
           {/* Exclude "done" from selectable options */}
           {["done"].map(
@@ -976,15 +983,17 @@ export default function ReservationsTable({ data = [], keys }) {
         </SelectContent>)}
         
       </Select>
-      <Button
-        variant="outline"
-        onClick={() => handleSaveStatus(selectedGuest.reservationType)}
-        disabled={
-          selectedGuest.reservations[0]?.status === "done" ? true : false
-        }
-      >
-        Save Changes
-      </Button>
+      {userRole === "Administrator"  &&  (
+        <Button
+          variant="outline"
+          onClick={() => handleSaveStatus(selectedGuest.reservationType)}
+          disabled={
+            selectedGuest.reservations[0]?.status === "done" ? true : false
+          }
+        >
+          Save Changes
+        </Button>
+    )}
     </div>
   </div>
 </Card>
@@ -1164,7 +1173,7 @@ export default function ReservationsTable({ data = [], keys }) {
             </div>
             {/* buttons */}
             <div className="relative bottom-0">
-              <div className="flex  flex-col h-full items-center gap-3">
+              <div className="flex flex-col h-full items-center gap-3">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1183,13 +1192,15 @@ export default function ReservationsTable({ data = [], keys }) {
                   <Files className="h-4 w-4" />
                 </Button>
 
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(selectedGuest)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {userRole === "Administrator" && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(selectedGuest)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </DialogContent>
