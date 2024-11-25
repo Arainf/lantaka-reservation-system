@@ -11,6 +11,7 @@ import { RegistrationProvider } from './context/utilContext';
 import { RoomTypeProvider } from './context/RoomTypeContext';
 import { DiscountProvider } from './context/discountContext';
 import { AdditionalFeeProvider } from './context/additionalFeeContext';
+import { ToastProvider } from './context/toastContext';
 
 
 
@@ -18,6 +19,7 @@ import { AdditionalFeeProvider } from './context/additionalFeeContext';
 function App() {
   return (
     <>
+    <ToastProvider>
     <RegistrationProvider>
     <UserProvider>
       <AccountProvider>
@@ -45,6 +47,7 @@ function App() {
       </AccountProvider>
     </UserProvider> 
     </RegistrationProvider>
+    </ToastProvider>
     </>
   );
 }

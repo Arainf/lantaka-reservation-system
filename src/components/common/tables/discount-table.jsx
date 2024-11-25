@@ -46,6 +46,13 @@ export default function DiscountTable({ searchTerm }) {
     currentPage * itemsPerPage
   );
 
+
+  // FETCH ON THE FIRST RELOAD
+  useEffect(() => {
+    fetchDiscounts();
+  }, []);
+
+
   const handleRowClick = (discount) => {
     setSelectedDiscount(discount);
     setNewDiscount({

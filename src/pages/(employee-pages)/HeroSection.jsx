@@ -15,6 +15,8 @@ import { useReservationsContext } from "@/context/reservationContext";
 import CheckinTable from "@/components/common/cards/CheckinTable";
 import CheckoutTable from "@/components/common/cards/CheckoutTable";
 import ProcessPayment from "@/components/common/cards/ProcessPayment";
+import { Toaster } from "@/components/ui/toaster";
+import { useToastContext } from "@/context/toastContext";
 
 const Reservation = () => {
   const { bookingSummary } = useReservations();
@@ -23,16 +25,148 @@ const Reservation = () => {
   const [buttonClicked, setButtonClicked] = useState(false);
   const [checkInModalOpen, setCheckInModalOpen] = useState(false);
   const [checkOutModalOpen, setCheckOutModalOpen] = useState(false);
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const { reservationsData } = useReservationsContext();
+  const [ paymentModalOpen, setPaymentModalOpen ] = useState(false);
+  const [ paymentOpen , setPaymentOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const { reservationsData,  fetchReservationsWaiting, fetchReservationsReady, fetchReservationsOnUse } = useReservationsContext();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [ data, setData] = useState([]);
+  const { toast } = useToastContext()
+
+  // Memoized filtered data
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return [];
+
+    return reservationsData.filter((reservation) =>
+      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [reservationsData, searchTerm]);
+
+
+  useEffect(() => {
+    const initialDate = new Date();
+    setSelectedDate(initialDate);
+    setDateTranslate(formatDateToYYYYMMDD(initialDate));
+  }, []);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    const newDate = formatDateToYYYYMMDD(date);
+    setDateTranslate(newDate);
+  };
+
+  const handleMouseDown = (e) => {
+    if (e.button === 0) {
+      setIsGrabbing(true);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsGrabbing(false);
+  };
 
   const toggleFormSidebar = () => {
     setButtonClicked(!buttonClicked);
   };
 
-  const handleCheckIn = (guestId) => {
-    console.log(`Checking in guest with ID: ${guestId}`);
-    setCheckInModalOpen(false);
+  const resetState = () => {
+    setResetTrigger(true);
+    setTimeout(() => {
+      setResetTrigger(false);
+    }, 0);
+  };  
+
+
+
+  // const filteredGuests = guests.filter((guest) =>
+  //   guest.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+
+  // const handleCheckIn = (guestId) => {
+  //   console.log(`Checking in guest with ID: ${guestId}`);
+  //   setCheckInModalOpen(false); 
+  // };
+ 
+ 
+
+  // const handleCheckOut = (guestId) => {
+  //   console.log(`Checking out guest with ID: ${guestId}`);
+  //   setCheckOutModalOpen(false);
+  // };
+
+  // const handlePayment = (guestId, amount) => {
+  //   console.log(
+  //     `Processing payment of $${amount} for guest with ID: ${guestId}`
+  //   );
+  //   setPaymentModalOpen(false);
+  // };
+
+
+
+  const handlePaymentReservationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/getReservationsWaiting`);
+      if (response.status === 404) {
+        // No reservations, set state to an empty array
+        setData([]);
+        console.warn("No reservations found for 'Waiting'.");
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Failed to fetch reservations for 'Waiting'.");
+      }
+      const reservationsData = await response.json();
+      setData(reservationsData);
+    } catch (error) {
+      console.error("Error fetching 'Waiting' reservations", error);
+    }
+  };
+
+  const handleCheckInReservationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/getReservationsReady`);
+      if (response.status === 404) {
+        // No reservations, set state to an empty array
+        setData([]);
+        console.warn("No reservations found for 'Ready'.");
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Failed to fetch reservations for 'Ready'.");
+      }
+      const reservationsData = await response.json();
+      setData(reservationsData);
+    } catch (error) {
+      console.error("Error fetching 'Ready' reservations", error);
+    } finally {
+      console.log(data)
+    }
+  };
+
+  const handleCheckOutReservationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/getReservationsOnUse`);
+      if (response.status === 404) {
+        // No reservations, set state to an empty array
+        setData([]);
+        console.warn("No reservations found for 'On Use'.");
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Failed to fetch reservations for 'On Use'.");
+      }
+      const reservationsData = await response.json();
+      setData(reservationsData);
+    } catch (error) {
+      console.error("Error fetching 'On Use' reservations", error);
+    } finally {
+      console.log(data)
+    }
+  };
+
+  const handleOpenPaymentModal = () => {
+    setPaymentModalOpen(true);
   };
 
   const handleCheckOut = (guestId) => {
@@ -43,10 +177,16 @@ const Reservation = () => {
   const handlePayment = (guestId, amount) => {
     console.log(`Processing payment of $${amount} for guest with ID: ${guestId}`);
     setPaymentModalOpen(false);
+    setCheckInModalOpen(false);
+    setCheckOutModalOpen(false);
   };
 
   return (
-    <div className="relative flex flex-col h-screen w-screen bg-background" id="reservation">
+    <>
+    <div
+      className="relative flex flex-col h-screen w-screen overflow-y-auto bg-background"
+      id="reservation"
+    >
       <main className="flex flex-col md:flex-row h-full">
         {/* Left Side: Room Selector */}
         <div className="flex flex-col md:w-2/3 h-full p-4 space-y-4">
@@ -79,43 +219,39 @@ const Reservation = () => {
               <Button className="w-full justify-start" onClick={() => navigate("/Reservation")}>
                 <Plus className="mr-2 h-4 w-4" /> New Reservation
               </Button>
+
+              {/* Process Payment */}
+              <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+                <DialogTrigger asChild onClick={handlePaymentReservationData}>
+                  <Button className="w-full justify-start" variant="outline">
+                    <MdOutlinePayment className="mr-2 h-4 w-4" /> 
+                    Process Payment
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="flex flex-col bg-transparent border-none" showCloseButton={false}>
+                  <ProcessPayment data={data} onClose={handleClosePaymentModal} />
+                </DialogContent>
+              </Dialog>
+
               <Dialog open={checkInModalOpen} onOpenChange={setCheckInModalOpen}>
-                <DialogTrigger asChild>
+                <DialogTrigger asChild onClick={handleCheckInReservationData}>
                   <Button className="w-full justify-start" variant="outline">
                     <FaCalendarCheck className="mr-2 h-4 w-4" /> Check-in Guest
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Check-in Guest</DialogTitle>
-                  </DialogHeader>
-                  <CheckinTable data={reservationsData} />
+                <DialogContent className="flex flex-col bg-transparent border-none shadow-none"  showCloseButton={false} >
+                    <CheckinTable data={data} onClose={handleClosePaymentModal} />
                 </DialogContent>
               </Dialog>
+
               <Dialog open={checkOutModalOpen} onOpenChange={setCheckOutModalOpen}>
-                <DialogTrigger asChild>
+                <DialogTrigger asChild onClick={handleCheckOutReservationData}>
                   <Button className="w-full justify-start" variant="outline">
                     <FaCalendarTimes className="mr-2 h-4 w-4" /> Check-out Guest
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Check-out Guest</DialogTitle>
-                  </DialogHeader>
-                  <CheckoutTable data={reservationsData} />
-                </DialogContent>
-              </Dialog>
-              <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full justify-start" variant="outline">
-                    <MdOutlinePayment className="mr-2 h-4 w-4" /> Process Payment
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Process Payment</DialogTitle>
-                  </DialogHeader>
-                  <ProcessPayment data={reservationsData} />
+                <DialogContent className="flex flex-col bg-transparent border-none shadow-none" showCloseButton={false}>
+                    <CheckoutTable data={data} onClose={handleClosePaymentModal} />
                 </DialogContent>
               </Dialog>
             </CardContent>
@@ -145,6 +281,14 @@ const Reservation = () => {
         </div>
       </main>
     </div>
+
+    <Toaster 
+      containerClassName="z-[10000]" 
+      toastOptions={{
+        className: "z-[10000]",
+      }}
+    />
+    </>
   );
 };
 

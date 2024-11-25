@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast";
+import { useToastContext } from "@/context/toastContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, X } from "lucide-react";
 import { useRegistrationContext } from "@/context/utilContext";
@@ -12,8 +12,8 @@ export default function ReservationsTable({ data = [], onClose }) {
   const [selectedReservationIndex, setSelectedReservationIndex] = useState(0); // Default to the first reservation
   const [sortOrder, setSortOrder] = useState("newest");
   const [searchTerm, setSearchTerm] = useState("");
-  const { toast } = useToast();
-  const { setPaymentModalOpen} = useRegistrationContext();
+  const { toast } = useToastContext();
+
 
   const filteredData = useMemo(() => {
     let dataToFilter = data.filter(reservation => reservation.status === "waiting")
@@ -120,7 +120,7 @@ export default function ReservationsTable({ data = [], onClose }) {
     try {
       const payload = {
         guest_id: reservation.guestId,
-        status: "paid",
+        status: "ready",
         type: reservation.reservationType,
       };
 
@@ -237,23 +237,7 @@ export default function ReservationsTable({ data = [], onClose }) {
                     </div>
                   </Card>
 
-                  {/* Navigation buttons */}
-                  <div className="flex justify-between mt-4">
-                    <Button
-                      onClick={goToPreviousReservation}
-                      disabled={selectedReservationIndex === 0}
-                    >
-                      Prev
-                    </Button>
-                    <Button
-                      onClick={goToNextReservation}
-                      disabled={
-                        selectedReservationIndex === filteredData.length - 1
-                      }
-                    >
-                      Next
-                    </Button>
-                  </div>
+                  
                 </>
               ) : (
                 <div className="border-dashed h-auto w-auto rounded-xl  border-2 border-gray-300">
@@ -264,16 +248,33 @@ export default function ReservationsTable({ data = [], onClose }) {
               )}
             </div>
           ) : (
+            <>
             <div className="border-dashed h-auto w-auto rounded-xl  border-2 border-gray-300">
               <p className="text-gray-500 text-center m-20 ">
                 Start searching to view reservations.
               </p>
             </div>
+            {/* Navigation buttons */}
+            <div className="flex justify-between mt-4">
+            <Button
+              onClick={goToPreviousReservation}
+              disabled={selectedReservationIndex === 0}
+            >
+              Prev
+            </Button>
+            <Button
+              onClick={goToNextReservation}
+              disabled={
+                selectedReservationIndex === filteredData.length - 1
+              }
+            >
+              Next
+            </Button>
+          </div>
+          </>
           )}
         </CardContent>
-      </Card>
-
-      <Toaster />
+      </Card> 
       </div>
     </>
   );

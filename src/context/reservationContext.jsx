@@ -22,6 +22,11 @@ export const ReservationsProvider = ({ children }) => {
     }
   };
 
+
+  
+
+
+
   useEffect(() => {
     fetchReservations();
   }, [deleteData, setDeleteData]);
