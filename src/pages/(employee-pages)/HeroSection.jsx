@@ -37,6 +37,8 @@ import { useReservationsContext } from "@/context/reservationContext";
 import { useRegistrationContext } from "@/context/utilContext";
 import CheckoutTable from "@/components/common/cards/CheckoutTable";
 import ProcessPayment from "@/components/common/cards/ProcessPayment";
+import { Toaster } from "@/components/ui/toaster";
+import { useToastContext } from "@/context/toastContext";
 
 
 import CheckinTable from "@/components/common/cards/CheckinTable";
@@ -58,8 +60,10 @@ const Reservation = () => {
   const [ paymentModalOpen, setPaymentModalOpen ] = useState(false);
   const [ paymentOpen , setPaymentOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("");
-  const { reservationsData } = useReservationsContext();
+  const { reservationsData,  fetchReservationsWaiting, fetchReservationsReady, fetchReservationsOnUse } = useReservationsContext();
   const [searchTerm, setSearchTerm] = useState("");
+  const [ data, setData] = useState([]);
+  const { toast } = useToastContext()
 
   // Memoized filtered data
   const filteredData = useMemo(() => {
@@ -130,15 +134,81 @@ const Reservation = () => {
   //   setPaymentModalOpen(false);
   // };
 
+
+
+  const handlePaymentReservationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/getReservationsWaiting`);
+      if (response.status === 404) {
+        // No reservations, set state to an empty array
+        setData([]);
+        console.warn("No reservations found for 'Waiting'.");
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Failed to fetch reservations for 'Waiting'.");
+      }
+      const reservationsData = await response.json();
+      setData(reservationsData);
+    } catch (error) {
+      console.error("Error fetching 'Waiting' reservations", error);
+    }
+  };
+
+  const handleCheckInReservationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/getReservationsReady`);
+      if (response.status === 404) {
+        // No reservations, set state to an empty array
+        setData([]);
+        console.warn("No reservations found for 'Ready'.");
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Failed to fetch reservations for 'Ready'.");
+      }
+      const reservationsData = await response.json();
+      setData(reservationsData);
+    } catch (error) {
+      console.error("Error fetching 'Ready' reservations", error);
+    } finally {
+      console.log(data)
+    }
+  };
+
+  const handleCheckOutReservationData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/getReservationsOnUse`);
+      if (response.status === 404) {
+        // No reservations, set state to an empty array
+        setData([]);
+        console.warn("No reservations found for 'On Use'.");
+        return;
+      }
+      if (!response.ok) {
+        throw new Error("Failed to fetch reservations for 'On Use'.");
+      }
+      const reservationsData = await response.json();
+      setData(reservationsData);
+    } catch (error) {
+      console.error("Error fetching 'On Use' reservations", error);
+    } finally {
+      console.log(data)
+    }
+  };
+
   const handleOpenPaymentModal = () => {
     setPaymentModalOpen(true);
   };
 
   const handleClosePaymentModal = () => {
     setPaymentModalOpen(false);
+    setCheckInModalOpen(false);
+    setCheckOutModalOpen(false);
   };
 
   return (
+    <>
     <div
       className="relative flex flex-col h-screen w-screen overflow-y-auto bg-background"
       id="reservation"
@@ -234,74 +304,38 @@ const Reservation = () => {
                 <Plus className="mr-2 h-4 w-4" /> New Reservation
               </Button>
 
-
               {/* Process Payment */}
               <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
-                <DialogTrigger asChild>
+                <DialogTrigger asChild onClick={handlePaymentReservationData}>
                   <Button className="w-full justify-start" variant="outline">
                     <MdOutlinePayment className="mr-2 h-4 w-4" /> 
                     Process Payment
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="flex flex-col bg-transparent border-none" showCloseButton={false}>
-                  <ProcessPayment data={reservationsData} onClose={handleClosePaymentModal} />
+                  <ProcessPayment data={data} onClose={handleClosePaymentModal} />
                 </DialogContent>
               </Dialog>
 
-
-
-              <Dialog
-                open={checkInModalOpen}
-                onOpenChange={setCheckInModalOpen}
-              >
-                <DialogTrigger asChild>
+              <Dialog open={checkInModalOpen} onOpenChange={setCheckInModalOpen}>
+                <DialogTrigger asChild onClick={handleCheckInReservationData}>
                   <Button className="w-full justify-start" variant="outline">
                     <FaCalendarCheck className="mr-2 h-4 w-4" /> Check-in Guest
                   </Button>
                 </DialogTrigger>
-                <DialogContent showCloseButton={false} >
-                <button
-                    onClick={() => setCheckInModalOpen(false)}
-                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
-                  >
-                    <X className="h-7 w-4" />
-                  </button>
-                  <DialogHeader>
-                    <DialogTitle>Check-in Guest</DialogTitle>
-                    
-                  </DialogHeader>
-                  <div style={{ overflowY: "auto", maxHeight: "400px" }}>
-
-                    <CheckinTable data={reservationsData} />
-                    </div>
-
+                <DialogContent className="flex flex-col bg-transparent border-none shadow-none"  showCloseButton={false} >
+                    <CheckinTable data={data} onClose={handleClosePaymentModal} />
                 </DialogContent>
               </Dialog>
-              <Dialog
-                open={checkOutModalOpen}
-                onOpenChange={setCheckOutModalOpen}
-              >
-                <DialogTrigger asChild>
+
+              <Dialog open={checkOutModalOpen} onOpenChange={setCheckOutModalOpen}>
+                <DialogTrigger asChild onClick={handleCheckOutReservationData}>
                   <Button className="w-full justify-start" variant="outline">
                     <FaCalendarTimes className="mr-2 h-4 w-4" /> Check-out Guest
                   </Button>
                 </DialogTrigger>
-                
-                <DialogContent showCloseButton={false}>
-                <button
-                    onClick={() => setCheckOutModalOpen(false)}
-                    className="absolute  -top-[85px] -right-[0px] text-white text-lg font-bold bg-red-500"
-                  >
-                    <X className="h-7 w-4" />
-                  </button>
-                  <DialogHeader>
-                    <DialogTitle>Check-out Guest</DialogTitle>
-                    
-                  </DialogHeader>
-                  
-                  <div style={{ overflowY: "auto", maxHeight: "400px" }}>
-                    <CheckoutTable data={reservationsData} />
-                  </div>
+                <DialogContent className="flex flex-col bg-transparent border-none shadow-none" showCloseButton={false}>
+                    <CheckoutTable data={data} onClose={handleClosePaymentModal} />
                 </DialogContent>
               </Dialog>
               
@@ -350,7 +384,16 @@ const Reservation = () => {
           </div>
         </div>
       )}
+       
     </div>
+
+    <Toaster 
+      containerClassName="z-[10000]" 
+      toastOptions={{
+        className: "z-[10000]",
+      }}
+    />
+    </>
   );
 };
 

@@ -14,6 +14,7 @@ import { IoIosBriefcase } from "react-icons/io"
 import { TbMessageCircleFilled } from "react-icons/tb"
 import { BsFileTextFill } from "react-icons/bs"
 import { Label } from "@/components/ui/label"
+import moment from 'moment-timezone';
 import {
   Select,
   SelectContent,
@@ -105,9 +106,10 @@ export default function Component() {
     triple: [],
     matrimonial: [],
   })
-  const { price, clientType, setClientType, discounts, initialTotalPrice } =
+  const { price, clientType, setClientType, discounts, initialTotalPrice, fetchDiscount } =
     usePriceContext()
   const [venueMessage, setVenueMessage] = useState("")
+  const [search, setSearch] = useState("")
   const [roomMessage, setRoomMessage] = useState("")
   const [dateRangeRoomsetter, setDateRangeRoomsetter] = useState({
     from: "",
@@ -124,6 +126,9 @@ export default function Component() {
     "Matrimonial capacity": 0,
   })
   const [venueCapacity, setVenueCapacity] = useState([])
+  const [clients, setClients] = useState([])
+  const [selectedClient, setSelectedClient] = useState(null)
+
 
   const form = useForm({
     resolver: zodResolver(reservationSchema),
@@ -176,7 +181,8 @@ export default function Component() {
   }, [price])
 
   useEffect(() => {
-    fetchEverythingAvailable()
+    fetchEverythingAvailable();
+    fetchDiscount();
   }, [])
 
   useEffect(() => {
@@ -282,43 +288,57 @@ export default function Component() {
   }, [price.venue_Holder, form])
 
   const onPass = async (data) => {
+    console.log(data);
     if (step < 3) {
-      await nextStep()
+      await nextStep();
     } else {
       try {
-        await step3Schema.parseAsync(data)
+        
+        await step3Schema.parseAsync(data);
 
-        data.accountId = localStorage.getItem("account_id")
-        data.totalPrice = calculateTotalPrice()
-        data.discount = discounts
-        data.initialTotalPrice = initialTotalPrice
-        data.MaxnumberofGuest = maxGuests
+        // Get the timezone (e.g., from a user setting or default to system's timezone)
+        const timeZone = 'Asia/Manila';  // Example: set this dynamically if needed
+
+        // Adjust the date range for room with the selected timezone
+        const fromRoom = moment(dateRangeRoomsetter.from).tz(timeZone, true).format();
+        const toRoom = moment(dateRangeRoomsetter.to).tz(timeZone, true).format();
+
+        // Adjust the date range for venue with the selected timezone
+        const fromVenue = moment(dateRangeVenueSetter.from).tz(timeZone, true).format();
+        const toVenue = moment(dateRangeVenueSetter.to).tz(timeZone, true).format();
+
+        data.accountId = localStorage.getItem("account_id");
+        data.totalPrice = calculateTotalPrice();
+        data.discount = discounts;
+        data.initialTotalPrice = initialTotalPrice;
+        data.MaxnumberofGuest = maxGuests;
 
         data.dateRangeRoom = {
-          from: dateRangeRoomsetter.from,
-          to: dateRangeRoomsetter.to,
-        }
+          from: fromRoom,
+          to: toRoom,
+        };
 
         data.dateRangeVenue = {
-          from: dateRangeVenueSetter.from,
-          to: dateRangeVenueSetter.to,
-        }
+          from: fromVenue,
+          to: toVenue,
+        };
 
-        data.selectedReservationRooms = selectedRooms
-        data.selectedReservationVenues = selectedVenues
-        data.clientType = clientType
-        console.log("data:", JSON.stringify(data, null, 2))
-        setFormData(data)
+        data.selectedReservationRooms = selectedRooms;
+        data.selectedReservationVenues = selectedVenues;
+        data.clientType = clientType;
+        
+        console.log("data:", JSON.stringify(data, null, 2));
+        setFormData(data);
       } catch (error) {
-        console.error("Final validation error:", error)
+        console.error("Final validation error:", error);
         if (error instanceof z.ZodError) {
           error.errors.forEach((err) => {
-            form.setError(err.path[0], { message: err.message })
-          })
+            form.setError(err.path[0], { message: err.message });
+          });
         }
       }
     }
-  }
+}
 
   const calculateTotalPrice = () => {
     let total = initialTotalPrice
@@ -427,15 +447,30 @@ export default function Component() {
   }
 
   const callAvailableRoom = (dateRange) => {
-    setDateRangeRoomsetter(dateRange)
-    fetchAvailableRoom(dateRange)
-    setShowResultsRoom(true)
+    console.log(`Date Range Raw: ${dateRange.from.toLocaleString()}, to ${dateRange.to.toLocaleString()}`)
+    if (dateRange.from && dateRange.to) {
+      const adjustedDateRange = {
+        from: new Date(dateRange.from),
+        to: new Date(dateRange.to),
+      }
+
+      console.log(`Date Range Adjusted: ${adjustedDateRange.from.toLocaleString()}, to ${adjustedDateRange.to.toLocaleString()}`)
+      setDateRangeRoomsetter(adjustedDateRange)
+      fetchAvailableRoom(adjustedDateRange)
+      setShowResultsRoom(true)
+    }
   }
 
   const callAvailableVenue = (dateRange) => {
-    setDateRangeVenueSetter(dateRange)
-    fetchAvailableVenue(dateRange)
-    setShowResultsVenue(true)
+    if (dateRange.from && dateRange.to) {
+      const adjustedDateRange = {
+        from: new Date(dateRange.from),
+        to: new Date(dateRange.to),
+      }
+      setDateRangeVenueSetter(adjustedDateRange)
+      fetchAvailableVenue(adjustedDateRange)
+      setShowResultsVenue(true)
+    }
   }
 
   const callAvailableRoomAndVenue = (dateRange) => {
@@ -446,6 +481,8 @@ export default function Component() {
     setShowResultsRoom(true)
     setShowResultsVenue(true)
   }
+
+
 
   const nextStep = async () => {
     try {
@@ -565,7 +602,7 @@ export default function Component() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
         {venues.map((room) => {
           const {
-            room_id: venueId,
+            room_name: venueId,
             room_isready: isReady,
             room_status: isAvailable,
           } = room
@@ -626,6 +663,41 @@ export default function Component() {
     }).format(amount)
   }
 
+  useEffect(() => {
+    if (search.trim()) {
+      fetch(`http://localhost:5000/api/clients?search=${search}`)
+        .then(response => response.json())
+        .then(data => {
+          setClients(data)
+        })
+        .catch(error => {
+          console.error("Error fetching clients:", error)
+        })
+    } else {
+      setClients([])
+    }
+  }, [search])
+  
+  const handleClientSelect = (client) => {
+    setSelectedClient(client)
+    form.reset({
+      ...form.getValues(),
+      clientAlias: client.guest_client,
+      clientType: client.guest_type,
+      firstName: client.guest_fName,
+      lastName: client.guest_lName,
+      gender: client.guest_gender,
+      email: client.guest_email,
+      phone: client.guest_phone,
+      designation: client.guest_designation,
+      messengerAccount: client.guest_messenger_account,
+      address: client.guest_address,
+    })
+    setSearch(client.guest_client)
+    setClients([])
+    setClientType(client.guest_type)
+  }
+
   return (
     <>
       <main className="flex flex-col h-screen w-screen overflow-hidden">
@@ -661,14 +733,36 @@ export default function Component() {
                                     <FormMessage className="form-message" />
                                   </div>
                                   <FormControl>
-                                    <Input
-                                      placeholder="Client Alias"
-                                      {...field}
-                                    />
+                                    <div className="relative">
+                                      <Input
+                                        placeholder="Client Alias"
+                                        {...field}
+                                        onChange={(e) => {
+                                          field.onChange(e.target.value)
+                                          setSearch(e.target.value)
+                                        }}
+                                        autocomplete="off"
+                                      />
+                                      {clients.length > 0 && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                          {clients.map((client) => (
+                                            <div
+                                              key={client.guest_id}
+                                              className="p-2 hover:bg-gray-100 cursor-pointer poppins-regular"
+                                              onClick={() => handleClientSelect(client)}
+                                            >
+                                              <p>{client.guest_client}</p>
+                                              <p className="poppins-light">{client.guest_fName} {client.guest_lName} </p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
                                   </FormControl>
                                 </FormItem>
                               )}
                             />
+                           
 
                             <div className="flex flex-row w-[500px] gap-4 ">
                               <FormField
@@ -765,7 +859,10 @@ export default function Component() {
                                         <div className="flex flex-row gap-2">
                                           <DatePicker
                                             value={field.value}
-                                            onChange={field.onChange}
+                                            onChange={(value) => {
+                                              field.onChange(value)
+                                              callAvailableRoom(value)
+                                            }}
                                             className="custom-datepicker w-full"
                                             state={roomState}
                                           />
@@ -798,7 +895,10 @@ export default function Component() {
                                         <div className="flex flex-row gap-2 ">
                                           <DatePicker
                                             value={field.value}
-                                            onChange={field.onChange}
+                                            onChange={(value) => {
+                                              field.onChange(value)
+                                              callAvailableRoom(value)
+                                            }}
                                             className="custom-datepicker w-full"
                                             state={venueState}
                                           />
@@ -1237,9 +1337,18 @@ export default function Component() {
         <DialogContent className="bg-transparent p-0 max-w-5xl border-none flex flex-row gap-3" showCloseButton={false}>
           <div className="w-3/5 flex flex-col gap-2">
             <Card className="flex-1 flex flex-col">
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">Confirm Your Reservation</CardTitle>
-              </CardHeader>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Confirm Your Reservation</CardTitle>
+              <p>
+                {formData?.dateRangeRoom?.from && formData?.dateRangeRoom?.to ? (
+                  `From: ${new Date(formData.dateRangeRoom.from).toLocaleDateString()} To: ${new Date(formData.dateRangeRoom.to).toLocaleDateString()}`
+                ) : (
+                  "No date range selected"
+                )}
+              </p>
+            </CardHeader>
+
+
               <CardContent className="p-4 flex flex-col h-full">
                 <ScrollArea className="h-[calc(80vh-8rem)] w-full pr-4">
                   <div className="space-y-4">
@@ -1250,6 +1359,7 @@ export default function Component() {
                           <Label className="font-medium">Full Name</Label>
                           <p>{`${formData.firstName || ""} ${formData.lastName || ""}`}</p>
                         </div>
+                        
                         <div>
                           <Label className="font-medium">Gender</Label>
                           <p>{formData.gender || "Not specified"}</p>

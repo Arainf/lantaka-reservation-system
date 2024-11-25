@@ -15,15 +15,26 @@ import {
 
 export function DatePicker({ value, onChange, className, state }) {
   const [date, setDate] = React.useState(value || {
-    from: new Date(),
-    to: addDays(new Date(), 0),
+    from: new Date(), 
+    to: new Date(), 
   })
 
   const handleDateChange = (newDate) => {
-    setDate(newDate)
-    onChange(newDate) // Pass selected date back to FormField
-    console.log("Selected date:", newDate)
-  }
+    console.log("Data to be sent to onChange:", newDate); // Log the data
+    setDate(newDate);
+    onChange(newDate); // Pass selected date back to FormField
+  
+    if (newDate?.from && newDate?.to) {
+      const formattedFrom = format(newDate.from, "yyyy-MM-dd");
+      const formattedTo = format(newDate.to, "yyyy-MM-dd");
+  
+      // Log the raw string for the date range
+      console.log(`From ${formattedFrom} to ${formattedTo}`);
+      console.log(`from ${newDate.from.toLocaleString()} to ${newDate.to.toLocaleString()}`);
+    }
+  };
+  
+  
 
   return (
     <div className={cn("flex items-center justify-between gap-2 ", className)}>
@@ -39,7 +50,6 @@ export function DatePicker({ value, onChange, className, state }) {
             style={{
               backgroundColor: "#95c1ff",
             }}
-
             disabled={state}
           >
             <IoCalendarSharp className="mr-2 h-4 w-4" />
@@ -62,8 +72,8 @@ export function DatePicker({ value, onChange, className, state }) {
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={handleDateChange} // Use the callback here
-            numberOfMonths={1}
+            onSelect={handleDateChange}
+            numberOfMonths={2}
             className="border-blue-500 text-black hover:border-blue-500"
           />
         </PopoverContent>
@@ -71,3 +81,5 @@ export function DatePicker({ value, onChange, className, state }) {
     </div>
   )
 }
+
+
