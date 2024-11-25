@@ -57,12 +57,8 @@ export default function Account() {
   const handleSaveChanges = async () => {
     setIsSaving(true);
     try {
-      // Simulating an API call to save changes
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // Update the context with the new user data
-      setUserData((prev) => ({ ...prev }));
-      
+      localStorage.setItem("userData", JSON.stringify(userData));
       toast({
         title: "Changes Saved",
         description: "Your changes have been successfully saved.",
@@ -179,7 +175,7 @@ export default function Account() {
                     type="text"
                     id="first_name"
                     name="first_name"
-                    value={userData.first_name}
+                    value={userData.fName}
                     onChange={handleInputChange}
                     className="shadow-sm"
                   />
