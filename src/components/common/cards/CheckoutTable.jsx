@@ -6,66 +6,101 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
 
-export default function ReservationsTable({ data = [] }) {
+export default function CheckoutPage({ data = [] }) {
   const [filter, setFilter] = useState("all");
-  const [selectedReservationIndex, setSelectedReservationIndex] = useState(0); // Default to the first reservation
+  const [selectedReservationIndex, setSelectedReservationIndex] = useState(0);
   const [sortOrder, setSortOrder] = useState("newest");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  
   // Memoized filtered data
   const filteredData = useMemo(() => {
-  let dataToFilter = data;
+    let dataToFilter = data;
 
-  // Apply search filter
-  if (searchTerm) {
-    dataToFilter = dataToFilter.filter((reservation) =>
-      reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
-
-  // Apply type filter
-  if (filter !== "all") {
-    dataToFilter = dataToFilter.filter((reservation) =>
-      filter === "room"
-        ? reservation.reservation_type === "room"
-        : filter === "venue"
-        ? reservation.reservation_type === "venue"
-        : true
-    );
-  }
-
-  // Group data by guest details (excluding reservation type)
-  const groupedData = dataToFilter.reduce((acc, reservation) => {
-    const key = `${reservation.guest_name}-${reservation.guest_email}`;
-
-    if (!acc[key]) {
-      acc[key] = {
-        guestName: reservation.guest_name,
-        guestEmail: reservation.guest_email,
-        reservations: [],
-        receiptDate: reservation.receipt_date,
-        reservationCheckout: reservation.check_out_date,
-
-      };
+    // Apply search filter
+    if (searchTerm) {
+      dataToFilter = dataToFilter.filter((reservation) =>
+        reservation.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        reservation.guest_email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
-    acc[key].reservations.push(reservation);
+    // Apply type filter
+    if (filter !== "all") {
+      dataToFilter = dataToFilter.filter((reservation) =>
+        filter === "room"
+          ? reservation.reservation_type === "room"
+          : filter === "venue"
+          ? reservation.reservation_type === "venue"
+          : true
+      );
+    }
 
-    return acc;
-  }, {});
+    // Group data by guest details (excluding reservation type)
+    const groupedData = dataToFilter.reduce((acc, reservation) => {
+      const key = `${reservation.guest_name}-${reservation.guest_email}`;
 
-  return Object.values(groupedData).sort((a, b) => {
-    const dateA = new Date(a.receiptDate);
-    const dateB = new Date(b.receiptDate);
-    return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-  });
-}, [data, filter, sortOrder, searchTerm]);
+      if (!acc[key]) {
+        acc[key] = {
+          guestName: reservation.guest_name,
+          guestEmail: reservation.guest_email,
+          reservations: [],
+          receiptDate: reservation.receipt_date,
+          checkinDate: reservation.check_in_date,
+          totalAmount: reservation.total_amount, // Added to show total cost
+        };
+      }
 
+      acc[key].reservations.push(reservation);
+      return acc;
+    }, {});
 
-  // Handle next and previous navigation
+    return Object.values(groupedData).sort((a, b) => {
+      const dateA = new Date(a.receiptDate);
+      const dateB = new Date(b.receiptDate);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
+  }, [data, filter, sortOrder, searchTerm]);
+
+  const selectedGuest = filteredData[selectedReservationIndex];
+
+  const checkout = async () => {
+    if (!selectedGuest) return;
+
+    try {
+      const reservation = selectedGuest.reservations[0];
+      if (!reservation) throw new Error("No reservation found for the selected guest.");
+
+      // Simulate checkout process (can be linked to payment gateway)
+      let payload = {
+        guest_id: reservation.guest_id,
+        total_amount: selectedGuest.totalAmount,
+      };
+
+      // Send checkout request (this would typically integrate with a payment API)
+      const response = await fetch("http://localhost:5000/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Checkout failed.");
+
+      const result = await response.json();
+      toast({
+        title: "Checkout Successful",
+        description: "Your reservation has been confirmed, and payment is processed.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Checkout Failed",
+        description: "Failed to complete checkout. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const goToNextReservation = () => {
     if (selectedReservationIndex < filteredData.length - 1) {
       setSelectedReservationIndex(selectedReservationIndex + 1);
@@ -81,7 +116,7 @@ export default function ReservationsTable({ data = [] }) {
   return (
     <>
       <Card>
-        <div className="fixed -top-[100px] left-[80px] mb-4 bg-white  rounded-lg border border-white/30 p-4">
+        <div className="fixed -top-[100px] left-[80px] mb-4 bg-white rounded-lg border border-white/30 p-4">
           <div className="relative">
             <input
               type="text"
@@ -107,16 +142,17 @@ export default function ReservationsTable({ data = [] }) {
                   <div className="flex items-center justify-between">
                     <div className="font-bold">
                       {filteredData[selectedReservationIndex].guestName} 
-                      {filteredData[selectedReservationIndex].reservationType}
                       <div className="mt-2">
-                        {/* dapat checkin date ito */}
-                        {new Date(
-                          filteredData[selectedReservationIndex].reservationCheckout
-                        ).toLocaleDateString()}
+                        {/* Show check-in date */}
+                        {new Date(filteredData[selectedReservationIndex].checkinDate).toLocaleDateString()}
                       </div>
-                      <div className="absolute top-[100px] right-[40px] text-sm px-[0px] text-gray-500">
-                      <Button>Check-out</Button>
                     </div>
+
+                    <div className="absolute top-[80px] right-[40px] text-sm px-[0px] text-gray-500">
+                      <div className="mt-4">
+                        {/* Checkout Button */}
+                        <Button onClick={checkout}>Checkout</Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

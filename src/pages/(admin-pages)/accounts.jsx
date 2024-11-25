@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import DeleteModal from "@/components/ui/deletemodal"
 import { useAccountContext } from "@/context/contexts"
 import DashboardRegistrationForm from "@/components/common/login-form/RegistrationForm"
-import { useRegistrationContext } from "@/context/registrationContext"
+import { useRegistrationContext } from "@/context/utilContext"
 import {
   Select,
   SelectContent,

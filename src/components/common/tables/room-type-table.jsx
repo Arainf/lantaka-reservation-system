@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useRegistrationContext } from "@/context/registrationContext"
+import { useRegistrationContext } from "@/context/utilContext"
 
 export default function RoomTypeTable({ searchTerm, render }) {
   const { roomTypes, fetchRoomTypes, addRoomType, updateRoomType, deleteRoomType } = useRoomTypeContext();

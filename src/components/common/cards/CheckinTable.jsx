@@ -72,10 +72,11 @@ export default function ReservationsTable({ data = [] }) {
 
       let payload = {
         guest_id: reservation.guest_id,
-        status: reservation.status,
+        status: "checked_in", // Update the status to 'checked_in'
         type,
       };
 
+      // Apply the type logic for room/venue or both
       if (type === "room") payload.reservation_room_ids = reservation.room_ids;
       if (type === "venue") payload.reservation_venue_ids = reservation.venue_ids;
       if (type === "both") {
@@ -83,6 +84,7 @@ export default function ReservationsTable({ data = [] }) {
         payload.reservation_venue_ids = reservation.venue_ids;
       }
 
+      // Send PUT request to update the reservation status
       const response = await fetch("http://localhost:5000/api/change_status", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -118,11 +120,10 @@ export default function ReservationsTable({ data = [] }) {
     }
   };
 
-
   return (
     <>
       <Card>
-        <div className="fixed -top-[100px] left-[80px] mb-4 bg-white  rounded-lg border border-white/30 p-4">
+        <div className="fixed -top-[100px] left-[80px] mb-4 bg-white rounded-lg border border-white/30 p-4">
           <div className="relative">
             <input
               type="text"
@@ -150,16 +151,17 @@ export default function ReservationsTable({ data = [] }) {
                       {filteredData[selectedReservationIndex].guestName} 
                       {filteredData[selectedReservationIndex].reservationType}
                       <div className="mt-2">
-                        {/* dapat checkin date ito */}
-                        {new Date(
-                          filteredData[selectedReservationIndex].checkinDate
-                        ).toLocaleDateString()}
+                        {/* Show check-in date */}
+                        {new Date(filteredData[selectedReservationIndex].checkinDate).toLocaleDateString()}
                       </div>
-                      <div className="absolute top-[100px] right-[40px] text-sm px-[0px] text-gray-500">
-                      <div className="mt-4">
-                        <Button onClick={() => Checkin(type)}>Check-in</Button>
-                        </div>
                     </div>
+
+                    <div className="absolute top-[80px] right-[40px] text-sm px-[0px] text-gray-500">
+                      <div className="mt-4">
+                        {/* Pass the type value to Checkin */}
+                        
+                        <Button onClick={() => Checkin("both")}>Check-in</Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
