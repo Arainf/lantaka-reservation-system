@@ -1,6 +1,15 @@
 'use client'
 
 import React, { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Card} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const RoomAndVenueSelector = () => {
   const [selectedType, setSelectedType] = useState("all");
@@ -69,50 +78,69 @@ const RoomAndVenueSelector = () => {
   };
 
   return (
-    <div className="space-y-6 px-4 sm:px-6 lg:px-8">
-      {/* Category Selector */}
-      <div className="flex space-x-4 overflow-x-auto">
-        {["rooms", "venues"].map((category) => (
-          <button
-            key={category}
-            className={`px-6 py-3 rounded-full transition-all duration-300 ${selectedCategory === category ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
-          </button>
-        ))}
-      </div>
+<ScrollArea className="space-y-6 px-4 sm:px-6 lg:px-4 h-[640px] overflow-hidden">      {/* Category and Type Selector in One Line */}
+      <div className="flex space-x-4 items-center py-1">
+        {/* Category Selector */}
+        <div className="flex  space-x-4">
+          {["rooms", "venues"].map((category) => (
+            <button
+              key={category}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform ${
+                selectedCategory === category
+                  ? "bg-blue-600 text-white shadow-md scale-95"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-95"
+              }`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+          ))}
+        </div>
 
-      {/* Type Selector */}
-      <div className="flex space-x-4 mt-4 overflow-x-auto">
-        {["all", "double", "triple", "matrimonial", "hall", "outdoor", "bar"].map((venueType) => (
-          <button
-            key={venueType}
-            className={`px-6 py-3 rounded-full transition-all duration-300 ${selectedType === venueType ? "bg-blue-600 text-white shadow-lg" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
-            onClick={() => setSelectedType(venueType)}
-          >
-            {venueType.charAt(0).toUpperCase() + venueType.slice(1)}
-          </button>
-        ))}
+        {/* Type Selector Dropdown */}
+        <div className="flex justify-center">
+      <Select value={selectedType} onValueChange={(value) => setSelectedType(value)}>
+        <SelectTrigger className="px-4 w-[100px] py-2 rounded-lg text-sm font-semibold bg-gray-200 text-gray-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-300 hover:scale-95">
+          <SelectValue placeholder="Select Venue Type" />
+        </SelectTrigger>
+        <SelectContent>
+          {[
+            "all",
+            "double",
+            "triple",
+            "matrimonial",
+            "hall",
+            "outdoor",
+            "bar",
+          ].map((venueType) => (
+            <SelectItem key={venueType} value={venueType}>
+              {venueType.charAt(0).toUpperCase() + venueType.slice(1)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+     </div>
       </div>
 
       {/* Item Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
         {filteredData.map((item) => (
-          <div
+          <Card
             key={item.id}
             className="p-4 bg-white border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer relative"
             onMouseEnter={() => setHoveredItem(item)}
             onMouseLeave={() => setHoveredItem(null)}
-          >
+           >
             <div className="flex flex-col h-full">
               <div className="flex justify-between items-center mb-2">
                 <div className="text-sm font-semibold">{item.name}</div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  item.isAvailable 
-                  ? "bg-green-100 text-green-600" 
-                  : "bg-red-100 text-red-600"
-                }`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    item.isAvailable
+                      ? "bg-green-100 text-green-600"
+                      : "bg-red-100 text-red-600"
+                  }`}
+                >
                   {item.isAvailable ? "Available" : "Reserved"}
                 </span>
               </div>
@@ -124,35 +152,48 @@ const RoomAndVenueSelector = () => {
             {hoveredItem && hoveredItem.id === item.id && (
               <div className="absolute z-10 w-64 bg-white rounded-lg shadow-xl p-4 -mt-2 -ml-2">
                 <div className="flex">
-                  <img src={item.img} alt={item.name} className="w-24 h-24 object-cover rounded-lg mr-4" />
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    className="w-24 h-24 object-cover rounded-lg mr-4"
+                  />
                   <div>
                     <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      item.isAvailable 
-                      ? "bg-green-100 text-green-600" 
-                      : "bg-red-100 text-red-600"
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        item.isAvailable
+                          ? "bg-green-100 text-green-600"
+                          : "bg-red-100 text-red-600"
+                      }`}
+                    >
                       {item.isAvailable ? "Available" : "Reserved"}
                     </span>
                   </div>
                 </div>
                 <div className="mt-2 text-sm">
-                  <p><strong>Check-in:</strong> {item.checkedIn}</p>
-                  <p><strong>Check-out:</strong> {item.checkedOut}</p>
+                  <p>
+                    <strong>Check-in:</strong> {item.checkedIn}
+                  </p>
+                  <p>
+                    <strong>Check-out:</strong> {item.checkedOut}
+                  </p>
                   {selectedCategory === "rooms" ? (
-                    <p className="mt-1"><strong>Details:</strong> {item.details}</p>
+                    <p className="mt-1">
+                      <strong>Details:</strong> {item.details}
+                    </p>
                   ) : (
-                    <p className="mt-1"><strong>Description:</strong> {item.description}</p>
+                    <p className="mt-1">
+                      <strong>Description:</strong> {item.description}
+                    </p>
                   )}
                 </div>
               </div>
             )}
-          </div>
+          </Card>
         ))}
       </div>
-    </div>
+    </ScrollArea>
   );
 };
 
 export default RoomAndVenueSelector;
-
