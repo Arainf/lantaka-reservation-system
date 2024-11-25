@@ -39,6 +39,7 @@ import NavigationTop from "@/components/common/navigatin-side-top/clientNavigati
 import BookingTable from "@/components/common/cards/BookingTable";
 import { useReservationsContext } from "@/context/reservationContext";
 import { UserContext } from "@/context/contexts";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Account() {
   const { reservationsData } = useReservationsContext();
@@ -246,9 +247,9 @@ export default function Account() {
             </TabsContent>
 
             <TabsContent value="bookings">
-              <div className="h-[450px] overflow-y-auto space-y-4 scrollbar-hidden">
+            <ScrollArea className="h-[500px] top-3  space-y-4 scrollbar-hidden">
                 <BookingTable data={reservationsData} />
-              </div>
+              </ScrollArea>
             </TabsContent>
           </Tabs>
         </CardContent>
