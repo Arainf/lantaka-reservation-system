@@ -1,13 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Mail, Upload, FileSpreadsheet, FileIcon as FilePdf, Book, BedSingle, CircleDollarSign, CircleUserRound } from 'lucide-react';
 import {
-  Mail,
-  Upload,
-  Book,
-  BedSingle,
-  CircleDollarSign,
-  CircleUserRound,
-} from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ReservationCard from "@/components/common/cards/ReservationCard";
 import { LineChartComponent } from "@/components/common/charts/LineChartComponent";
 import { Component as OccupancyChartComponent } from "@/components/common/charts/BarChartComponent";
@@ -36,55 +35,46 @@ const AdminDashboard = () => {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const handleExport = () => {
+  const handleExport = async (format) => {
     if (!dashboardData) return;
-
+  
     const formatDate = (date) => date.toISOString().split('T')[0];
-    
-    const reportData = {
-      generatedAt: new Date().toISOString(),
-      dateRange: {
-        start: formatDate(startDate),
-        end: formatDate(endDate),
-      },
-      metrics: {
-        totalBookings: {
-          value: dashboardData.totalBookings,
-          change: `${dashboardData.totalBookingsChange}% from last ${dashboardData.totalBookingsPeriod}`,
-        },
-        availableRooms: {
-          value: dashboardData.availableRooms,
-          change: `${dashboardData.availableRoomsChange}% from last ${dashboardData.availableRoomsPeriod}`,
-        },
-        revenue: {
-          value: dashboardData.totalRevenue,
-          change: `${dashboardData.totalRevenueChange}% from last ${dashboardData.totalRevenuePeriod}`,
-        },
-        guests: {
-          value: dashboardData.totalGuests,
-          change: `${dashboardData.totalGuestsChange}% from last ${dashboardData.totalGuestsPeriod}`,
-        },
-      },
-      charts: {
-        occupancy: dashboardData.occupancyData,
-        revenue: dashboardData.revenueData,
-        roomTypePerformance: dashboardData.roomTypePerformance,
-        visitorDistribution: dashboardData.visitorData,
-      },
-    };
+    const params = new URLSearchParams({
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
+      viewMode,
+      export: format,
+    });
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `dashboard-report-${formatDate(new Date())}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    try {
+      const response = await fetch(`http://localhost:5000/api/dashboardData?${params}`, {
+        method: 'GET',
+        headers: {
+          'Accept': format === 'excel' 
+            ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            : 'application/pdf'
+        }
+      });
+  
+      if (!response.ok) throw new Error('Export failed');
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `dashboard-report-${formatDate(new Date())}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting dashboard data:', error);
+      // You might want to add a toast notification here
+    }
   };
 
   const getPercentageChangeText = (change, period) => {
+    if (change === undefined || period === undefined) return '';
     const direction = change >= 0 ? 'Up' : 'Down';
     return `${direction} from last ${period}`;
   };
@@ -110,44 +100,46 @@ const AdminDashboard = () => {
 
     return (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <ReservationCard
-            isLoading={loading}
-            title="TOTAL BOOKINGS"
-            icon={Book}
-            value={dashboardData.totalBookings}
-            percentageChange={dashboardData.totalBookingsChange}
-            percentageSuffix={getPercentageChangeText(dashboardData.totalBookingsChange, dashboardData.totalBookingsPeriod)}
-            baseColor="#001f3f"
-          />
-          <ReservationCard
-            isLoading={loading}
-            title="AVAILABLE ROOMS"
-            icon={BedSingle}
-            value={dashboardData.availableRooms}
-            percentageChange={dashboardData.availableRoomsChange}
-            percentageSuffix={getPercentageChangeText(dashboardData.availableRoomsChange, dashboardData.availableRoomsPeriod)}
-            baseColor="#001f3f"
-          />
-          <ReservationCard
-            isLoading={loading}
-            title="REVENUE"
-            icon={CircleDollarSign}
-            value={dashboardData.totalRevenue}
-            percentageChange={dashboardData.totalRevenueChange}
-            percentageSuffix={getPercentageChangeText(dashboardData.totalRevenueChange, dashboardData.totalRevenuePeriod)}
-            baseColor="#001f3f"
-          />
-          <ReservationCard
-            isLoading={loading}
-            title="GUESTS"
-            icon={CircleUserRound}
-            value={dashboardData.totalGuests}
-            percentageChange={dashboardData.totalGuestsChange}
-            percentageSuffix={getPercentageChangeText(dashboardData.totalGuestsChange, dashboardData.totalGuestsPeriod)}
-            baseColor="#001f3f"
-          />
-        </div>
+        {dashboardData && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <ReservationCard
+              isLoading={loading}
+              title="TOTAL BOOKINGS"
+              icon={Book}
+              value={dashboardData.totalBookings}
+              percentageChange={dashboardData.totalBookingsChange}
+              percentageSuffix={getPercentageChangeText(dashboardData.totalBookingsChange, dashboardData.totalBookingsPeriod)}
+              baseColor="#001f3f"
+            />
+            <ReservationCard
+              isLoading={loading}
+              title="AVAILABLE ROOMS"
+              icon={BedSingle}
+              value={dashboardData.availableRooms}
+              percentageChange={dashboardData.availableRoomsChange}
+              percentageSuffix={getPercentageChangeText(dashboardData.availableRoomsChange, dashboardData.totalBookingsPeriod)}
+              baseColor="#001f3f"
+            />
+            <ReservationCard
+              isLoading={loading}
+              title="REVENUE"
+              icon={CircleDollarSign}
+              value={dashboardData.totalRevenue}
+              percentageChange={dashboardData.totalRevenueChange}
+              percentageSuffix={getPercentageChangeText(dashboardData.totalRevenueChange, dashboardData.totalRevenuePeriod)}
+              baseColor="#001f3f"
+            />
+            <ReservationCard
+              isLoading={loading}
+              title="GUESTS"
+              icon={CircleUserRound}
+              value={dashboardData.totalGuests}
+              percentageChange={dashboardData.totalGuestsChange}
+              percentageSuffix={getPercentageChangeText(dashboardData.totalGuestsChange, dashboardData.totalBookingsPeriod)}
+              baseColor="#001f3f"
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2">
@@ -214,9 +206,23 @@ const AdminDashboard = () => {
                   <Button variant="outline" size="sm">
                     <Mail className="h-5 w-5" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleExport}>
-                    <Upload className="h-5 w-5" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Upload className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleExport('excel')}>
+                        <FileSpreadsheet className="h-4 w-4 mr-2" />
+                        Export as Excel
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport('pdf')}>
+                        <FilePdf className="h-4 w-4 mr-2" />
+                        Export as PDF
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>
@@ -232,4 +238,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

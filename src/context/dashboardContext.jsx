@@ -8,60 +8,43 @@ export const DashboardProvider = ({ children }) => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('daily');
-  const [startDate, setStartDate] = useState(() => {
-    // Ensure consistent date handling by setting time to start of day
-    const date = new Date();
-    date.setHours(0, 0, 0, 0);
-    if (viewMode === 'monthly') {
-      date.setMonth(date.getMonth() - 2);
-      date.setDate(1);
-    } else {
-      date.setDate(date.getDate() - 7);
-    }
-    return date;
-  });
-  
-  const [endDate, setEndDate] = useState(() => {
-    // Ensure consistent date handling by setting time to end of day
-    const date = new Date();
-    date.setHours(23, 59, 59, 999);
-    if (viewMode === 'monthly') {
-      date.setMonth(date.getMonth() + 1);
-      date.setDate(0);
-    }
-    return date;
-  });
 
-  // Update date range when view mode changes
-  useEffect(() => {
+  // Initialize dates based on view mode
+  const initializeDates = (mode) => {
     const now = new Date();
-    now.setHours(23, 59, 59, 999);
     
-    if (viewMode === 'monthly') {
-      const newStartDate = new Date(now);
-      newStartDate.setMonth(now.getMonth() - 2);
-      newStartDate.setDate(1);
-      newStartDate.setHours(0, 0, 0, 0);
-      setStartDate(newStartDate);
-
-      const newEndDate = new Date(now);
-      newEndDate.setMonth(newEndDate.getMonth() + 1);
-      newEndDate.setDate(0);
-      newEndDate.setHours(23, 59, 59, 999);
-      setEndDate(newEndDate);
+    let start = new Date(now);
+    let end = new Date(now);
+    
+    // Set end date to end of current day
+    end.setHours(23, 59, 59, 999);
+    
+    if (mode === 'monthly') {
+      // For monthly view: Start from beginning of 2 months ago
+      start.setMonth(now.getMonth() - 2);
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
     } else {
-      const newStartDate = new Date(now);
-      newStartDate.setDate(now.getDate() - 7);
-      newStartDate.setHours(0, 0, 0, 0);
-      setStartDate(newStartDate);
-      setEndDate(now);
+      // For daily view: Start from beginning of 6 days ago
+      start.setDate(now.getDate() - 6);
+      start.setHours(0, 0, 0, 0);
     }
+
+    return { start, end };
+  };
+
+  // Initialize state with proper dates
+  const [dateRange, setDateRange] = useState(() => initializeDates(viewMode));
+
+  // Update dates when view mode changes
+  useEffect(() => {
+    const newDateRange = initializeDates(viewMode);
+    setDateRange(newDateRange);
   }, [viewMode]);
 
   const fetchDashboardData = async (start, end) => {
     setLoading(true);
     try {
-      // Ensure consistent date format for API calls
       const formattedStartDate = start.toISOString().split('T')[0];
       const formattedEndDate = end.toISOString().split('T')[0];
       
@@ -83,16 +66,35 @@ export const DashboardProvider = ({ children }) => {
     }
   };
 
+  // Fetch data when dates change
   useEffect(() => {
-    fetchDashboardData(startDate, endDate);
-  }, [startDate, endDate, viewMode]);
+    fetchDashboardData(dateRange.start, dateRange.end);
+  }, [dateRange, viewMode]);
+
+  const setStartDate = (date) => {
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+    setDateRange(prev => ({
+      ...prev,
+      start: newDate
+    }));
+  };
+
+  const setEndDate = (date) => {
+    const newDate = new Date(date);
+    newDate.setHours(23, 59, 59, 999);
+    setDateRange(prev => ({
+      ...prev,
+      end: newDate
+    }));
+  };
 
   const contextValue = {
     dashboardData,
     loading,
-    startDate,
+    startDate: dateRange.start,
+    endDate: dateRange.end,
     setStartDate,
-    endDate,
     setEndDate,
     viewMode,
     setViewMode,
@@ -104,4 +106,3 @@ export const DashboardProvider = ({ children }) => {
     </DashboardContext.Provider>
   );
 };
-
