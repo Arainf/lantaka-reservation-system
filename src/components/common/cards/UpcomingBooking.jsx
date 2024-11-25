@@ -148,7 +148,7 @@ export default function ReservationsTable({ data = [] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <button
             onClick={() => setIsModalOpen(false)}
-            className="absolute top-[150px] right-[230px] text-white text-lg font-bold bg-red-500"
+            className="absolute top-[150px] right-[230px] text-white text-lg font-bold bg-red-500 hover:bg-red-600 hover:shadow-lg transition-all duration-200"
           >
             X
           </button>
