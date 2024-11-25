@@ -1,6 +1,6 @@
 import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { PieChart, Pie, Cell, Legend, Tooltip } from "recharts";
+import { Label, Pie, PieChart, Cell, Legend, Tooltip } from "recharts";
 import {
   Card,
   CardContent,
@@ -10,10 +10,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-// Color mapping for the chart with updated colors
+// Color mapping for the chart
 const COLORS = {
-  "Room Guests": "#7BA7E9", 
-  "Venue Visitors": "#246DDB", 
+  "Room Guests": "#7BA7E9",
+  "Venue Visitors": "#246DDB",
 };
 
 const RADIAN = Math.PI / 180;
@@ -23,60 +23,28 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text 
-      x={x} 
-      y={y} 
-      fill="white" 
-      textAnchor="middle" 
-      dominantBaseline="central"
-      className="text-xs font-medium"
-    >
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central">
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
 };
 
-const CustomLegend = ({ payload }) => {
-  return (
-    <div className="flex justify-center gap-4">
-      {payload.map((entry, index) => (
-        <div key={`legend-${index}`} className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3" 
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-sm text-gray-600">{entry.value}</span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white p-2 shadow-lg rounded-lg border">
-        <p className="text-sm font-medium">{payload[0].name}</p>
-        <p className="text-sm text-gray-600">{`Visitors: ${payload[0].value}`}</p>
-      </div>
-    );
-  }
-  return null;
-};
-
 export function Component({ data, isLoading, trending }) {
+  // Calculate total visitors
   const totalVisitors = React.useMemo(() => {
     return data ? data.reduce((acc, curr) => acc + curr.visitors, 0) : 0;
   }, [data]);
 
+  // Loading state
   if (isLoading) {
     return (
       <Card className="flex flex-col">
-        <div className="h-[400px] w-full animate-pulse bg-gray-200 rounded-lg" />
+        <div className="h-[400px] w-full animate-pulse bg-gray-200" />
       </Card>
     );
   }
 
+  // No data available state
   if (!data || data.length === 0) {
     return (
       <Card className="flex flex-col h-full items-center justify-center">
@@ -86,13 +54,13 @@ export function Component({ data, isLoading, trending }) {
   }
 
   return (
-    <Card className="flex flex-col h-[420px] w-full">
+    <Card className="flex flex-col h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>Visitors</CardTitle>
         <CardDescription>Room vs Venue</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <div className="w-full h-full flex items-center justify-center mt-[-20px]">
+        <div className="w-full h-[300px] flex items-center justify-center">
           <PieChart width={300} height={300}>
             <Pie
               data={data}
@@ -101,7 +69,6 @@ export function Component({ data, isLoading, trending }) {
               labelLine={false}
               label={renderCustomizedLabel}
               outerRadius={100}
-              innerRadius={60}
               fill="#8884d8"
               dataKey="visitors"
               nameKey="name"
@@ -114,12 +81,16 @@ export function Component({ data, isLoading, trending }) {
                 />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
-            <Legend content={<CustomLegend />} />
+            <Tooltip />
+            <Legend 
+              verticalAlign="bottom" 
+              height={36}
+              formatter={(value) => <span className="text-sm">{value}</span>}
+            />
           </PieChart>
         </div>
-        <div className="text-center">
-          <p className="text-3xl font-bold justify-between items-center mt-[-175px]">{totalVisitors.toLocaleString()}</p>
+        <div className="text-center mt-4">
+          <p className="text-3xl font-bold">{totalVisitors}</p>
           <p className="text-sm text-muted-foreground">Total Visitors</p>
         </div>
       </CardContent>

@@ -15,7 +15,6 @@ const ReservationCard = ({
   percentagePrefix = "",
   percentageSuffix = "from last month",
   baseColor = "#3498db",
-  graphData,
 }) => {
   const shades = useMemo(() => {
     const numberOfShades = 5;
@@ -52,14 +51,14 @@ const ReservationCard = ({
                 className="p-2 rounded-full"
                 style={{ backgroundColor: "#001f3f" }}
               >
-                <Icon className="h-6 w-6 text-white" />
+                {Icon && <Icon className="h-6 w-6 text-white" />}
               </div>
             )}
             <h3 className="ml-3 text-lg font-semibold text-gray-700">
               {isLoading ? <Skeleton className="h-6 w-24" /> : title}
             </h3>
           </div>
-          {!isLoading && (
+          {!isLoading && percentageChange !== undefined && (
             <div className={`flex items-center ${percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
               {percentageChange >= 0 ? <ArrowUpIcon className="h-4 w-4 mr-1" /> : <ArrowDownIcon className="h-4 w-4 mr-1" />}
               <span className="text-sm font-medium">{Math.abs(percentageChange).toFixed(1)}%</span>
@@ -72,7 +71,7 @@ const ReservationCard = ({
               <Skeleton className="h-12 w-[100px]" />
             ) : (
               <div className="text-3xl font-bold text-gray-900">
-                {valuePrefix}{value.toLocaleString()}{valueSuffix}
+                {valuePrefix}{typeof value === 'number' ? value.toLocaleString() : value}{valueSuffix}
               </div>
             )}
             {!isLoading && (

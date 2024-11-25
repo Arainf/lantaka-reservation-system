@@ -38,7 +38,7 @@ export function Component({ data, isLoading }) {
         <CardTitle>Room Type Performance</CardTitle>
         <CardDescription>Booking frequency and average stay duration by room type</CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="px-2 py-6">
         <ChartContainer config={chartConfig} className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={data} margin={{ top: 10, right: 25, left: 25, bottom: 20 }}>
