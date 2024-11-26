@@ -59,7 +59,7 @@ export default function ReservationsTable({ data = [], keys }) {
     "Triple Bed": 0,
     "Matrimonial Bed": 0,
   });
-  const { price, setClientType } = usePriceContext();
+  const { price, setClientType, fetchPrice, clientType } = usePriceContext();
   const { setDeleteData, setSaveNote } = useReservationsContext();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,10 +72,29 @@ export default function ReservationsTable({ data = [], keys }) {
     setUserRole(role);
   }, []);
 
+  useEffect(() => {
+    if (selectedGuest?.guestType && setClientType) {
+      setClientType(selectedGuest.guestType);
+      console.log(selectedGuest.guestType);
+      fetchPrice(selectedGuest.guestType); // Pass the correct value to fetchPrice
+    }
+  }, [selectedGuest, setClientType]);
+  
+  useEffect(() => {
+    if (price) {
+      setRoomRates({
+        "Double Bed": price.double_price || 0,
+        "Triple Bed": price.triple_price || 0,
+        "Matrimonial Bed": price.matrimonial_price || 0,
+      });
+    }
+  }, [price]);
+  
   const groupedData = useMemo(() => {
     const result = data.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}`;
-
+      // Use `receipt_id` explicitly in the key to differentiate instances
+      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}-${reservation.receipt_id}-${reservation.timestamp}`;
+  
       if (!acc[key]) {
         acc[key] = {
           guestId: reservation.guest_id,
@@ -83,6 +102,7 @@ export default function ReservationsTable({ data = [], keys }) {
           guestEmail: reservation.guest_email,
           guestType: reservation.guest_type,
           reservationType: reservation.reservation_type,
+          receiptId: reservation.receipt_id, // Differentiate instances by receipt_id
           receiptDate: reservation.receipt_date,
           receiptTotal: reservation.receipt_total_amount,
           receiptSubTotal: reservation.receipt_initial_total,
@@ -93,7 +113,7 @@ export default function ReservationsTable({ data = [], keys }) {
           reservationVenueID: [],
         };
       }
-
+  
       reservation.receipt_discounts.forEach((discount) => {
         if (
           discount &&
@@ -104,7 +124,7 @@ export default function ReservationsTable({ data = [], keys }) {
           acc[key].receiptDiscounts.push(discount);
         }
       });
-
+  
       if (reservation.reservation_type === "room") {
         acc[key].reservationRoomID.push(reservation.reservation_id);
       } else if (reservation.reservation_type === "venue") {
@@ -116,26 +136,27 @@ export default function ReservationsTable({ data = [], keys }) {
           acc[key].reservationVenueID.push(reservation.reservation_id);
         }
       }
-
+  
       acc[key].reservations.push(reservation);
-      
+  
       return acc;
     }, {});
-
-   
-   
-
+  
+    // Convert the result object into an array and paginate
     const groupedArray = Object.values(result);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = groupedArray.slice(indexOfFirstItem, indexOfLastItem);
-
+  
     return {
       allItems: groupedArray,
       currentItems: currentItems,
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
   }, [data, currentPage, itemsPerPage]);
+  
+  
+  
 
    console.log("grouped data" , groupedData);
 
@@ -294,13 +315,7 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   }, [price]);
 
-  useEffect(() => {
-    setRoomRates({
-      "Double Bed": price.double_price || 0,
-      "Triple Bed": price.triple_price || 0,
-      "Matrimonial Bed": price.matrimonial_price || 0,
-    });
-  }, [price]);
+
 
   const getStatusColor = (status) => {
     const statusColors = {

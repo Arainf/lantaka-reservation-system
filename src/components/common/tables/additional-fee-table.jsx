@@ -209,33 +209,6 @@ export default function AdditionalFeeTable({ searchTerm }) {
             <DialogTitle>{isEditing ? "Edit Fee" : "Fee Details"}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {isEditing ? (
-              <>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="edit_fee_name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="edit_fee_name"
-                    value={editingFee?.additional_fee_name || ""}
-                    onChange={(e) => setEditingFee({ ...editingFee, additional_fee_name: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="edit_fee_amount" className="text-right">
-                    Amount (₱)
-                  </Label>
-                  <Input
-                    id="edit_fee_amount"
-                    value={editingFee?.additional_fee_amount || ""}
-                    onChange={(e) => setEditingFee({ ...editingFee, additional_fee_amount: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="font-medium text-right">Name:</span>
                   <span className="col-span-3">{selectedFee?.additional_fee_name}</span>
@@ -244,27 +217,9 @@ export default function AdditionalFeeTable({ searchTerm }) {
                   <span className="font-medium text-right">Amount:</span>
                   <span className="col-span-3">₱{selectedFee?.additional_fee_amount.toFixed(2)}</span>
                 </div>
-              </>
-            )}
+  
+    
           </div>
-          <DialogFooter>
-            {isEditing ? (
-              <Button onClick={handleUpdateFee}>
-                <Save className="mr-2 h-4 w-4" />
-                Save
-              </Button>
-            ) : (
-              <Button onClick={() => setIsEditing(true)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
-            )}
-            <Button onClick={() => handleDeleteFee(selectedFee.additional_fee_id)} variant="destructive">Delete</Button>
-            <Button onClick={() => {
-              setIsEditing(false);
-              setIsDialogOpen(false);
-            }}>Close</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 

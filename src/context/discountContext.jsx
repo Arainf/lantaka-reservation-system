@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useNotifications } from "@/context/notificationContext";
 
 const DiscountContext = createContext(undefined);
 
@@ -14,6 +15,7 @@ export const DiscountProvider = ({ children }) => {
   const [discounts, setDiscounts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { createNotification } = useNotifications();
 
   const fetchDiscounts = useCallback(async () => {
     setIsLoading(true);
@@ -46,13 +48,18 @@ export const DiscountProvider = ({ children }) => {
         throw new Error('Failed to add discount');
       }
       await fetchDiscounts();
+      createNotification({
+        type: 'Added',
+        description: `Discount "${discount.discount_name}" has been added.`,
+        role: 'employee',
+      });
     } catch (error) {
       setError(error.message);
       console.error('Error adding discount:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDiscounts]);
+  }, [fetchDiscounts, createNotification]);
 
   const updateDiscount = useCallback(async (discount) => {
     setIsLoading(true);
@@ -67,13 +74,18 @@ export const DiscountProvider = ({ children }) => {
         throw new Error('Failed to update discount');
       }
       await fetchDiscounts();
+      createNotification({
+        type: 'Modified',
+        description: `Discount "${discount.discount_name}" has been updated.`,
+        role: 'employee',
+      });
     } catch (error) {
       setError(error.message);
       console.error('Error updating discount:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDiscounts]);
+  }, [fetchDiscounts, createNotification]);
 
   const deleteDiscount = useCallback(async (id) => {
     setIsLoading(true);
@@ -86,20 +98,35 @@ export const DiscountProvider = ({ children }) => {
         throw new Error('Failed to delete discount');
       }
       await fetchDiscounts();
+      createNotification({
+        type: 'Deleted',
+        description: `Discount with ID "${id}" has been deleted.`,
+        role: 'employee',
+      });
     } catch (error) {
       setError(error.message);
       console.error('Error deleting discount:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDiscounts]);
+  }, [fetchDiscounts, createNotification]);
 
   useEffect(() => {
     fetchDiscounts();
   }, [fetchDiscounts]);
 
   return (
-    <DiscountContext.Provider value={{ discounts, isLoading, error, fetchDiscounts, addDiscount, updateDiscount, deleteDiscount }}>
+    <DiscountContext.Provider
+      value={{
+        discounts,
+        isLoading,
+        error,
+        fetchDiscounts,
+        addDiscount,
+        updateDiscount,
+        deleteDiscount,
+      }}
+    >
       {children}
     </DiscountContext.Provider>
   );

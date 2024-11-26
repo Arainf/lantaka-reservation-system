@@ -35,7 +35,7 @@ export default function ReservationsTable({ data = [], onClose }) {
     }
 
     const groupedData = dataToFilter.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}`
+      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}-${reservation.receipt_id}-${reservation.timestamp}`;
 
       if (!acc[key]) {
         acc[key] = {
@@ -191,7 +191,10 @@ export default function ReservationsTable({ data = [], onClose }) {
 
       <Card>
         <CardHeader className="pl-6 pb-2">
-          <CardTitle> Check-In Guest </CardTitle>
+          <CardTitle> Check-In Guest {" "}
+          <span className="ml-2 text-sm text-gray-500">
+                ({filteredData.length} to check-in)
+              </span> </CardTitle>
         </CardHeader>
         <CardContent>
           {searchTerm ? (

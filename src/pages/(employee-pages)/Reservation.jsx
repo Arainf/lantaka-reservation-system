@@ -15,6 +15,7 @@ import { TbMessageCircleFilled } from "react-icons/tb"
 import { BsFileTextFill } from "react-icons/bs"
 import { Label } from "@/components/ui/label"
 import moment from 'moment-timezone';
+import Spinner from "@/components/ui/spinner"
 import {
   Select,
   SelectContent,
@@ -52,7 +53,7 @@ import { Separator } from "@/components/ui/separator"
 
 const step1Schema = z.object({
   clientAlias: z.string().min(1, "*"),
-  clientType: z.enum(["Internal", "External"], {
+  clientType: z.enum(["internal", "external"], {
     errorMap: () => ({ message: "*" }),
   }),
   reservationType: z.enum(["room", "venue", "both"], {
@@ -128,6 +129,7 @@ export default function Component() {
   const [venueCapacity, setVenueCapacity] = useState([])
   const [clients, setClients] = useState([])
   const [selectedClient, setSelectedClient] = useState(null)
+  const [loading, setLoading] = useState(false);
 
 
   const form = useForm({
@@ -388,6 +390,18 @@ export default function Component() {
       setSelectedRooms([])
       setSelectedVenues([])
     } else if (reservationType === "both") {
+      form.setValue("dateRangeVenue", { from: "", to: "" })
+      form.setValue("dateRangeRoom", { from: "", to: "" })
+
+      form.reset({
+        ...form.getValues(),
+        dateRangeRoom: { from: "", to: "" },
+        dateRangeVenue: { from: "", to: "" },
+        MaxnumberofGuest: 0,
+        selectedReservationRooms: [""],
+        selectedReservationVenues: [" "],
+      })
+
       setRoomState(false)
       setVenueState(false)
     }
@@ -422,9 +436,14 @@ export default function Component() {
         form.reset()
         setSelectedRooms([])
         setSelectedVenues([])
-        setTimeout(() => {
-          navigate(0)
-        }, 1500)
+        
+           // Show spinner
+          setTimeout(() => {
+            setLoading(true);
+            navigate(0); // Navigate (reload the page)
+            
+          }, 1500);
+
       } else {
         toast({
           variant: "destructive",
@@ -462,11 +481,14 @@ export default function Component() {
   }
 
   const callAvailableVenue = (dateRange) => {
+    console.log(`Date Range Raw: ${dateRange.from.toLocaleString()}, to ${dateRange.to.toLocaleString()}`)
     if (dateRange.from && dateRange.to) {
       const adjustedDateRange = {
         from: new Date(dateRange.from),
         to: new Date(dateRange.to),
       }
+
+      console.log(`Date Range Adjusted: ${adjustedDateRange.from.toLocaleString()}, to ${adjustedDateRange.to.toLocaleString()}`)
       setDateRangeVenueSetter(adjustedDateRange)
       fetchAvailableVenue(adjustedDateRange)
       setShowResultsVenue(true)
@@ -602,7 +624,7 @@ export default function Component() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-4">
         {venues.map((room) => {
           const {
-            room_name: venueId,
+            room_id: venueId,
             room_isready: isReady,
             room_status: isAvailable,
           } = room
@@ -677,6 +699,8 @@ export default function Component() {
       setClients([])
     }
   }, [search])
+
+  const [clnTpe, serClnTpe ] = useState("")
   
   const handleClientSelect = (client) => {
     setSelectedClient(client)
@@ -695,7 +719,9 @@ export default function Component() {
     })
     setSearch(client.guest_client)
     setClients([])
+    serClnTpe(client.guest_type)
     setClientType(client.guest_type)
+    console.log(client.guest_type)
   }
 
   return (
@@ -782,7 +808,7 @@ export default function Component() {
                                         field.onChange(value)
                                         setClientType(value)
                                       }}
-                                      defaultValue={field.value}
+                                      defaultValue={field.value || clnTpe}
                                     >
                                       <FormControl>
                                         <SelectTrigger>
@@ -790,10 +816,10 @@ export default function Component() {
                                         </SelectTrigger>
                                       </FormControl>
                                       <SelectContent>
-                                        <SelectItem value="Internal">
+                                        <SelectItem value="internal">
                                           Internal
                                         </SelectItem>
-                                        <SelectItem value="External">
+                                        <SelectItem value="external">
                                           External
                                         </SelectItem>
                                       </SelectContent>
@@ -829,7 +855,7 @@ export default function Component() {
                                         <SelectItem value="room">
                                           Room
                                         </SelectItem>
-                                        <SelectItem value="venue">
+                                        <SelectItem value="venue">    
                                           Venue
                                         </SelectItem>
                                         <SelectItem value="both">
@@ -897,7 +923,7 @@ export default function Component() {
                                             value={field.value}
                                             onChange={(value) => {
                                               field.onChange(value)
-                                              callAvailableRoom(value)
+                                              callAvailableVenue(value)
                                             }}
                                             className="custom-datepicker w-full"
                                             state={venueState}
@@ -1493,6 +1519,10 @@ export default function Component() {
           </div>
         </DialogContent>
       </Dialog>
+      <div>
+      {/* Conditionally render the spinner */}
+      {loading && <Spinner />}
+      </div>
       <Toaster />
     </>
   );

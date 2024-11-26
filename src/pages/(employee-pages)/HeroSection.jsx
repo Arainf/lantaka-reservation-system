@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import RoomTypeSelector from "@/components/common/cards/RoomTypeSelector";
@@ -17,6 +17,11 @@ import CheckoutTable from "@/components/common/cards/CheckoutTable";
 import ProcessPayment from "@/components/common/cards/ProcessPayment";
 import { Toaster } from "@/components/ui/toaster";
 import { useToastContext } from "@/context/toastContext";
+import { Calendar2 } from "@/components/ui/calendar2";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from 'lucide-react';
+import { format } from "date-fns";
+import { useHero } from "@/context/heroContext";
 
 const Reservation = () => {
   const { bookingSummary } = useReservations();
@@ -28,8 +33,8 @@ const Reservation = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const { toast } = useToastContext();
+  const { selectedDate, updateSelectedDate } = useHero();
 
-  // Memoized filtered data
   const filteredData = useMemo(() => {
     if (!searchTerm) return reservationsData;
 
@@ -76,11 +81,29 @@ const Reservation = () => {
     <>
       <div className="relative flex flex-col h-screen w-screen overflow-y-auto bg-background" id="reservation">
         <main className="flex flex-col md:flex-row h-full">
-          {/* Left Side: Room Selector */}
           <div className="flex flex-col md:w-2/3 h-full p-4 space-y-4">
             <Card className="flex h-full flex-col flex-1">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 mb-1">
                 <CardTitle>Available Rooms</CardTitle>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`w-full sm:w-[280px] justify-start text-left font-normal`}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar2
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(newDate) => newDate && updateSelectedDate(newDate)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </CardHeader>
               <CardContent className="overflow-y-auto">
                 <RoomTypeSelector />
@@ -88,7 +111,6 @@ const Reservation = () => {
             </Card>
           </div>
 
-          {/* Right Side: Quick Actions & Summary */}
           <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 border-l">
             <Card>
               <CardContent className="p-0">
@@ -107,7 +129,6 @@ const Reservation = () => {
                   <Plus className="mr-2 h-4 w-4" /> New Reservation
                 </Button>
 
-                {/* Process Payment */}
                 <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
                   <DialogTrigger asChild>
                     <Button className="w-full justify-start" variant="outline" onClick={handlePaymentReservationData}>
@@ -180,4 +201,3 @@ const Reservation = () => {
 };
 
 export default Reservation;
-

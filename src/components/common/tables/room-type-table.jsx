@@ -68,38 +68,6 @@ export default function RoomTypeTable({ searchTerm, render }) {
     setIsEditing(false);
   };
 
-  // const handleAddRoomType = async () => {
-  //   try {
-  //     const formData = new FormData();
-  //     for (const key in newRoomType) {
-  //       formData.append(key, newRoomType[key]);
-  //     }
-  //     await addRoomType(formData);
-  //     setIsAddDialogOpen(false);
-  //     setRenderers((prevKey) => prevKey + 1);
-  //     setNewRoomType({
-  //       room_type_name: "",
-  //       room_type_capacity: "",
-  //       room_type_price_internal: "",
-  //       room_type_price_external: "",
-  //       room_type_description: "",
-  //       room_type_img: null,
-  //     });
-  //     toast({
-  //       title: "Success",
-  //       description: "Room type added successfully",
-  //       variant: "success",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to add room type",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setRenderers((prevKey) => prevKey + 1);
-  //   }
-  // };
 
   const handleEditRoomType = async () => {
     try {

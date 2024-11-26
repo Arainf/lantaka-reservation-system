@@ -13,7 +13,6 @@ import Unauthorize from "@/pages/unathorize";
 
 // admin pages import routes
 import AdminDashboard from "@/pages/(admin-pages)/dashboard";
-import AdminEventLogs from "@/pages/(admin-pages)/eventlogs";
 import AdminReservation from "@/pages/(admin-pages)/reservation";
 import AdminGuestList from "@/pages/(admin-pages)/guestlist";
 import AdminAccounts from "@/pages/(admin-pages)/accounts";
@@ -84,22 +83,6 @@ const AppRoutes = () => {
           <ProtectedRoute
             element={
               <AdminGuestList
-                sidebarOpen={sidebarOpen}
-                toggleSidebar={toggleSidebar}
-              />
-            }
-            allowedRoles={["Administrator"]}
-            isDevMode={isDevMode}
-          />
-        }
-      />
-
-      <Route
-        path="/eventlogs"
-        element={
-          <ProtectedRoute
-            element={
-              <AdminEventLogs
                 sidebarOpen={sidebarOpen}
                 toggleSidebar={toggleSidebar}
               />

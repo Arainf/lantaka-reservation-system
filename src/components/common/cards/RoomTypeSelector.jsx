@@ -1,198 +1,241 @@
 'use client'
 
 import React, { useState } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Card} from "@/components/ui/card";
+import { format } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { useHero } from "@/context/heroContext";
+import Spinner from "@/components/ui/spinner";
 
 const RoomAndVenueSelector = () => {
-  const [selectedType, setSelectedType] = useState("all");
+  const { data, isLoading, error, calendarReservations, selectedDate } = useHero();
   const [selectedCategory, setSelectedCategory] = useState("rooms");
-  const [hoveredItem, setHoveredItem] = useState(null);
+  const [selectedRoomType, setSelectedRoomType] = useState("all");
 
-  const data = {
-    rooms: [
-      { id: 206, name: "Room 206", type: "double", isAvailable: true, checkedIn: "2024-11-25 12:00 PM", checkedOut: "2024-11-28 12:00 PM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 208, name: "Room 208", type: "double", isAvailable: true, checkedIn: "2024-11-22 2:00 PM", checkedOut: "2024-11-25 11:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 210, name: "Room 210", type: "double", isAvailable: false, checkedIn: "2024-11-20 1:00 PM", checkedOut: "2024-11-22 10:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 212, name: "Room 212", type: "double", isAvailable: true, checkedIn: "2024-11-25 3:00 PM", checkedOut: "2024-11-30 12:00 PM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 214, name: "Room 214", type: "double", isAvailable: true, checkedIn: "2024-11-24 10:00 AM", checkedOut: "2024-11-27 12:00 PM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 216, name: "Room 216", type: "double", isAvailable: false, checkedIn: "2024-11-18 6:00 PM", checkedOut: "2024-11-20 8:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 218, name: "Room 218", type: "double", isAvailable: true, checkedIn: "2024-11-23 5:00 PM", checkedOut: "2024-11-26 1:00 PM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 220, name: "Room 220", type: "double", isAvailable: true, checkedIn: "2024-11-25 9:00 AM", checkedOut: "2024-11-29 12:00 PM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 222, name: "Room 222", type: "double", isAvailable: false, checkedIn: "2024-11-21 2:00 PM", checkedOut: "2024-11-23 11:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 224, name: "Room 224", type: "double", isAvailable: true, checkedIn: "2024-11-26 1:00 PM", checkedOut: "2024-11-28 10:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 226, name: "Room 226", type: "double", isAvailable: false, checkedIn: "2024-11-19 3:00 PM", checkedOut: "2024-11-22 12:00 PM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 228, name: "Room 228", type: "double", isAvailable: true, checkedIn: "2024-11-27 11:00 AM", checkedOut: "2024-11-30 10:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 230, name: "Room 230", type: "double", isAvailable: true, checkedIn: "2024-11-28 2:00 PM", checkedOut: "2024-12-01 11:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
-      { id: 234, name: "Room 234", type: "double", isAvailable: true, checkedIn: "2024-11-29 12:00 PM", checkedOut: "2024-12-02 10:00 AM", img: "/img/double.jpg", details: "Double bed, nearest to the sea." },
+  if (isLoading) return <Spinner />;
+  if (error) return (
+    <div className="flex items-center justify-center min-h-[200px] text-red-600">
+      <p className="text-center">
+        <span className="block text-lg font-semibold">Error</span>
+        <span className="block mt-1">{error.message}</span>
+      </p>
+    </div>
+  );
+  if (!data) return (
+    <div className="flex items-center justify-center min-h-[200px] text-gray-500">
+      <p className="text-center">
+        <span className="block text-lg font-semibold">No Data</span>
+        <span className="block mt-1">No data available at the moment</span>
+      </p>
+    </div>
+  );
 
-      { id: 203, name: "Room 203", type: "triple", isAvailable: true, checkedIn: "2024-11-25 1:00 PM", checkedOut: "2024-11-28 11:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 205, name: "Room 205", type: "triple", isAvailable: true, checkedIn: "2024-11-26 2:00 PM", checkedOut: "2024-11-29 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 207, name: "Room 207", type: "triple", isAvailable: false, checkedIn: "2024-11-22 3:00 PM", checkedOut: "2024-11-25 12:00 PM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 209, name: "Room 209", type: "triple", isAvailable: true, checkedIn: "2024-11-27 11:00 AM", checkedOut: "2024-11-30 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 211, name: "Room 211", type: "triple", isAvailable: true, checkedIn: "2024-11-28 1:00 PM", checkedOut: "2024-12-01 11:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 213, name: "Room 213", type: "triple", isAvailable: false, checkedIn: "2024-11-23 2:00 PM", checkedOut: "2024-11-26 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 215, name: "Room 215", type: "triple", isAvailable: true, checkedIn: "2024-11-29 12:00 PM", checkedOut: "2024-12-02 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 217, name: "Room 217", type: "triple", isAvailable: true, checkedIn: "2024-11-30 1:00 PM", checkedOut: "2024-12-03 11:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 219, name: "Room 219", type: "triple", isAvailable: false, checkedIn: "2024-11-24 3:00 PM", checkedOut: "2024-11-27 12:00 PM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 221, name: "Room 221", type: "triple", isAvailable: true, checkedIn: "2024-12-01 11:00 AM", checkedOut: "2024-12-04 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 223, name: "Room 223", type: "triple", isAvailable: false, checkedIn: "2024-11-25 2:00 PM", checkedOut: "2024-11-28 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 225, name: "Room 225", type: "triple", isAvailable: true, checkedIn: "2024-12-02 1:00 PM", checkedOut: "2024-12-05 11:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 227, name: "Room 227", type: "triple", isAvailable: true, checkedIn: "2024-12-03 12:00 PM", checkedOut: "2024-12-06 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 229, name: "Room 229", type: "triple", isAvailable: false, checkedIn: "2024-11-26 3:00 PM", checkedOut: "2024-11-29 12:00 PM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 231, name: "Room 231", type: "triple", isAvailable: true, checkedIn: "2024-12-04 11:00 AM", checkedOut: "2024-12-07 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 233, name: "Room 233", type: "triple", isAvailable: false, checkedIn: "2024-11-27 2:00 PM", checkedOut: "2024-11-30 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 235, name: "Room 235", type: "triple", isAvailable: true, checkedIn: "2024-12-05 1:00 PM", checkedOut: "2024-12-08 11:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-      { id: 237, name: "Room 237", type: "triple", isAvailable: true, checkedIn: "2024-12-06 12:00 PM", checkedOut: "2024-12-09 10:00 AM", img: "/img/triple.jpg", details: "Triple bed, nearest to the road." },
-
-      { id: 236, name: "Room 236", type: "matrimonial", isAvailable: false, checkedIn: "2024-11-28 3:00 PM", checkedOut: "2024-12-01 12:00 PM", img: "/img/matrimonial.jpg", details: "Matrimonial room, price to be confirmed." },
-      { id: 116, name: "Room 116", type: "matrimonial", isAvailable: true, checkedIn: "2024-12-07 11:00 AM", checkedOut: "2024-12-10 10:00 AM", img: "/img/matrimonial.jpg", details: "Matrimonial room, price to be confirmed." },
-    ],
-    venues: [
-      { id: "breeza", name: "Breeza Hall", category: "hall", isAvailable: true, checkedIn: "2024-11-25 9:00 AM", checkedOut: "2024-11-25 5:00 PM", img: "/placeholder.svg?height=96&width=96", description: "A large, open space suitable for events and gatherings." },
-      { id: "capiz", name: "Capiz Hall", category: "hall", isAvailable: false, checkedIn: "2024-11-24 8:00 AM", checkedOut: "2024-11-24 3:00 PM", img: "/placeholder.svg?height=96&width=96", description: "A medium-sized hall perfect for intimate gatherings and meetings." },
-      { id: "dining", name: "Dining Hall", category: "hall", isAvailable: true, checkedIn: "2024-11-25 12:00 PM", checkedOut: "2024-11-25 9:00 PM", img: "/placeholder.svg?height=96&width=96", description: "The main dining area for meals and special events." },
-      { id: "gazebo", name: "Gazebo", category: "outdoor", isAvailable: true, checkedIn: "2024-11-25 10:00 AM", checkedOut: "2024-11-25 4:00 PM", img: "/placeholder.svg?height=96&width=96", description: "Outdoor gazebo for smaller ceremonies or relaxation." },
-      { id: "talisay", name: "Old Talisay Bar", category: "bar", isAvailable: false, checkedIn: "2024-11-24 7:00 PM", checkedOut: "2024-11-24 11:00 PM", img: "/placeholder.svg?height=96&width=96", description: "A cozy bar area for drinks and evening relaxation." },
-    ],
+  const getStatusColor = (status) => {
+    const statusColors = {
+      ready: "bg-green-200",
+      waiting: "bg-yellow-200",
+      onUse: "bg-blue-200",
+      cancelled: "bg-red-200",
+      done: "bg-purple-200",
+      onCleaning: "bg-orange-200",
+    };
+    return statusColors[status] || "text-gray-800";
   };
 
-  const filteredData =
-    selectedCategory === "rooms"
-      ? selectedType === "all"
-        ? data.rooms
-        : data.rooms.filter((room) => room.type === selectedType)
-      : selectedType === "all"
-      ? data.venues
-      : data.venues.filter((venue) => venue.category === selectedType);
+  const getStatusBgColor = (status) => {
+    const statusColors = {
+      ready: "bg-green-200 text-green-800",
+      waiting: "bg-yellow-200 text-yellow-800",
+      onUse: "bg-blue-200 text-blue-800",
+      cancelled: "bg-red-200 text-red-800",
+      done: "bg-purple-200 text-purple-800",
+      onCleaning: "bg-orange-200 text-orange-800",
+    };
+    return statusColors[status] || "bg-gray-100";
+  };
 
-  const getAvailabilityColor = (isAvailable) => {
-    return isAvailable ? "text-green-500" : "text-red-500";
+  const isRoomReserved = (roomId) => {
+    return calendarReservations?.some(
+      reservation => reservation.id === roomId && 
+      format(selectedDate, 'yyyy-MM-dd') >= reservation.dateStart &&
+      format(selectedDate, 'yyyy-MM-dd') <= reservation.dateEnd
+    );
+  };
+
+  const getRoomStatus = (room) => {
+    if (calendarReservations && isRoomReserved(room.room_id)) {
+      const reservation = calendarReservations.find(r => r.id === room.room_id);
+      return reservation.status;
+    }
+    return room.status;
+  };
+
+  const RoomCard = ({ room }) => {
+    const currentStatus = getRoomStatus(room);
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Card 
+              className={`p-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer relative overflow-hidden ${getStatusBgColor(currentStatus)}`}
+            >
+              <div className="flex justify-between items-center">
+                <div className="font-semibold truncate">{room.room_name}</div>
+                <div className={`text-xs font-medium ${getStatusColor(currentStatus)}`}>
+                  {currentStatus}
+                </div>
+              </div>
+            </Card>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="w-80 p-0">
+            <div className="p-4">
+              {isRoomReserved(room.room_id) && (
+                <div className="mt-2 pt-2 border-t">
+                  <p className="text-sm font-semibold">Reservation Details:</p>
+                  {calendarReservations
+                    .filter(r => r.id === room.room_id)
+                    .map(reservation => (
+                      <div key={reservation.reservationid} className="text-sm">
+                        <p><strong>Guest:</strong> {reservation.guests}</p>
+                        <p><strong>Check In:</strong> {reservation.checkIn}</p>
+                        <p><strong>Check Out:</strong> {reservation.checkOut}</p>
+                        <p><strong>Date:</strong> {reservation.dateStart} - {reservation.dateEnd}</p>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
+
+  const VenueCard = ({ venue }) => {
+    const currentStatus = getRoomStatus(venue);
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Card 
+              className={`p-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer relative overflow-hidden ${getStatusBgColor(currentStatus)}`}
+            >
+              <div className="flex justify-between items-center">
+                <div className="font-semibold truncate">{venue.room_name}</div>
+                <div className={`text-xs font-medium ${getStatusColor(currentStatus)}`}>
+                  {currentStatus}
+                </div>
+              </div>
+            </Card>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="w-80 p-0">
+            <div className="p-4">
+              <h3 className="font-semibold text-lg">{venue.room_name}</h3>
+              <p className="text-sm text-gray-500">
+                <strong>Status:</strong> {currentStatus}
+              </p>
+              <p className="text-sm">
+                <strong>Is Ready:</strong> {venue.room_isready ? 'Yes' : 'No'}
+              </p>
+              <p className="text-sm">
+                <strong>Venue Status:</strong> {venue.room_status ? 'Occupied' : 'Available'}
+              </p>
+              {isRoomReserved(venue.room_id) && (
+                <div className="mt-2 pt-2 border-t">
+                  <p className="text-sm font-semibold">Reservation Details:</p>
+                  {calendarReservations
+                    .filter(r => r.id === venue.room_id)
+                    .map(reservation => (
+                      <div key={reservation.reservationid} className="text-sm">
+                        <p><strong>Guest:</strong> {reservation.guests}</p>
+                        <p><strong>Check In:</strong> {reservation.checkIn}</p>
+                        <p><strong>Check Out:</strong> {reservation.checkOut}</p>
+                        <p><strong>Date:</strong> {reservation.dateStart} - {reservation.dateEnd}</p>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
+
+  const renderContent = () => {
+    if (selectedCategory === "venues") {
+      return (
+        <ScrollArea className="h-[calc(100vh-300px)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {data.venues_holder.map((venue) => (
+              <VenueCard key={venue.room_id} venue={venue} />
+            ))}
+          </div>
+        </ScrollArea>
+      );
+    }
+
+    let roomsToDisplay = [];
+    if (selectedRoomType === "all") {
+      roomsToDisplay = [...data.double_rooms, ...data.triple_rooms, ...data.matrimonial_rooms];
+    } else if (selectedRoomType === "double") {
+      roomsToDisplay = data.double_rooms;
+    } else if (selectedRoomType === "triple") {
+      roomsToDisplay = data.triple_rooms;
+    } else if (selectedRoomType === "matrimonial") {
+      roomsToDisplay = data.matrimonial_rooms;
+    }
+
+    return (
+      <ScrollArea className="h-[calc(100vh-300px)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {roomsToDisplay.map((room) => (
+            <RoomCard key={room.room_id} room={room} />
+          ))}
+        </div>
+      </ScrollArea>
+    );
   };
 
   return (
-<ScrollArea className="space-y-6 px-4 sm:px-6 lg:px-4 h-[640px] overflow-hidden">      {/* Category and Type Selector in One Line */}
-      <div className="flex space-x-4 items-center py-1">
-        {/* Category Selector */}
-        <div className="flex  space-x-4">
-          {["rooms", "venues"].map((category) => (
-            <button
-              key={category}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 transform ${
-                selectedCategory === category
-                  ? "bg-blue-600 text-white shadow-md scale-95"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-95"
-              }`}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </button>
-          ))}
-        </div>
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="flex gap-4">
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="rooms">Rooms</SelectItem>
+            <SelectItem value="venues">Venues</SelectItem>
+          </SelectContent>
+        </Select>
 
-        {/* Type Selector Dropdown */}
-        <div className="flex justify-center">
-      <Select value={selectedType} onValueChange={(value) => setSelectedType(value)}>
-        <SelectTrigger className="px-4 w-[100px] py-2 rounded-lg text-sm font-semibold bg-gray-200 text-gray-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-300 hover:scale-95">
-          <SelectValue placeholder="Select Venue Type" />
-        </SelectTrigger>
-        <SelectContent>
-          {[
-            "all",
-            "double",
-            "triple",
-            "matrimonial",
-            "hall",
-            "outdoor",
-            "bar",
-          ].map((venueType) => (
-            <SelectItem key={venueType} value={venueType}>
-              {venueType.charAt(0).toUpperCase() + venueType.slice(1)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-     </div>
+        {selectedCategory === "rooms" && (
+          <Select value={selectedRoomType} onValueChange={setSelectedRoomType}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select room type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Rooms</SelectItem>
+              <SelectItem value="double">Double</SelectItem>
+              <SelectItem value="triple">Triple</SelectItem>
+              <SelectItem value="matrimonial">Matrimonial</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
-      {/* Item Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-        {filteredData.map((item) => (
-          <Card
-            key={item.id}
-            className="p-4 bg-white border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer relative"
-            onMouseEnter={() => setHoveredItem(item)}
-            onMouseLeave={() => setHoveredItem(null)}
-           >
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between items-center mb-2">
-                <div className="text-sm font-semibold">{item.name}</div>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    item.isAvailable
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                  }`}
-                >
-                  {item.isAvailable ? "Available" : "Reserved"}
-                </span>
-              </div>
-              <div className="text-xs text-gray-500 mt-auto">
-                Check-in: {item.checkedIn}
-              </div>
-            </div>
-            {/* Item details popup on hover */}
-            {hoveredItem && hoveredItem.id === item.id && (
-              <div className="absolute z-10 w-64 bg-white rounded-lg shadow-xl p-4 -mt-2 -ml-2">
-                <div className="flex">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="w-24 h-24 object-cover rounded-lg mr-4"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-lg">{item.name}</h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        item.isAvailable
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
-                    >
-                      {item.isAvailable ? "Available" : "Reserved"}
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-2 text-sm">
-                  <p>
-                    <strong>Check-in:</strong> {item.checkedIn}
-                  </p>
-                  <p>
-                    <strong>Check-out:</strong> {item.checkedOut}
-                  </p>
-                  {selectedCategory === "rooms" ? (
-                    <p className="mt-1">
-                      <strong>Details:</strong> {item.details}
-                    </p>
-                  ) : (
-                    <p className="mt-1">
-                      <strong>Description:</strong> {item.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
-    </ScrollArea>
+      {renderContent()}
+    </div>
   );
 };
 

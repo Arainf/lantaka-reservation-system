@@ -22,6 +22,7 @@ import { useDiscountContext } from "@/context/discountContext";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 
+
 export default function DiscountTable({ searchTerm }) {
   const { discounts, isLoading, error, fetchDiscounts, addDiscount, updateDiscount, deleteDiscount } = useDiscountContext();
   const [selectedDiscount, setSelectedDiscount] = useState(null);
@@ -35,6 +36,7 @@ export default function DiscountTable({ searchTerm }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const { toast } = useToast();
+
 
   const filteredDiscounts = discounts.filter((discount) =>
     discount.discount_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -292,29 +294,11 @@ export default function DiscountTable({ searchTerm }) {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <span className="font-medium text-right">Percentage:</span>
-                  <span className="col-span-3">{selectedDiscount?.discount_percentage}%</span>
+                  <span className="col-span-3 ml-2">{selectedDiscount?.discount_percentage}%</span>
                 </div>
               </>
             )}
           </div>
-          <DialogFooter>
-            {isEditing ? (
-              <Button onClick={handleEditDiscount}>
-                <Save className="mr-2 h-4 w-4" />
-                Save
-              </Button>
-            ) : (
-              <Button onClick={() => setIsEditing(true)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
-            )}
-            <Button onClick={() => handleDeleteDiscount(selectedDiscount.discount_id)} variant="destructive">Delete</Button>
-            <Button onClick={() => {
-              setIsEditing(false);
-              setIsDialogOpen(false);
-            }}>Close</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
