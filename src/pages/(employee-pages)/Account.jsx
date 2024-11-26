@@ -10,31 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import {
-  ArrowUpDown,
-  Building2,
-  Calendar,
-  Clock,
-  Loader2,
-  Mail,
-  Phone,
-  Upload,
-  User,
-} from "lucide-react";
+import { Loader2, Mail, Phone, User, Building2 } from "lucide-react";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import BookingTable from "@/components/common/cards/BookingTable";
 import { useReservationsContext } from "@/context/reservationContext";
@@ -46,19 +27,39 @@ export default function Account() {
   const { userData, setUserData } = useContext(UserContext);
 
   const navigate = useNavigate();
+  const [account, setAccount] = useState(userData);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
+    setAccount((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      localStorage.setItem("userData", JSON.stringify(userData));
+      // Replace with your API endpoint URL
+      const response = await fetch('http://localhost:5000/api/updateaccount', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          guest_id: account.guestId, // Replace with the relevant field for guest ID
+          first_name: account.fName,
+          last_name: account.lName,
+          email: account.email,
+          phone: account.phone,
+          date_of_birth: account.dateOfBirth,
+        }),
+              });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save changes');
+      }
+  
+      const data = await response.json(); // Assuming the server responds with JSON
       toast({
         title: "Changes Saved",
         description: "Your changes have been successfully saved.",
@@ -74,10 +75,10 @@ export default function Account() {
       setIsSaving(false);
     }
   };
+  
 
   const handleLogout = () => {
     setIsLoggingOut(true);
-    // Perform logout logic here
     localStorage.removeItem("userToken");
     setTimeout(() => {
       setIsLoggingOut(false);
@@ -97,7 +98,7 @@ export default function Account() {
       <Card className="fixed inset-0 w-screen h-screen pt-[5rem] bg-white/50 dark:bg-gray-900/50 overflow-hidden">
         <CardHeader className="pb-4 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
           <div className="relative group">
-            <Avatar className="w-24 h-24 ">
+            <Avatar className="w-24 h-24">
               <img
                 src="src/assets/images/SchoolLogo.png"
                 alt="Upload Logo"
@@ -108,17 +109,17 @@ export default function Account() {
 
           <div className="flex-1">
             <CardTitle className="text-3xl font-bold">
-              {`${userData.first_name} ${userData.last_name}`.toUpperCase()}
+              {`${account.first_name} ${account.last_name}`.toUpperCase()}
             </CardTitle>
             <CardDescription className="text-lg mt-1">
-              {userData.position}
+              {account.position}
             </CardDescription>
           </div>
           <div className="flex gap-3 pt-[20px] md:self-start">
             <Button
               onClick={handleSaveChanges}
               disabled={isSaving}
-              className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+              className="bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all"
             >
               {isSaving ? (
                 <div className="flex items-center justify-center">
@@ -132,7 +133,7 @@ export default function Account() {
             <Button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="bg-[#FCB813] text-white hover:bg-yellow-600 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+              className="bg-[#FCB813] text-white hover:bg-yellow-600 shadow-lg hover:shadow-xl transition-all"
             >
               {isLoggingOut ? (
                 <div className="flex items-center justify-center">
@@ -146,8 +147,8 @@ export default function Account() {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="personal" className="mt-6 ">
-            <TabsList className="grid w-full grid-cols-2 gap-4 ">
+          <Tabs defaultValue="personal" className="mt-6">
+          <TabsList className="grid w-full grid-cols-2 gap-4 ">
               <TabsTrigger
                 value="personal"
                 className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
@@ -175,7 +176,7 @@ export default function Account() {
                     type="text"
                     id="first_name"
                     name="first_name"
-                    value={userData.fName}
+                    value={account.fName}
                     onChange={handleInputChange}
                     className="shadow-sm"
                   />
@@ -188,12 +189,11 @@ export default function Account() {
                     type="text"
                     id="last_name"
                     name="last_name"
-                    value={userData.lname}
+                    value={account.lName}
                     onChange={handleInputChange}
                     className="shadow-sm"
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="dateOfBirth" className="text-sm font-medium">
                     Date of Birth
@@ -202,7 +202,7 @@ export default function Account() {
                     type="date"
                     id="dateOfBirth"
                     name="dateOfBirth"
-                    value={userData.dateOfBirth}
+                    value={account.dateOfBirth}
                     onChange={handleInputChange}
                     className="shadow-sm"
                   />
@@ -218,7 +218,7 @@ export default function Account() {
                     type="email"
                     id="email"
                     name="email"
-                    value={userData.email}
+                    value={account.email}
                     onChange={handleInputChange}
                     className="shadow-sm"
                   />
@@ -234,7 +234,7 @@ export default function Account() {
                     type="tel"
                     id="phone"
                     name="phone"
-                    value={userData.phone}
+                    value={account.phone}
                     onChange={handleInputChange}
                     className="shadow-sm"
                   />
@@ -243,7 +243,7 @@ export default function Account() {
             </TabsContent>
 
             <TabsContent value="bookings">
-            <ScrollArea className="h-[500px] top-3  space-y-4 scrollbar-hidden">
+              <ScrollArea className="h-[500px] top-3 space-y-4 scrollbar-hidden">
                 <BookingTable data={reservationsData} />
               </ScrollArea>
             </TabsContent>
@@ -253,4 +253,3 @@ export default function Account() {
     </>
   );
 }
-
