@@ -18,6 +18,7 @@ import Footer from "@/components/common/footer/Footer";
 import { useDashboardContext } from "@/context/dashboardContext";
 import { DashboardDatePickerDemo as DashboardDatePicker } from "@/components/common/utilities/DashboardDatePicker";
 import ViewToggle from "@/components/common/utilities/ViewToggle";
+import Spinner from '@/components/ui/spinner';
 
 const AdminDashboard = () => {
   const {
@@ -85,9 +86,7 @@ const AdminDashboard = () => {
   const renderDashboardContent = () => {
     if (loading) {
       return (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-lg text-gray-500">Loading...</p>
-        </div>
+        <Spinner />
       );
     }
 
