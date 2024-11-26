@@ -135,7 +135,7 @@ export const ReservationProvider = ({ children }) => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/reservationCalendar')
+      const response = await axios.get('http://localhost:5000/api/getreservationCalendar')
       const formattedEvents = response.data.map(event => ({
         reservation: event.reservationid,
         id: event.id,

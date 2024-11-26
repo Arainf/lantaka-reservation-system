@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useNotifications } from "@/context/notificationContext"; // Assuming a notification context is used.
 
 const RoomTypeContext = createContext(undefined);
 
@@ -12,6 +13,7 @@ export const useRoomTypeContext = () => {
 
 export const RoomTypeProvider = ({ children }) => {
   const [roomTypes, setRoomTypes] = useState([]);
+  const { createNotification } = useNotifications();
 
   const fetchRoomTypes = useCallback(async () => {
     try {
@@ -37,10 +39,15 @@ export const RoomTypeProvider = ({ children }) => {
         throw new Error('Failed to add room type');
       }
       await fetchRoomTypes();
+      createNotification({
+        type: 'Added',
+        description: `Room type "${roomType.room_type_name}" was added.`,
+        role: 'employee',
+      });
     } catch (error) {
       console.error('Error adding room type:', error);
     }
-  }, [fetchRoomTypes]);
+  }, [fetchRoomTypes, createNotification]);
 
   const updateRoomType = useCallback(async (id, roomType) => {
     try {
@@ -53,11 +60,15 @@ export const RoomTypeProvider = ({ children }) => {
         throw new Error('Failed to update room type');
       }
       await fetchRoomTypes();
+      createNotification({
+        type: 'Modified',
+        description: `Room type "${roomType.room_type_name || id}" was updated.`,
+        role: 'employee',
+      });
     } catch (error) {
-     
       console.error('Error updating room type:', error);
     }
-  }, [fetchRoomTypes]);
+  }, [fetchRoomTypes, createNotification]);
 
   const deleteRoomType = useCallback(async (id) => {
     try {
@@ -68,17 +79,24 @@ export const RoomTypeProvider = ({ children }) => {
         throw new Error('Failed to delete room type');
       }
       await fetchRoomTypes();
+      createNotification({
+        type: 'Deleted',
+        description: `Room type with ID "${id}" was removed.`,
+        role: 'employee',
+      });
     } catch (error) {
       console.error('Error deleting room type:', error);
     }
-  }, [fetchRoomTypes]);
+  }, [fetchRoomTypes, createNotification]);
 
   useEffect(() => {
     fetchRoomTypes();
   }, [fetchRoomTypes]);
 
   return (
-    <RoomTypeContext.Provider value={{ roomTypes, fetchRoomTypes, addRoomType, updateRoomType, deleteRoomType }}>
+    <RoomTypeContext.Provider
+      value={{ roomTypes, fetchRoomTypes, addRoomType, updateRoomType, deleteRoomType }}
+    >
       {children}
     </RoomTypeContext.Provider>
   );

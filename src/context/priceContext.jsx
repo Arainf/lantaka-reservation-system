@@ -6,7 +6,7 @@ export const usePriceContext = () => useContext(PriceContext);
 
 export const PriceProvider = ({ children }) => {
   const [price, setPrice] = useState({});
-  const [clientType, setClientType] = useState('Internal');
+  const [clientType, setClientType] = useState('');
   const [discounts, setDiscounts] = useState([]);
   const [initialTotalPrice, setInitialTotalPrice] = useState(0);
   const [discountsData, setDiscountsData] = useState({});
@@ -115,6 +115,7 @@ export const PriceProvider = ({ children }) => {
     insertDiscount,
     insertAddFee,
     fetchDiscount,
+    fetchPrice
   };
 
   return (

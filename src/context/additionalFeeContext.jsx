@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useNotifications } from "@/context/notificationContext";
 
 const AdditionalFeeContext = createContext();
 
@@ -12,6 +13,7 @@ export const useAdditionalFees = () => {
 
 export const AdditionalFeeProvider = ({ children }) => {
   const [additionalFees, setAdditionalFees] = useState([]);
+  const { createNotification } = useNotifications();
 
   const fetchAddFees = useCallback(async () => {
     try {
@@ -36,15 +38,20 @@ export const AdditionalFeeProvider = ({ children }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fee),
-      });           
+      });
       if (!response.ok) {
         throw new Error('Failed to add fee');
       }
       await fetchAddFees();
+      createNotification({
+        type: 'Added',
+        description: `Additional fee "${fee.additional_fee_name}" has been  added.`,
+        role: 'employee',
+      });
     } catch (error) {
       console.error('Error adding fee:', error);
     }
-  }, [fetchAddFees]);
+  }, [fetchAddFees, createNotification]);
 
   const updateFee = useCallback(async (id, fee) => {
     try {
@@ -57,10 +64,15 @@ export const AdditionalFeeProvider = ({ children }) => {
         throw new Error('Failed to update fee');
       }
       await fetchAddFees();
+      createNotification({
+        type: 'Modified',
+        description: `Additional fee "${fee.additional_fee_name}" has been  updated.`,
+        role: 'employee',
+      });
     } catch (error) {
       console.error('Error updating fee:', error);
     }
-  }, [fetchAddFees]);
+  }, [fetchAddFees, createNotification]);
 
   const deleteFee = useCallback(async (id) => {
     try {
@@ -71,13 +83,26 @@ export const AdditionalFeeProvider = ({ children }) => {
         throw new Error('Failed to delete fee');
       }
       await fetchAddFees();
+      createNotification({
+        type: 'Deleted',
+        description: `Additional fee "${id}" has been deleted.`,
+        role: 'employee',
+      });
     } catch (error) {
       console.error('Error deleting fee:', error);
     }
-  }, [fetchAddFees]);
+  }, [fetchAddFees, createNotification]);
 
   return (
-    <AdditionalFeeContext.Provider value={{ additionalFees, fetchAddFees, addFee, updateFee, deleteFee }}>
+    <AdditionalFeeContext.Provider
+      value={{
+        additionalFees,
+        fetchAddFees,
+        addFee,
+        updateFee,
+        deleteFee,
+      }}
+    >
       {children}
     </AdditionalFeeContext.Provider>
   );

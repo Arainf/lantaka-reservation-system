@@ -12,6 +12,8 @@ import { RoomTypeProvider } from './context/RoomTypeContext';
 import { DiscountProvider } from './context/discountContext';
 import { AdditionalFeeProvider } from './context/additionalFeeContext';
 import { ToastProvider } from './context/toastContext';
+import { NotificationProvider } from './context/notificationContext';
+import { HeroProvider } from './context/heroContext';
 
 
 
@@ -19,10 +21,12 @@ import { ToastProvider } from './context/toastContext';
 function App() {
   return (
     <>
+    <NotificationProvider>
     <ToastProvider>
     <RegistrationProvider>
     <UserProvider>
       <AccountProvider>
+        <HeroProvider>
         <ReservationProvider>
           <RoomandVenueProvider>
             <PriceProvider>
@@ -44,10 +48,12 @@ function App() {
             </PriceProvider>
           </RoomandVenueProvider>
         </ReservationProvider>
+        </HeroProvider>
       </AccountProvider>
     </UserProvider> 
     </RegistrationProvider>
     </ToastProvider>
+    </NotificationProvider>
     </>
   );
 }
