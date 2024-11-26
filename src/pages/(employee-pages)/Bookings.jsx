@@ -305,7 +305,7 @@ export default function ReservationCalendar() {
                   variant="ghost"
                   onClick={resetFilters}
                   title="Reset all filters"
-                  className="mt-2"
+                  className=" text-xs w-[50px]"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
