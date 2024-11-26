@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Mail, Upload, FileSpreadsheet, FileIcon as FilePdf, Book, BedSingle, CircleDollarSign, CircleUserRound } from 'lucide-react';
+import { Upload, FileSpreadsheet, FileIcon as FilePdf, Book, BedSingle, CircleDollarSign, CircleUserRound } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ import Footer from "@/components/common/footer/Footer";
 import { useDashboardContext } from "@/context/dashboardContext";
 import { DashboardDatePickerDemo as DashboardDatePicker } from "@/components/common/utilities/DashboardDatePicker";
 import ViewToggle from "@/components/common/utilities/ViewToggle";
-import Spinner from "@/components/ui/spinner";
 
 const AdminDashboard = () => {
   const {
@@ -38,7 +37,7 @@ const AdminDashboard = () => {
 
   const handleExport = async (format) => {
     if (!dashboardData) return;
-  
+
     const formatDate = (date) => date.toISOString().split('T')[0];
     const params = new URLSearchParams({
       startDate: formatDate(startDate),
@@ -56,9 +55,12 @@ const AdminDashboard = () => {
             : 'application/pdf'
         }
       });
-  
-      if (!response.ok) throw new Error('Export failed');
-  
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Export failed: ${response.status} ${response.statusText}. ${errorText}`);
+      }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -69,8 +71,8 @@ const AdminDashboard = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error exporting dashboard data:', error);
-      // You might want to add a toast notification here
+      console.error('Error exporting dashboard data:', error.message);
+      // You might want to show this error to the user in the UI
     }
   };
 
@@ -83,7 +85,9 @@ const AdminDashboard = () => {
   const renderDashboardContent = () => {
     if (loading) {
       return (
-        <Spinner />
+        <div className="flex justify-center items-center h-64">
+          <p className="text-lg text-gray-500">Loading...</p>
+        </div>
       );
     }
 
@@ -112,11 +116,11 @@ const AdminDashboard = () => {
             />
             <ReservationCard
               isLoading={loading}
-              title="AVAILABLE ROOMS"
+              title="AVAILABLE SPACES"
               icon={BedSingle}
-              value={dashboardData.availableRooms}
-              percentageChange={dashboardData.availableRoomsChange}
-              percentageSuffix={getPercentageChangeText(dashboardData.availableRoomsChange, dashboardData.totalBookingsPeriod)}
+              value={dashboardData.availableSpaces}
+              percentageChange={dashboardData.availableSpacesChange}
+              percentageSuffix={getPercentageChangeText(dashboardData.availableSpacesChange, dashboardData.totalBookingsPeriod)}
               baseColor="#001f3f"
             />
             <ReservationCard
@@ -195,16 +199,7 @@ const AdminDashboard = () => {
             <div className="hidden lg:flex items-center space-x-4">
               <ViewToggle viewMode={viewMode} onToggle={setViewMode} />
               <div className="flex items-center space-x-3 bg-white rounded-md shadow-sm p-2">
-                <DashboardDatePicker
-                  date={startDate}
-                  onDateChange={setStartDate}
-                />
-                <span className="text-gray-500">-</span>
-                <DashboardDatePicker date={endDate} onDateChange={setEndDate} />
-                <div className="flex space-x-3 ml-2">
-                  <Button variant="outline" size="sm">
-                    <Mail className="h-5 w-5" />
-                  </Button>
+                <div className="flex space-x-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm">
@@ -237,3 +232,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

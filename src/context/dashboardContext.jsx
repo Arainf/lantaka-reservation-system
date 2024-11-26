@@ -7,33 +7,28 @@ export const useDashboardContext = () => useContext(DashboardContext);
 export const DashboardProvider = ({ children }) => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('daily');
+  const [viewMode, setViewMode] = useState('monthly');
 
   // Initialize dates based on view mode
   const initializeDates = (mode) => {
     const now = new Date();
-    
     let start = new Date(now);
     let end = new Date(now);
     
-    // Set end date to end of current day
-    end.setHours(23, 59, 59, 999);
-    
     if (mode === 'monthly') {
-      // For monthly view: Start from beginning of 2 months ago
-      start.setMonth(now.getMonth() - 2);
-      start.setDate(1);
-      start.setHours(0, 0, 0, 0);
+      // For monthly view: Start from beginning of 2 months ago, end at end of current month
+      start.setMonth(now.getMonth() - 2, 1);
+      end.setMonth(end.getMonth() + 1, 0);
     } else {
-      // For daily view: Start from beginning of 6 days ago
+      // For daily view: Start from 6 days ago, end today
       start.setDate(now.getDate() - 6);
       start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
     }
 
     return { start, end };
   };
 
-  // Initialize state with proper dates
   const [dateRange, setDateRange] = useState(() => initializeDates(viewMode));
 
   // Update dates when view mode changes
