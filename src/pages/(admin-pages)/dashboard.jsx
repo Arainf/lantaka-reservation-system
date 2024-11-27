@@ -73,7 +73,7 @@ const AdminDashboard = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error exporting dashboard data:', error.message);
-      // You might want to show this error to the user in the UI
+
     }
   };
 

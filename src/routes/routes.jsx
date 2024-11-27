@@ -22,7 +22,6 @@ import AdminUtilies from "@/pages/(admin-pages)/utilities";
 import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
 import Account from "@/pages/(employee-pages)/Account";
-import JoshTest from "@/pages/Josh-Test/JoshTest";
 import CalendarPage from "@/pages/(employee-pages)/Calendar";
 import Bookings from "@/pages/(employee-pages)/Bookings";
 
@@ -33,7 +32,7 @@ const AppRoutes = () => {
   const { userRole, userData } = useContext(UserContext);
 
   console.log(userRole);
-  const isDevMode = true; // Set this to true to disable route protection for developers
+  const isDevMode = false; // Set this to true to disable route protection for developers
 
   const toggleSidebar = () => {
     setSidebarOpen((prevState) => !prevState);
@@ -149,7 +148,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Home toggleSidebar={toggleSidebar} />}
-            allowedRoles={["Employee"]}
+            allowedRoles={["Employee", "Administrator"]}
             isDevMode={isDevMode}
           />
         }
@@ -159,7 +158,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Reservation toggleSidebar={toggleSidebar} />}
-            allowedRoles={["Employee"]}
+            allowedRoles={["Employee" , "Administrator"]}
             isDevMode={isDevMode}
           />
         }
@@ -169,7 +168,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Bookings />}
-            allowedRoles={["Employee"]}
+            allowedRoles={["Employee" , "Administrator"]}
             isDevMode={isDevMode}
           />
         }
@@ -179,7 +178,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute
             element={<Account />}
-            allowedRoles={["Employee"]}
+            allowedRoles={["Employee" , "Administrator"]}
             isDevMode={isDevMode}
           />
         }
@@ -190,7 +189,7 @@ const AppRoutes = () => {
             element={
               <ProtectedRoute
                 element={<CalendarPage />}
-                allowedRoles={["Employee"]}
+                allowedRoles={["Employee" , "Administrator"]}
                 isDevMode={isDevMode}
               />
             }
@@ -201,7 +200,6 @@ const AppRoutes = () => {
       {/* Test Routes */}
 
       <Route path="/Rainiertest" element={<DashboardRegistrationForm />} />
-      <Route path="/Joshtest" element={<JoshTest />} />
       
         
     </Routes>

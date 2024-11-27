@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
-import ReservationsTable from "@/components/common/cards/BookingSummary";
+import ReservationsTable from "@/components/common/cards/ReservationTable";
 import { useReservationsContext } from "@/context/reservationContext";
 import BookingSummary from "@/components/common/cards/BookingSummary";
 import UpcomingBooking from "@/components/common/cards/UpcomingBooking";
