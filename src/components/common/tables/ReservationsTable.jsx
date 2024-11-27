@@ -848,7 +848,7 @@ export default function ReservationsTable({ data = [], keys }) {
       {selectedGuest && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3"
+            className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3 shadow-none"
             showCloseButton={false}
           >
             <div className="w-3/6 flex flex-col gap-3">
@@ -902,7 +902,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           Venue Reservations (
                           {selectedGuest.reservationVenueID.length}):
                         </h4>
-                        <ScrollArea className="max-h-[200px] overflow-y-auto w-[95%] p-2">
+                        <ScrollArea className="max-h-[15  0px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations
                             .filter(
                               (reservation) =>
@@ -927,7 +927,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           {selectedGuest.reservationType} Reservations (
                           {selectedGuest.reservations.length}):
                         </h4>
-                        <ScrollArea className="max-h-[400px] overflow-y-auto w-[95%] p-2">
+                        <ScrollArea className="max-h-[150px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations.map(
                             (reservation, index) => (
                               <div

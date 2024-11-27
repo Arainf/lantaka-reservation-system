@@ -32,7 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ChevronLeft, ChevronRight, Edit, Save, Trash2, X, Upload } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit, Save, Trash2, X, Upload, Search } from 'lucide-react';
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
 import { useRoomVenueContentsContext } from "@/context/roomandVenueContext";
@@ -446,14 +446,17 @@ export default function VenueRoomManagement({
             <div className="p-6 space-y-6 flex-grow overflow-auto">
               <h1 className="text-2xl font-bold">Venue and Room Management</h1>
 
-              <div className="flex items-center space-x-2">
+              <div className=" relative flex items-center space-x-2">
                 <Input
                   type="text"
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
+                  className="pl-10 pr-4 py-2 w-50 md:w-80"
                 />
+                <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
+                  <Search className="text-gray-900" size={18} />
+                </div>
                 <Select value={filterType} onValueChange={setFilterType}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Filter by type" />
@@ -599,7 +602,7 @@ export default function VenueRoomManagement({
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="sm:max-w-[900px] border-none bg-transparent p-0"
+            className="sm:max-w-[900px] border-none bg-transparent p-0 shadow-none"
             showCloseButton={false}
           >
             <div className="flex flex-row gap-4">

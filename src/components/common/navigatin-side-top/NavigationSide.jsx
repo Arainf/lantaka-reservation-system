@@ -8,9 +8,6 @@ import { BiLogOut } from "react-icons/bi"; // Import logout icon
 import { IoMdArrowDropdown } from "react-icons/io"; // Import dropdown arrow icon
 import { MdOutlineRoomService } from "react-icons/md";
 import { RiListSettingsFill } from "react-icons/ri";
-
-
-import sidebarBg from '@/assets/images/sidebar.png'; // Sidebar background image
 import './navigationside.css'; // Import CSS for styling
 import { ListCheck, SquareMenu } from "lucide-react";
 
@@ -97,10 +94,6 @@ const NavigationSide = ({ isOpen }) => {
           <h1 className={`titleStyle ${isOpen ? 'visible' : 'invisible'}`} style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
           &lt; Lantaka Reservation System / &gt;
           </h1>
-          {/* remove this when the project is done */}
-          {/* <h6 className={`subtitleStyle ${isOpen ? 'visible' : 'invisible'}`}> */}
-            {/* "Database Management & Web System and Technologies" */}
-          {/* </h6> */}
         </div>
       </div>
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react"
 import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
-import ReservationsTable from "@/components/common/cards/ReservationsTable"
+import ReservationsTable from "@/components/common/tables/ReservationsTable"
 import { Filter, Search, RefreshCw, ArrowUpDown } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 export default function AdminReservation({ sidebarOpen = false, toggleSidebar = () => {} }) {
   const { reservationsData, fetchReservations, deleteData, saveNote } = useReservationsContext()
@@ -159,12 +160,12 @@ const filteredReservations = reservationsData
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   placeholder="Search by name or account..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
+                  className="pl-10 pr-4 py-2 w-50 md:w-80"
                 />
                 <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
                   <Search className="text-gray-900" size={18} />
