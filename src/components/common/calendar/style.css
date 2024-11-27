@@ -1,0 +1,29 @@
+.grouped-event {
+    background-color: #f3f4f6;
+    border-left: 4px solid #6366f1;
+    padding: 4px;
+  }
+  
+  .group-event {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .group-title {
+    font-weight: 500;
+  }
+  
+  .group-count {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .calendar-wrapper {
+    --ec-border-color: #e5e7eb;
+    --ec-event-bg-color: #6366f1;
+    --ec-event-border-color: #4f46e5;
+    --ec-today-bg-color: #fef3c7;
+  }
+  
+  
