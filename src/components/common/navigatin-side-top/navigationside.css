@@ -7,6 +7,7 @@
   background-size: cover;
   box-shadow: -11px 0px 48px 16px rgba(80, 78, 78, 0.75);
   background-color: #001f3f;
+  background-image: url('./src/assets/images/sidebar.webp') !important;
   flex-shrink: 0; /* Prevent sidebar from shrinking */
 }
  /* side bar title and logo */

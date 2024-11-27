@@ -114,7 +114,7 @@ const Reservation = () => {
           <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 border-l">
             <Card>
               <CardContent className="p-0">
-                <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden">
+                <div className="h-1/4 bg-[#143774] border flex border-gray-200 rounded-lg overflow-hidden justify-center">
                   <Clock />
                 </div>
               </CardContent>
@@ -162,6 +162,8 @@ const Reservation = () => {
                     <CheckoutTable data={data} onClose={handleCloseModal} />
                   </DialogContent>
                 </Dialog>
+
+                
               </CardContent>
             </Card>
 

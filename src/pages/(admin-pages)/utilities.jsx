@@ -8,9 +8,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
 import { Toaster } from "@/components/ui/toaster"
-import DiscountTable from "@/components/common/tables/discount-table"
-import AdditionalFeeTable from "@/components/common/tables/additional-fee-table"
-import RoomTypeTable from "@/components/common/tables/room-type-table"
+import DiscountTable from "@/components/common/tables/DiscountTable"
+import AdditionalFeeTable from "@/components/common/tables/AdditionalFeeTable"
+import RoomTypeTable from "@/components/common/tables/RoomTypeTable"
 import { useRegistrationContext } from "@/context/utilContext"
 
 export default function AdminUtilities({

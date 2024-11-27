@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react"
 import { createIcons, icons } from "lucide"
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide"
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop"
-import AccountsTable from "@/components/common/cards/AccountsTable"
+import AccountsTable from "@/components/common/tables/accountsTable"
 import { Filter, Search, RefreshCw, Plus, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Avatar } from "@/components/ui/avatar";
 import NotificationBell from "@/components/common/Notification/NotificationBell"; // Import your NotificationBell
 import Slogo from "@/assets/images/SchoolLogo.png";
-import Hlogo from "@/assets/images/HorizontalLogo.png";
+import Hlogo from "@/assets/images/NAVIGATIONLOGO.png";
 import { UserContext } from "@/context/contexts";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Modal from "@/components/ui/modal";
@@ -34,8 +34,8 @@ const NavigationTop = memo(({ handleBackToHome }) => {
   return (
     <header className="flex justify-between items-center h-14 px-4 bg-[#0f172a] text-white sticky top-0 right-0 z-10">
       {/* Left Section */}
-      <div className="flex items-center space-x-2 w-1/4">
-        <img src={Hlogo} alt="Logo" className="logoStyle2" />
+      <div className="flex items-center">
+        <img src={Hlogo} alt="Logo" />
       </div>
 
       {/* Center Navigation */}

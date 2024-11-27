@@ -599,7 +599,7 @@ export default function VenueRoomManagement({
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="sm:max-w-[900px] border-none bg-transparent p-0"
+            className="sm:max-w-[900px] border-none bg-transparent p-0 shadow-none"
             showCloseButton={false}
           >
             <div className="flex flex-row gap-4">
