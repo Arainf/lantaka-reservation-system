@@ -48,17 +48,17 @@ const NotificationBell = () => {
   const getIcon = (type) => {
     switch (type) {
       case 'Added' || 'Create':
-        return <Plus size={16} className="mr-2 text-green-600" />;
+        return <Plus size={28} className="mr-2 text-green-600" />;
       case 'Deleted':
-        return <Trash2 size={16} className="mr-2 text-red-600" />;
+        return <Trash2 size={28} className="mr-2 text-red-600" />;
       case 'Reserve':
-        return <Calendar size={16} className="mr-2 text-blue-600" />;
+        return <Calendar size={28} className="mr-2 text-blue-600" />;
       case 'Upcoming':
-        return <Calendar size={16} className="mr-2 text-yellow-600" />;
+        return <Calendar size={28} className="mr-2 text-yellow-600" />;
       case 'Modified':
-        return <Pencil size={16} className="mr-2 text-violet-600" />;
+        return <Pencil size={28} className="mr-2 text-violet-600" />;
       default:
-        return <Bell size={16} className="mr-2 text-gray-600" />;
+        return <Bell size={28} className="mr-2 text-gray-600" />;
     }
   };
 

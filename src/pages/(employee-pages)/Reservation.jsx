@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback, } from "react"
+import React, { useState, useEffect, useCallback, useContext } from "react"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -50,6 +50,9 @@ import CostCalculator from "@/components/common/cards/Receipt"
 import { Badge } from "@/components/ui/badge"
 import { usePriceContext } from "@/context/priceContext"
 import { Separator } from "@/components/ui/separator"
+import { useNotifications } from "@/context/notificationContext";
+import { UserContext } from "@/context/contexts";
+
 
 const step1Schema = z.object({
   clientAlias: z.string().min(1, "*"),
@@ -107,6 +110,7 @@ export default function Component() {
     triple: [],
     matrimonial: [],
   })
+  const { createNotification } = useNotifications();
   const { price, clientType, setClientType, discounts, initialTotalPrice, fetchDiscount } =
     usePriceContext()
   const [venueMessage, setVenueMessage] = useState("")
@@ -130,6 +134,7 @@ export default function Component() {
   const [clients, setClients] = useState([])
   const [selectedClient, setSelectedClient] = useState(null)
   const [loading, setLoading] = useState(false);
+  const { userData  } = useContext(UserContext);
 
 
   const form = useForm({
@@ -167,6 +172,7 @@ export default function Component() {
       "Triple capacity": price.triple_capacity || 0,
       "Matrimonial capacity": price.Matrimonial_capacity || 0,
     })
+    console.log(capacity)
   }, [price])
 
   useEffect(() => {
@@ -213,7 +219,7 @@ export default function Component() {
         capacity["Matrimonial capacity"]
     }
     return totalGuests
-  }, [selectedRoomReceipt, capacity])
+  }, [selectedRoomReceipt, capacity, price])
 
   useEffect(() => {
     const newMaxGuests = calculateMaxGuests()
@@ -295,40 +301,55 @@ export default function Component() {
       await nextStep();
     } else {
       try {
-        
         await step3Schema.parseAsync(data);
-
+  
         // Get the timezone (e.g., from a user setting or default to system's timezone)
         const timeZone = 'Asia/Manila';  // Example: set this dynamically if needed
-
+  
         // Adjust the date range for room with the selected timezone
-        const fromRoom = moment(dateRangeRoomsetter.from).tz(timeZone, true).format();
-        const toRoom = moment(dateRangeRoomsetter.to).tz(timeZone, true).format();
-
+        const fromRoom = dateRangeRoomsetter.from ? moment(dateRangeRoomsetter.from).tz(timeZone, true).format() : null;
+        const toRoom = dateRangeRoomsetter.to ? moment(dateRangeRoomsetter.to).tz(timeZone, true).format() : null;
+  
         // Adjust the date range for venue with the selected timezone
-        const fromVenue = moment(dateRangeVenueSetter.from).tz(timeZone, true).format();
-        const toVenue = moment(dateRangeVenueSetter.to).tz(timeZone, true).format();
-
+        const fromVenue = dateRangeVenueSetter.from ? moment(dateRangeVenueSetter.from).tz(timeZone, true).format() : null;
+        const toVenue = dateRangeVenueSetter.to ? moment(dateRangeVenueSetter.to).tz(timeZone, true).format() : null;
+  
         data.accountId = localStorage.getItem("account_id");
         data.totalPrice = calculateTotalPrice();
         data.discount = discounts;
         data.initialTotalPrice = initialTotalPrice;
         data.MaxnumberofGuest = maxGuests;
-
-        data.dateRangeRoom = {
-          from: fromRoom,
-          to: toRoom,
-        };
-
-        data.dateRangeVenue = {
-          from: fromVenue,
-          to: toVenue,
-        };
-
+  
+        // Check if `fromRoom` and `toRoom` are defined, if so, set `dateRangeRoom`
+        if (fromRoom && toRoom) {
+          data.dateRangeRoom = {
+            from: fromRoom,
+            to: toRoom,
+          };
+        }
+  
+        // If no dates are selected for room, set it to "none"
+        if (!fromRoom && !toRoom) {
+          data.dateRangeRoom = "none";
+        }
+  
+        // Check if `fromVenue` and `toVenue` are defined, if so, set `dateRangeVenue`
+        if (fromVenue && toVenue) {
+          data.dateRangeVenue = {
+            from: fromVenue,
+            to: toVenue,
+          };
+        }
+  
+        // If no dates are selected for venue, set it to "none"
+        if (!fromVenue && !toVenue) {
+          data.dateRangeVenue = "none";
+        }
+  
         data.selectedReservationRooms = selectedRooms;
         data.selectedReservationVenues = selectedVenues;
         data.clientType = clientType;
-        
+  
         console.log("data:", JSON.stringify(data, null, 2));
         setFormData(data);
       } catch (error) {
@@ -340,7 +361,8 @@ export default function Component() {
         }
       }
     }
-}
+  }
+  
 
   const calculateTotalPrice = () => {
     let total = initialTotalPrice
@@ -412,58 +434,68 @@ export default function Component() {
   }, [reservationType])
 
   const handleConfirmSubmit = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/submitReservation",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      )
-
-      const result = await response.json()
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: result.message || "Reservation submitted successfully!",
-          variant: "success",
-        })
-        setIsConfirmationOpen(false)
-        form.reset()
-        setSelectedRooms([])
-        setSelectedVenues([])
-        
-           // Show spinner
-          setTimeout(() => {
-            setLoading(true);
-            navigate(0); // Navigate (reload the page)
-            
-          }, 1500);
-
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description:
-            result.error ||
-            "An error occurred while submitting the reservation.",
-        })
+      const response = await fetch("http://localhost:5000/api/submitReservation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(result.error || "An error occurred while submitting the reservation.");
       }
+  
+      toast({
+        title: "Success",
+        description: result.message || "Reservation submitted successfully!",
+        variant: "success",
+      });
+  
+      let fullName = userData.first_name + " " + userData.last_name;
+
+        // Create a formatted timestamp
+      const timestamp = new Date().toLocaleString('en-US', {
+        weekday: 'long', // Day of the week
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true, // 12-hour format (AM/PM)
+      });
+
+      await createNotification({
+        type: 'Created',
+        description: `Account Name: "${fullName}" has created reservations for: "${formData.clientAlias} (${formData.firstName}) at Timestamp: "${timestamp} ".`,
+        role: 'Administrator',
+      });
+  
+      setIsConfirmationOpen(false);
+      form.reset();
+      setSelectedRooms([]);
+      setSelectedVenues([]);
+  
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      navigate(0);
+  
     } catch (error) {
-      console.error("Error submitting reservation:", error)
+      console.error("Error submitting reservation:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      })
+        description: error.message || "An unexpected error occurred. Please try again.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
+      setLoading(false);
     }
-  }
+  };
 
   const callAvailableRoom = (dateRange) => {
     console.log(`Date Range Raw: ${dateRange.from.toLocaleString()}, to ${dateRange.to.toLocaleString()}`)

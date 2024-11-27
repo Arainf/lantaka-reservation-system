@@ -92,28 +92,31 @@ export default function ReservationsTable({ data = [], keys }) {
   
   const groupedData = useMemo(() => {
     const result = data.reduce((acc, reservation) => {
-      // Use `receipt_id` explicitly in the key to differentiate instances
-      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}-${reservation.receipt_id}-${reservation.timestamp}`;
+      // Use `timestamp` explicitly in the key to group by timestamp
+      const key = reservation.timestamp;
   
+      // Initialize the grouping if it's not already done
       if (!acc[key]) {
         acc[key] = {
+          timestamp: reservation.timestamp,
+          reservations: [],
           guestId: reservation.guest_id,
           guestName: reservation.guest_name,
           guestEmail: reservation.guest_email,
           guestType: reservation.guest_type,
           reservationType: reservation.reservation_type,
-          receiptId: reservation.receipt_id, // Differentiate instances by receipt_id
+          receiptId: reservation.receipt_id,
           receiptDate: reservation.receipt_date,
           receiptTotal: reservation.receipt_total_amount,
           receiptSubTotal: reservation.receipt_initial_total,
           additionalNotes: reservation.additional_notes,
           receiptDiscounts: [],
-          reservations: [],
           reservationRoomID: [],
           reservationVenueID: [],
         };
       }
   
+      // Process receipt discounts
       reservation.receipt_discounts.forEach((discount) => {
         if (
           discount &&
@@ -125,6 +128,7 @@ export default function ReservationsTable({ data = [], keys }) {
         }
       });
   
+      // Group reservations by type (room, venue, or both)
       if (reservation.reservation_type === "room") {
         acc[key].reservationRoomID.push(reservation.reservation_id);
       } else if (reservation.reservation_type === "venue") {
@@ -137,6 +141,7 @@ export default function ReservationsTable({ data = [], keys }) {
         }
       }
   
+      // Add the current reservation to the group
       acc[key].reservations.push(reservation);
   
       return acc;
@@ -154,6 +159,7 @@ export default function ReservationsTable({ data = [], keys }) {
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
   }, [data, currentPage, itemsPerPage]);
+  
   
   
   

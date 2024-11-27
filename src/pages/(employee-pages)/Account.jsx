@@ -21,10 +21,12 @@ import BookingTable from "@/components/common/cards/BookingTable";
 import { useReservationsContext } from "@/context/reservationContext";
 import { UserContext } from "@/context/contexts";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNotifications } from "@/context/notificationContext";
 
 export default function Account() {
   const { reservationsData } = useReservationsContext();
   const { userData, setUserData } = useContext(UserContext);
+  const { createNotification } = useNotifications();
 
   const navigate = useNavigate();
   const [account, setAccount] = useState(userData);
@@ -60,6 +62,11 @@ export default function Account() {
       }
   
       const data = await response.json(); // Assuming the server responds with JSON
+      createNotification({
+        type: 'Modified',
+        description: `Account Name: "${account.fName}" has been updated.`,
+        role: 'Administrator',
+      });
       toast({
         title: "Changes Saved",
         description: "Your changes have been successfully saved.",

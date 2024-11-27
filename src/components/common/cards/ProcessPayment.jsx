@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,6 +6,8 @@ import { useToastContext } from "@/context/toastContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, X } from "lucide-react";
 import { useRegistrationContext } from "@/context/utilContext";
+import { useNotifications } from "@/context/notificationContext";
+import { UserContext } from "@/context/contexts";
 
 export default function ReservationsTable({ data = [], onClose }) {
   const [filter, setFilter] = useState("all");
@@ -13,6 +15,8 @@ export default function ReservationsTable({ data = [], onClose }) {
   const [sortOrder, setSortOrder] = useState("newest");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToastContext();
+  const { createNotification } = useNotifications();
+  const { userData  } = useContext(UserContext);
 
   const filteredData = useMemo(() => {
     let dataToFilter = data.filter(
@@ -160,6 +164,25 @@ export default function ReservationsTable({ data = [], onClose }) {
         title: "Payment Successful",
         description: "Reservation has been successfully paid.",
         variant: "success",
+      });
+
+      let fullName = userData.first_name + " " + userData.last_name;
+
+       const timestamp = new Date().toLocaleString('en-US', {
+        weekday: 'long', // Day of the week
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true, // 12-hour format (AM/PM)
+      });
+
+      createNotification({
+        type: 'Modified',
+        description: `Employee account "${fullName}" has process payment reservation ids: {"${reservation.reservationRoomID || reservation.reservationVenueID}" } - Timestamp: "${timestamp}".`,
+        role: 'Administrator',
       });
   
       // Close the dialog

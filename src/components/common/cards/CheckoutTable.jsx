@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, X } from "lucide-react";
+import { useNotifications } from "@/context/notificationContext";
+import { UserContext } from "@/context/contexts";
 
 export default function ReservationsTable({ data = [], onClose }) {
   const [filter, setFilter] = useState("all");
@@ -12,6 +14,8 @@ export default function ReservationsTable({ data = [], onClose }) {
   const [sortOrder, setSortOrder] = useState("newest");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const { createNotification } = useNotifications();
+  const { userData  } = useContext(UserContext);
   const filteredData = useMemo(() => {
     let dataToFilter = data.filter(reservation => reservation.status === "onUse")
 
@@ -108,12 +112,12 @@ export default function ReservationsTable({ data = [], onClose }) {
   }
 
   const handleProceedToPayment = async () => {
-    console.log("Clicked")
+    console.log("Clicked");
     if (!filteredData[selectedReservationIndex]) return;
 
     const reservation = filteredData[selectedReservationIndex];
     if (!reservation) return;
-https://www.facebook.com/adrian.fabian.1023
+
     try {
       const payload = {
         guest_id: reservation.guestId,
@@ -150,6 +154,29 @@ https://www.facebook.com/adrian.fabian.1023
         description: "Reservation has been successfully paid.",
         variant: "success",
       });
+
+      let fullName = userData.first_name + " " + userData.last_name;
+
+      // Create a formatted timestamp
+      const timestamp = new Date().toLocaleString('en-US', {
+        weekday: 'long', // Day of the week
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true, // 12-hour format (AM/PM)
+      });
+
+      createNotification({
+        type: 'Modified',
+        description: `Account Name: "${fullName}" has checked out with reservation IDs: {"${reservation.reservationRoomID || reservation.reservationVenueID}"} - Timestamp: "${timestamp}".`,
+        role: 'Administrator',
+      });
+
+        // Close the dialog
+    onClose();
     } catch (error) {
       toast({
         title: "Payment Failed",
@@ -157,7 +184,8 @@ https://www.facebook.com/adrian.fabian.1023
         variant: "destructive",
       });
     }
-  };
+};
+
 
   return (
     <>

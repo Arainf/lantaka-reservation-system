@@ -97,7 +97,17 @@ const RoomAndVenueSelector = () => {
           </TooltipTrigger>
           <TooltipContent side="right" className="w-80 p-0">
             <div className="p-4">
-              {isRoomReserved(room.room_id) && (
+            <h3 className="font-semibold text-lg">{room.room_name}</h3>
+              <p className="text-sm text-gray-500">
+                <strong>Status:</strong> {currentStatus}
+              </p>
+              <p className="text-sm">
+                <strong>Is Ready:</strong> {room.room_isready ? 'Yes' : 'No'}
+              </p>
+              <p className="text-sm">
+                <strong>Room Status:</strong> {room.room_status ? 'Occupied' : 'Available'}
+              </p>
+              {isRoomReserved(room.room_id) ? (
                 <div className="mt-2 pt-2 border-t">
                   <p className="text-sm font-semibold">Reservation Details:</p>
                   {calendarReservations
@@ -110,6 +120,10 @@ const RoomAndVenueSelector = () => {
                         <p><strong>Date:</strong> {reservation.dateStart} - {reservation.dateEnd}</p>
                       </div>
                     ))}
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm">No reservations found for this Room.</p>
                 </div>
               )}
             </div>
@@ -149,7 +163,7 @@ const RoomAndVenueSelector = () => {
               <p className="text-sm">
                 <strong>Venue Status:</strong> {venue.room_status ? 'Occupied' : 'Available'}
               </p>
-              {isRoomReserved(venue.room_id) && (
+              {isRoomReserved(venue.room_id) ? (
                 <div className="mt-2 pt-2 border-t">
                   <p className="text-sm font-semibold">Reservation Details:</p>
                   {calendarReservations
@@ -162,6 +176,10 @@ const RoomAndVenueSelector = () => {
                         <p><strong>Date:</strong> {reservation.dateStart} - {reservation.dateEnd}</p>
                       </div>
                     ))}
+                </div>
+              ) : (
+                <div>
+                  <p className="text-sm">No reservations found for this Venue.</p>
                 </div>
               )}
             </div>

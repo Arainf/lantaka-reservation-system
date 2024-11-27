@@ -38,6 +38,7 @@ import { useReservationsContext } from "@/context/reservationContext";
 import BookingSummary from "@/components/common/cards/BookingSummary";
 import UpcomingBooking from "@/components/common/cards/UpcomingBooking";
 import UpcomingBookingdue from "@/components/common/cards/UpcomingBookingdue";
+import { useNotifications } from "@/context/notificationContext";
 
 export default function ReservationCalendar() {
   const { reservationsData, fetchReservations, deleteData, saveNote } =
@@ -61,6 +62,7 @@ export default function ReservationCalendar() {
     direction: "ascending",
   });
   const [tableKey, setTableKey] = useState(0);
+  const { createNotification } = useNotifications();
 
   useEffect(() => {
     fetchEvents();
@@ -135,10 +137,18 @@ export default function ReservationCalendar() {
               type: event.resource.type,
             }
           )
+
+          
       );
       await Promise.all(updatePromises);
       await fetchEvents();
       handleCloseEventDialog();
+      const account = localStorage.getItem("userData.first_name");
+      createNotification({
+        type: 'Modified',
+        description: `Account Name: "${account}" has updated event id "${event.reservation}".`,
+        role: 'Administrator',
+      });
     } catch (error) {
       console.error("Error updating events:", error);
       alert("Failed to update reservation statuses. Please try again.");
