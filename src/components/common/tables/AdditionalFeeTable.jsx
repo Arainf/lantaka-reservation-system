@@ -204,7 +204,7 @@ export default function AdditionalFeeTable({ searchTerm }) {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] shadow-none">
           <DialogHeader>
             <DialogTitle>{isEditing ? "Edit Fee" : "Fee Details"}</DialogTitle>
           </DialogHeader>

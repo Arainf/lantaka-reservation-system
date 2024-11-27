@@ -5,7 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Edit, Trash2, X, Files, Eye, Save } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  X,
+  Download,
+  Eye,
+  Save,
+  PhilippinePeso,
+  PlusCircle,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { PinIcon as PushPin } from "lucide-react";
 import {
@@ -22,6 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import {
@@ -44,7 +54,7 @@ const calculateNumberOfNights = (checkInDate, checkOutDate) => {
   const checkOut = new Date(checkOutDate);
   const timeDiff = checkOut.getTime() - checkIn.getTime();
   const nightsDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  return nightsDiff;
+  return Math.max(nightsDiff, 1);
 };
 
 export default function ReservationsTable({ data = [], keys }) {
@@ -65,6 +75,31 @@ export default function ReservationsTable({ data = [], keys }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [userRole, setUserRole] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [feeDescription, setFeeDescription] = useState("");
+  const [feeAmount, setFeeAmount] = useState("");
+
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
+  const [fees, setFees] = useState([]);
+  const [newFee, setNewFee] = useState("");
+
+  // Add fee to the fees list
+  const addFee = () => {
+    if (feeDescription && feeAmount) {
+      const newFee = `${feeDescription}: ₱${feeAmount}`;
+      setFees([...fees, newFee]);
+      setFeeDescription('');
+      setFeeAmount('');
+    }
+  };
+
+  // Save the fees
+  const saveFees = () => {
+    // Logic to save the fees (e.g., sending to an API or updating the state)
+    console.log("Fees saved:", fees);
+    setIsOpen(false); // Close the modal after saving
+  };
 
   useEffect(() => {
     // Get the user role from local storage
@@ -79,7 +114,7 @@ export default function ReservationsTable({ data = [], keys }) {
       fetchPrice(selectedGuest.guestType); // Pass the correct value to fetchPrice
     }
   }, [selectedGuest, setClientType]);
-  
+
   useEffect(() => {
     if (price) {
       setRoomRates({
@@ -89,12 +124,12 @@ export default function ReservationsTable({ data = [], keys }) {
       });
     }
   }, [price]);
-  
+
   const groupedData = useMemo(() => {
     const result = data.reduce((acc, reservation) => {
       // Use `timestamp` explicitly in the key to group by timestamp
       const key = reservation.timestamp;
-  
+
       // Initialize the grouping if it's not already done
       if (!acc[key]) {
         acc[key] = {
@@ -115,7 +150,7 @@ export default function ReservationsTable({ data = [], keys }) {
           reservationVenueID: [],
         };
       }
-  
+
       // Process receipt discounts
       reservation.receipt_discounts.forEach((discount) => {
         if (
@@ -127,7 +162,7 @@ export default function ReservationsTable({ data = [], keys }) {
           acc[key].receiptDiscounts.push(discount);
         }
       });
-  
+
       // Group reservations by type (room, venue, or both)
       if (reservation.reservation_type === "room") {
         acc[key].reservationRoomID.push(reservation.reservation_id);
@@ -140,31 +175,27 @@ export default function ReservationsTable({ data = [], keys }) {
           acc[key].reservationVenueID.push(reservation.reservation_id);
         }
       }
-  
+
       // Add the current reservation to the group
       acc[key].reservations.push(reservation);
-  
+
       return acc;
     }, {});
-  
+
     // Convert the result object into an array and paginate
     const groupedArray = Object.values(result);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = groupedArray.slice(indexOfFirstItem, indexOfLastItem);
-  
+
     return {
       allItems: groupedArray,
       currentItems: currentItems,
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
   }, [data, currentPage, itemsPerPage]);
-  
-  
-  
-  
 
-   console.log("grouped data" , groupedData);
+  console.log("grouped data", groupedData);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= itemsPerPage) {
@@ -321,8 +352,6 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   }, [price]);
 
-
-
   const getStatusColor = (status) => {
     const statusColors = {
       ready: "bg-green-50",
@@ -359,7 +388,6 @@ export default function ReservationsTable({ data = [], keys }) {
     setNotes(guest.additionalNotes || "");
     setIsDialogOpen(true);
   };
-
 
   const handleDelete = (guest) => {
     if (userRole === "Administrator") {
@@ -750,77 +778,77 @@ export default function ReservationsTable({ data = [], keys }) {
       </Table>
 
       <div className="flex items-center justify-between px-2 py-4">
-      <div className="text-sm text-muted-foreground">
-    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-    {Math.min(currentPage * itemsPerPage, groupedData.allItems.length)} of{" "}
-    {groupedData.allItems.length} entries
-  </div>
-  <div className="flex items-center space-x-2">
-    {/* Previous Button */}
-    <Button
-      variant="outline"
-      onClick={() => handlePageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-    >
-      <ChevronLeft className="h-4 w-4" />
-      Previous
-    </Button>
-
-    {/* Dynamic Pagination */}
-    {Array.from({ length: groupedData.totalPages }, (_, index) => {
-      const page = index + 1;
-      const isEllipsis = 
-        (page > 2 && page < currentPage - 1) || 
-        (page < groupedData.totalPages - 1 && page > currentPage + 1);
-
-      if (isEllipsis) {
-        return (
-          <span key={`ellipsis-${page}`} className="text-muted-foreground">
-            ...
-          </span>
-        );
-      }
-
-      if (
-        page === 1 || 
-        page === groupedData.totalPages || 
-        Math.abs(currentPage - page) <= 1
-      ) {
-        return (
+        <div className="text-sm text-muted-foreground">
+          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+          {Math.min(currentPage * itemsPerPage, groupedData.allItems.length)} of{" "}
+          {groupedData.allItems.length} entries
+        </div>
+        <div className="flex items-center space-x-2">
+          {/* Previous Button */}
           <Button
-            key={page}
-            variant={currentPage === page ? "default" : "outline"}
-            size="sm"
-            onClick={() => handlePageChange(page)}
+            variant="outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
           >
-            {page}
+            <ChevronLeft className="h-4 w-4" />
+            Previous
           </Button>
-        );
-      }
 
-      return null;
-    })}
+          {/* Dynamic Pagination */}
+          {Array.from({ length: groupedData.totalPages }, (_, index) => {
+            const page = index + 1;
+            const isEllipsis =
+              (page > 2 && page < currentPage - 1) ||
+              (page < groupedData.totalPages - 1 && page > currentPage + 1);
 
-    {/* Next Button */}
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => handlePageChange(currentPage + 1)}
-      disabled={currentPage === groupedData.totalPages}
-    >
-      Next
-      <ChevronRight className="h-4 w-4" />
-    </Button>
-  </div>
+            if (isEllipsis) {
+              return (
+                <span
+                  key={`ellipsis-${page}`}
+                  className="text-muted-foreground"
+                >
+                  ...
+                </span>
+              );
+            }
+
+            if (
+              page === 1 ||
+              page === groupedData.totalPages ||
+              Math.abs(currentPage - page) <= 1
+            ) {
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </Button>
+              );
+            }
+
+            return null;
+          })}
+
+          {/* Next Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === groupedData.totalPages}
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-
-      
-
 
       {selectedGuest && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3"
+            className="bg-transparent p-0 max-w-4xl border-none flex flex-row gap-3 shadow-none"
             showCloseButton={false}
           >
             <div className="w-3/6 flex flex-col gap-3">
@@ -874,7 +902,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           Venue Reservations (
                           {selectedGuest.reservationVenueID.length}):
                         </h4>
-                        <ScrollArea className="max-h-[200px] overflow-y-auto w-[95%] p-2">
+                        <ScrollArea className="max-h-[15  0px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations
                             .filter(
                               (reservation) =>
@@ -899,7 +927,7 @@ export default function ReservationsTable({ data = [], keys }) {
                           {selectedGuest.reservationType} Reservations (
                           {selectedGuest.reservations.length}):
                         </h4>
-                        <ScrollArea className="max-h-[400px] overflow-y-auto w-[95%] p-2">
+                        <ScrollArea className="max-h-[150px] overflow-y-auto w-[95%] p-2">
                           {selectedGuest.reservations.map(
                             (reservation, index) => (
                               <div
@@ -955,70 +983,75 @@ export default function ReservationsTable({ data = [], keys }) {
               </Card>
 
               <Card className="p-4">
-  <div className="flex flex-col gap-3">
-    <Label htmlFor="status">Status</Label>
-    <div className="flex-1 flex-row flex gap-3">
-      <Select
-        value={selectedGuest.reservations[0]?.status || "default"}
-        onValueChange={handleStatusChange}
-      >
-        <SelectTrigger
-          id="status"
-          className={getStatusColorBadge(
-            selectedGuest.reservations[0]?.status || "default"
-          )}
-          disabled={
-            selectedGuest.reservations[0]?.status === "done" ? true : userRole !== "Administrator"
-          }
-          
-          
-        >
-          <SelectValue
-            placeholder={
-              selectedGuest.reservations[0]?.status || "Please select"
-            }
-          />
-        </SelectTrigger>
-        { selectedGuest.reservations[0]?.status === "done"  ? (
-          <SelectContent>
-          {/* Exclude "done" from selectable options */}
-          {["done"].map(
-            (status) => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </SelectItem>
-            )
-          )}
-        </SelectContent>
-          
-        ) : (
-          <SelectContent>
-          {/* Exclude "done" from selectable options */}
-          {["ready", "waiting", "onUse", "cancelled", "onCleaning"].map(
-            (status) => (
-              <SelectItem key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </SelectItem>
-            )
-          )}
-        </SelectContent>)}
-        
-      </Select>
-      {userRole === "Administrator"  &&  (
-        <Button
-          variant="outline"
-          onClick={() => handleSaveStatus(selectedGuest.reservationType)}
-          disabled={
-            selectedGuest.reservations[0]?.status === "done" ? true : false
-          }
-        >
-          Save Changes
-        </Button>
-    )}
-    </div>
-  </div>
-</Card>
-
+                <div className="flex flex-col gap-3">
+                  <Label htmlFor="status">Status</Label>
+                  <div className="flex-1 flex-row flex gap-3">
+                    <Select
+                      value={selectedGuest.reservations[0]?.status || "default"}
+                      onValueChange={handleStatusChange}
+                    >
+                      <SelectTrigger
+                        id="status"
+                        className={getStatusColorBadge(
+                          selectedGuest.reservations[0]?.status || "default"
+                        )}
+                        disabled={
+                          selectedGuest.reservations[0]?.status === "done"
+                            ? true
+                            : userRole !== "Administrator"
+                        }
+                      >
+                        <SelectValue
+                          placeholder={
+                            selectedGuest.reservations[0]?.status ||
+                            "Please select"
+                          }
+                        />
+                      </SelectTrigger>
+                      {selectedGuest.reservations[0]?.status === "done" ? (
+                        <SelectContent>
+                          {/* Exclude "done" from selectable options */}
+                          {["done"].map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      ) : (
+                        <SelectContent>
+                          {/* Exclude "done" from selectable options */}
+                          {[
+                            "ready",
+                            "waiting",
+                            "onUse",
+                            "cancelled",
+                            "onCleaning",
+                          ].map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      )}
+                    </Select>
+                    {userRole === "Administrator" && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          handleSaveStatus(selectedGuest.reservationType)
+                        }
+                        disabled={
+                          selectedGuest.reservations[0]?.status === "done"
+                            ? true
+                            : false
+                        }
+                      >
+                        Save Changes
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </Card>
             </div>
 
             <div className="w-2/6 flex flex-col gap-3">
@@ -1195,32 +1228,126 @@ export default function ReservationsTable({ data = [], keys }) {
             {/* buttons */}
             <div className="relative bottom-0">
               <div className="flex flex-col h-full items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleClose}
-                  className="bg-white"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                {/* Close Button */}
+                <div className="relative group">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleClose}
+                    className="bg-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <div className="absolute left-full ml-2 bottom-0.5 transform opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-700 text-white text-xs p-2 rounded-md whitespace-nowrap">
+                    Close
+                  </div>
+                </div>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGeneratePDF}
-                  className="bg-white"
-                >
-                  <Files className="h-4 w-4" />
-                </Button>
+                {/* Generate PDF Button */}
+                <div className="relative group">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGeneratePDF}
+                    className="bg-white"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <div className="absolute left-full ml-2 bottom-0.5 transform opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-700 text-white text-xs p-2 rounded-md whitespace-nowrap">
+                    Generate PDF
+                  </div>
+                </div>
+
+                <div className="relative group ">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={openModal}
+                    className="bg-white flex items-center justify-center"
+                  >
+                    <PhilippinePeso className="h-4 w-4" />
+                  </Button>
+
+                  <div className="absolute left-full ml-3 bottom-1/2 transform translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-800 text-white text-xs px-3 py-1 rounded-md shadow-lg whitespace-nowrap">
+                    Additional Fees
+                  </div>
+
+                  <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                  <DialogContent className="2xl:left-[75%] xl:left-[81.5%] 2xl:top-[55%] xl:top-[56%] w-[300px] h-auto z-50">
+                  <DialogHeader>
+                        <DialogTitle>Additional Fees</DialogTitle>
+                        <DialogDescription>Fee Breakdown:</DialogDescription>
+                      </DialogHeader>
+
+                      <ScrollArea className="h-[100px] overflow-hidden">
+    <ScrollArea className="h-full">
+      <ul className="list-disc list-inside">
+        {fees.map((fee, index) => (
+          
+          <li key={index}> {fee} </li>
+        ))}
+      </ul>
+    </ScrollArea>
+    <ScrollArea orientation="vertical" className="w-2 bg-gray-300 rounded-full" />
+    <ScrollArea />
+  </ScrollArea>
+
+                      {/* Input Fields to Add Fee Name and Amount */}
+                      <div className=" flex flex-col gap-2">
+                        {/* Fee Description */}
+                        <input
+                          type="text"
+                          value={feeDescription}
+                          onChange={(e) => setFeeDescription(e.target.value)}
+                          placeholder="Enter fee description"
+                          className="border px-2 py-1 rounded-md flex-grow bg-white text-black"
+                        />
+
+                        {/* Fee Amount */}
+                        <input
+                          type="number"
+                          value={feeAmount}
+                          onChange={(e) => setFeeAmount(e.target.value)}
+                          placeholder="Enter fee amount"
+                          className="border px-2 py-1 rounded-md flex-grow bg-white text-black"
+                        />
+
+                        {/* Button to Add Fee */}
+                        <Button
+                          onClick={addFee}
+                          className="bg-blue-500 text-white mt-2"
+                        >
+                          <PlusCircle className="h-4 w-4 mr-2" />
+                          Add Fee
+                        </Button>
+
+                        {/* Save Button */}
+                        <Button
+                          onClick={saveFees} // Define the save function for your logic
+                          className="bg-green-500 text-white mt-2"
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
 
                 {userRole === "Administrator" && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(selectedGuest)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="absolute group bottom-0">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(selectedGuest)}
+                      className="flex items-center justify-center"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+
+                    <div className="absolute left-full ml-2 bottom-1/2 transform translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                      Delete Guest
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

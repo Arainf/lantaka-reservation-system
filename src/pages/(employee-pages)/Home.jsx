@@ -72,38 +72,56 @@ export default function Component() {
               }`}
             >
               <span>LANTAKA </span>
-              <span className="block">HOTEL</span>
             </h2>
             <p
-              className={`mt-10 text-center tracking-[2.5px] font-light text-gray-100 transition-all duration-1000 ease-out delay-600 ${
+              className={`text-[1.7rem] text-white poppins-semibold transition-all duration-1000 ease-out delay-300 ${
                 showText
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-10"
               }`}
             >
-              Pro Deo et Patria
+              SPIRITUALITY, FORMATION, AND TRAINING CENTER
             </p>
+
             <div
-              className={`relative inline-flex items-center justify-start px-6 py-4 mb-2 text-white bg-transparent border border-transparent rounded-lg group transition-all duration-300 ease-in-out ${
+              onClick={() => {
+                const reservationSection =
+                  document.getElementById("reservation");
+                if (reservationSection) {
+                  reservationSection.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className={`relative inline-flex items-center justify-start top-[100px] px-6 py-4 mb-2 text-white bg-transparent border border-transparent rounded-lg group transition-all duration-300 ease-in-out ${
                 showButton
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-10"
               }`}
             >
+              {/* Arrow Icon for Scroll */}
               <span
-                className="mr-2 transition-colors duration-300 cursor-pointer block  text-white text-lg  py-3 px-3 rounded shadow "
-                onClick={() => {
-                  const reservationSection =
-                    document.getElementById("reservation");
-                  if (reservationSection) {
-                    reservationSection.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
+                className="cursor-pointer flex items-center"
+              
               >
-                Reservation
+                {/* Down Arrow SVG Icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 transition-transform duration-300 group-hover:translate-y-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               </span>
-              <span className="absolute left-1 bottom-4 w-0 h-0 transition-all duration-300 bg-yellow-500 group-hover:w-[160px]  group-hover:h-1" />
-            </div>
+
+              {/* Hover Effect Line */}
+              <span className="absolute bottom-0 left-1/2 h-1 w-0 bg-yellow-500 transition-all duration-300 transform -translate-x-1/2 group-hover:w-full" />
+              </div>
           </div>
         </div>
       </section>
@@ -118,4 +136,3 @@ export default function Component() {
     </main>
   );
 }
-  

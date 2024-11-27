@@ -177,7 +177,7 @@ export default function RoomTypeTable({ searchTerm, render }) {
       </Table>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[900px] border-none bg-transparent p-0" showCloseButton={false} >
+        <DialogContent className="sm:max-w-[900px] border-none bg-transparent p-0 shadow-none" showCloseButton={false} >
           <div className="flex flex-row gap-4">
             <div className="w-[calc(50%-1rem)] flex flex-col gap-4">
               <Card className="flex-1 flex flex-col">
