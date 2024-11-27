@@ -206,10 +206,6 @@ const AdminDashboard = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleExport('excel')}>
-                        <FileSpreadsheet className="h-4 w-4 mr-2" />
-                        Export as Excel
-                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleExport('pdf')}>
                         <FilePdf className="h-4 w-4 mr-2" />
                         Export as PDF

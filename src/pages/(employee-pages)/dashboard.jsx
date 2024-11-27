@@ -64,7 +64,7 @@ export default function Component() {
               }`}
             >
               <span>LANTAKA </span>
-              <span className="block">HOTEL</span>
+              <span className="block">HOTdEL</span>
             </h2>
             <p
               className={`mt-10 text-center tracking-[2.5px] font-light text-gray-100 transition-all duration-1000 ease-out delay-600 ${
