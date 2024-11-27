@@ -12,7 +12,7 @@ const ViewToggle = ({ viewMode, onToggle }) => {
         className="flex items-center space-x-2"
       >
         <CalendarDays className="h-4 w-4" />
-        <span>Daily</span>
+        <span>Weekly</span>
       </Button>
       <Button
         variant={viewMode === 'monthly' ? 'default' : 'ghost'}
