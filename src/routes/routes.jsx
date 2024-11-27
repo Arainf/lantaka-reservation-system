@@ -23,7 +23,7 @@ import Home from "@/pages/(employee-pages)/Home";
 import Reservation from "@/pages/(employee-pages)/Reservation";
 import Account from "@/pages/(employee-pages)/Account";
 import JoshTest from "@/pages/Josh-Test/JoshTest";
-
+import CalendarPage from "@/pages/(employee-pages)/Calendar";
 import Bookings from "@/pages/(employee-pages)/Bookings";
 
 const AppRoutes = () => {
@@ -184,6 +184,17 @@ const AppRoutes = () => {
           />
         }
       />
+
+    <Route
+            path="/Calendar"
+            element={
+              <ProtectedRoute
+                element={<CalendarPage />}
+                allowedRoles={["Employee"]}
+                isDevMode={isDevMode}
+              />
+            }
+          />
       {/* Unauthorized page */}
       <Route path="/unauthorized" element={<Unauthorize />} />
 
