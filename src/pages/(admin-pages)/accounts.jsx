@@ -12,6 +12,7 @@ import DeleteModal from "@/components/ui/deletemodal"
 import { useAccountContext } from "@/context/contexts"
 import DashboardRegistrationForm from "@/components/common/login-form/RegistrationForm"
 import { useRegistrationContext } from "@/context/utilContext"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -103,12 +104,12 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   placeholder="Search by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-50 md:w-80 border-2 border-gray-300 bg-transparent rounded-lg focus:outline-none focus:border-blue-500"
+                  className="pl-10 pr-4 py-2 w-50 md:w-80"
                 />
                 <div className="absolute inset-y-0 left-2 flex items-center pointer-events-none">
                   <Search className="text-gray-900" size={18} />
@@ -167,7 +168,6 @@ export default function AdminAccounts({ sidebarOpen = false, toggleSidebar = () 
             <AccountsTable
               key={tableKey}
               accounts={filteredAccounts}
-              onDelete={handleDelete}
             />
           </div>
         </main>

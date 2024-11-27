@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, X, Copy, Trash2 } from 'lucide-react'
+import React, { useState } from 'react';
+import { useGuestContext } from '@/context/GuestContext';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, X, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -12,48 +13,57 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import Slogo from '@/assets/images/SchoolLogo.png'
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import Slogo from '@/assets/images/SchoolLogo.png';
 
+export default function GuestTable({ currentPage, setCurrentPage }) {
+  const { guests, selectGuest, deleteGuest } = useGuestContext();
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedGuest, setSelectedGuest] = useState(null);
 
-
-export default function GuestTable({ data = [], onDelete, onEdit, currentPage, setCurrentPage }) {
-  const [selectedGuest, setSelectedGuest] = useState(null)
-  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
-  const [additionalNotes, setAdditionalNotes] = useState("")
-  const [guestType, setGuestType] = useState("")
-  const itemsPerPage = 5
-  const totalPages = Math.ceil(data.length / itemsPerPage)
-  const currentData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(guests.length / itemsPerPage);
+  const currentData = guests.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const getGuestTypeColor = (type) => {
     switch (type.toLowerCase()) {
       case 'internal':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-blue-100 text-blue-800';
       case 'external':
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
     }
-  }
+  };
 
   const handleRowClick = (guest) => {
-    setSelectedGuest(guest)
-    setAdditionalNotes(guest.additional_notes || "")
-    setGuestType(guest.guest_type)
-    setIsDetailsDialogOpen(true)
-  }
+    setSelectedGuest(guest);
+    selectGuest(guest.guest_id);
+    setIsDetailsDialogOpen(true);
+  };
 
+  const handleDeleteClick = (e) => {
+    e.stopPropagation();
+    setIsDeleteDialogOpen(true);
+  };
 
   const handleDelete = () => {
-    onDelete(selectedGuest.guest_id)
-    setIsDetailsDialogOpen(false)
-  }
+    if (selectedGuest) {
+      deleteGuest(selectedGuest.guest_id);
+      setIsDetailsDialogOpen(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -62,111 +72,64 @@ export default function GuestTable({ data = [], onDelete, onEdit, currentPage, s
   };
 
   return (
-      <>
-        <Table>
-          <TableHeader >
-            <TableRow className="hover:bg-bg-[#0f172a]">
-              <TableHead className="w-[25%] text-white">Guest Name</TableHead>
-              <TableHead className="w-[20%] text-white">Email</TableHead>
-              <TableHead className="w-[20%] text-white">Phone</TableHead>
-              <TableHead className="w-[15%] text-white">Type</TableHead>
-              <TableHead className="w-[30%] text-white">Client</TableHead>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-bg-[#0f172a]">
+            <TableHead className="w-[25%] text-white">Guest Name</TableHead>
+            <TableHead className="w-[20%] text-white">Email</TableHead>
+            <TableHead className="w-[20%] text-white">Phone</TableHead>
+            <TableHead className="w-[15%] text-white">Type</TableHead>
+            <TableHead className="w-[30%] text-white">Client</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {currentData.map((guest) => (
+            <TableRow
+              key={guest.guest_id}
+              onClick={() => handleRowClick(guest)}
+              className="cursor-pointer hover:bg-blue-100"
+            >
+              <TableCell className="font-medium">
+                {guest.guest_fName} {guest.guest_lName}
+              </TableCell>
+              <TableCell>{guest.guest_email}</TableCell>
+              <TableCell>{guest.guest_phone}</TableCell>
+              <TableCell>
+                <Badge variant="secondary" className={getGuestTypeColor(guest.guest_type)}>
+                  {guest.guest_type}
+                </Badge>
+              </TableCell>
+              <TableCell>{guest.guest_client}</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentData.map((guest) => (
-              <TableRow
-                key={guest.guest_id}
-                onClick={() => handleRowClick(guest)}
-                className="cursor-pointer hover:bg-blue-100"
-              >
-                <TableCell className="font-medium">
-                  {guest.guest_fName} {guest.guest_lName}
-                </TableCell>
-                <TableCell>{guest.guest_email}</TableCell>
-                <TableCell>{guest.guest_phone}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className={getGuestTypeColor(guest.guest_type)}>
-                    {guest.guest_type}
-                  </Badge>
-                </TableCell>
-                <TableCell>{guest.guest_client}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+          ))}
+        </TableBody>
+      </Table>
       
-        <div className="flex items-center justify-between">
-  <div className="text-sm text-muted-foreground">
-    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-    {Math.min(currentPage * itemsPerPage, currentData.length)} of{" "}
-    {currentData.length} entries
-  </div>
-  <div className="flex items-center space-x-2">
-    {/* Previous Button */}
-    <Button
-      variant="outline"
-      onClick={() => handlePageChange(currentPage - 1)}
-      disabled={currentPage === 1}
-    >
-      <ChevronLeft className="h-4 w-4" />
-      Previous
-    </Button>
-
-    {/* Dynamic Pagination */}
-    {Array.from({ length: totalPages }, (_, index) => {
-      const page = index + 1;
-      const isEllipsis = 
-        (page > 2 && page < currentPage - 1) || 
-        (page < totalPages - 1 && page > currentPage + 1);
-
-      if (isEllipsis) {
-        return (
-          <span key={`ellipsis-${page}`} className="text-muted-foreground">
-            ...
-          </span>
-        );
-      }
-
-      if (
-        page === 1 || 
-        page === totalPages || 
-        Math.abs(currentPage - page) <= 1
-      ) {
-        return (
-          <Button
-            key={page}
-            variant={currentPage === page ? "default" : "outline"}
-            size="sm"
-            onClick={() => handlePageChange(page)}
-          >
-            {page}
-          </Button>
-        );
-      }
-
-      return null;
-    })}
-
-    {/* Next Button */}
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => handlePageChange(currentPage + 1)}
-      disabled={currentPage === totalPages}
-    >
-      Next
-      <ChevronRight className="h-4 w-4" />
-    </Button>
-  </div>
-</div>
-
-          
-<Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent 
-        className="bg-transparent p-0 max-w-4xl border-none flex flex-col items-center gap-3 shadow-none"
-        showCloseButton={false}
+      <div className="flex items-center justify-between mt-4">
+        <Button
+          variant="outline"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
         >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Previous
+        </Button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          variant="outline"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+          <ChevronRight className="h-4 w-4 ml-2" />
+        </Button>
+      </div>
+      
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="bg-white p-0 max-w-4xl border-none flex flex-col items-center gap-3 shadow-none">
           <div className='flex flex-col items-center gap-3 w-full max-w-lg'>
             <div className='flex flex-row gap-3 items-center w-full'>
               <img src={Slogo} alt="" width={60} height={60} className="rounded-full" />
@@ -218,13 +181,33 @@ export default function GuestTable({ data = [], onDelete, onEdit, currentPage, s
             </Card>
           </div>
           <div className='flex justify-end gap-3 w-full max-w-lg'>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="destructive" onClick={handleDeleteClick}>
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Guest
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this guest? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
-  )
+  );
 }
+

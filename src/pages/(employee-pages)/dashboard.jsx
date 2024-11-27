@@ -18,7 +18,7 @@ export default function Account() {
   const [account, setAccount] = useState(userData);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+
   const handleBackToHome = () => {
     navigate("/");
   };

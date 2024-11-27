@@ -41,7 +41,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
       {/* Center Navigation */}
       <div className="flex justify-center w-1/2">
         <nav className="flex space-x-4">
-          {["Home", "Reservation", "Bookings", "Account"].map((title) => (
+          {["Home", "Reservation", "Bookings"].map((title) => (
             <Link
               to={`/${title.toLowerCase()}`}
               className="clientnavtop relative text-slate-100 font-medium"
