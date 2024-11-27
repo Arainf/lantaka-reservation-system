@@ -23,17 +23,21 @@ import {
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Slogo from '@/assets/images/SchoolLogo.png'
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast"; // Import toast from ShadCN
+import { Toaster } from "@/components/ui/toaster"
+import { useToast } from "@/hooks/use-toast"
+import DeleteConfirmationDialog from '../cards/DeleteConfirmationDialog'
+import axios from 'axios'
 
 function AccountsTable({ accounts, onDelete }) {
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   const totalPages = Math.ceil(accounts.length / itemsPerPage)
   const currentAccounts = accounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-  const { toast } = useToast();
+  const { toast } = useToast()
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -51,46 +55,65 @@ function AccountsTable({ accounts, onDelete }) {
     setIsDetailsDialogOpen(true)
   }
 
-  const handleDelete = async () => {
-    if (!selectedAccount) return
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true)
+    setIsDetailsDialogOpen(false);
+  }
 
+  const handleDeleteConfirm = async (values) => {
+
+    if (!selectedAccount) return;
+    setIsLoading(true);
+  
+    const loggedInUsername = localStorage.getItem('userData');
+    const username = JSON.parse(loggedInUsername);
+
+  
     try {
-      // Send a DELETE request to the API with the selected account's ID
-      const response = await fetch('http://localhost:5000/api/deleteAccount', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ account_id: selectedAccount.account_id }),
-      })
-
-      if (response.ok) {
-        // Trigger the onDelete callback if deletion is successful
-        onDelete(selectedAccount)
-        setIsDetailsDialogOpen(false)
-        
-        toast({
-          title: "Success",
-          description: "Item updated successfully",
-          variant: "success",
-        });
- // Show success toast
+      // First, verify the password
+      const verifyResponse = await axios.post('http://localhost:5000/deletelogin', {
+        username: username.username,
+        password: values.password,
+      });
+  
+      if (verifyResponse.data.success) { // Ensure you're checking `data.success`
+        // If password is verified, proceed with deletion
+        const deleteResponse = await fetch(
+          `http://localhost:5000/api/deleteAccount/${selectedAccount.account_id}`,
+          { method: 'DELETE' }
+        );
+  
+        if (deleteResponse.ok) {
+          onDelete(selectedAccount);
+          setIsDetailsDialogOpen(false);
+          setIsDeleteDialogOpen(false);
+          toast({
+            title: "Success",
+            description: "Account deleted successfully",
+            variant: "success",
+          });
+        } else {
+          throw new Error('Failed to delete account');
+        }
       } else {
+        // Handle unsuccessful verification
         toast({
           title: "Error",
-          description: "Failed to delete Account",
+          description: "Password verification failed",
           variant: "destructive",
-        }); // Show error toast
+        });
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "An error occurred while deleting the account",
+        description: error.response?.data?.message || "An error occurred while deleting the account",
         variant: "destructive",
       });
-  
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
+  
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -194,6 +217,7 @@ function AccountsTable({ accounts, onDelete }) {
           </Button>
         </div>
       </div>
+
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
         <DialogContent 
         className="bg-transparent p-0 max-w-4xl border-none flex flex-col items-center gap-3 shadow-none"
@@ -213,8 +237,8 @@ function AccountsTable({ accounts, onDelete }) {
                 </CardContent>
               </Card>
               <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
-              <X className="h-4 w-4 " />
-            </Button>
+                <X className="h-4 w-4 " />
+              </Button>
             </div>
             <Card className="w-full">
               <CardContent className="py-6">
@@ -248,16 +272,27 @@ function AccountsTable({ accounts, onDelete }) {
                 )}
               </CardContent>
             </Card>
-            
           </div>
           <div className='flex justify-end gap-3 w-full max-w-lg'>
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="destructive" onClick={handleDeleteClick}>
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Account
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setIsDetailsDialogOpen(true);
+        }}
+        
+        onConfirm={handleDeleteConfirm}
+        isLoading={isLoading}
+      />
+      
       <Toaster/>
     </>
   )
