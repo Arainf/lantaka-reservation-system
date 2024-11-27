@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FaCalendarCheck, FaCalendarTimes } from "react-icons/fa";
 import { MdOutlinePayment } from "react-icons/md";
-import Image from "@/assets/images/LantakaBg.jpg"; // Verify this path
+//import Image from "@/assets/images/LantakaBg.jpg"; // Verify this path
 
 export default function Sidebar() {
   const [currentTime, setCurrentTime] = useState(new Date());

@@ -3,7 +3,7 @@
 import LoginForm from "../../components/common/login-form/LoginForm";
 import LogoLRRS from "@/assets/images/LRSlogo.png";
 import '../../components/common/login-form/LoginForm';
-import LantakaBg from "../../assets/images/LantakaBG.jpg";
+import LantakaBg from "../../assets/images/DJI_0198.webp";
 
 const LoginPage = () => {
   return (

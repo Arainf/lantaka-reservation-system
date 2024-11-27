@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import { ChevronDown } from "lucide-react";
 import OurRooms from "@/components/common/cards/rooms";
-import LantakaBG from "@/assets/images/LantakaEmployeeBG.png";
+import LantakaBG from "@/assets/images/DJI_0205.webp";
 import Reservation from "./HeroSection";
 
 export default function Component() {
