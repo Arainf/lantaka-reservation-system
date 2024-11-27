@@ -1,6 +1,6 @@
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+import React from "react";
+import { TrendingUp, TrendingDown } from "lucide-react";
+import { PieChart, Pie, Cell, Legend, Tooltip } from "recharts";
 import {
   Card,
   CardContent,
@@ -8,45 +8,73 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/card";
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  Venue: {
-    label: "Venue",
-    color: "hsl(var(--chart-1))",
-  },
-  Room: {
-    label: "Room",
-    color: "hsl(var(--chart-2))",
-  },
-  Other: {
-    label: "Other",
-    color: "hsl(var(--chart-3))",
-  },
-}
+// Color mapping for the chart with updated colors
+const COLORS = {
+  "Room Guests": "#7BA7E9", 
+  "Venue Visitors": "#246DDB", 
+};
 
-export function Component({ data, isLoading }) {
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill="white" 
+      textAnchor="middle" 
+      dominantBaseline="central"
+      className="text-xs font-medium"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
+const CustomLegend = ({ payload }) => {
+  return (
+    <div className="flex justify-center gap-4">
+      {payload.map((entry, index) => (
+        <div key={`legend-${index}`} className="flex items-center gap-2">
+          <div 
+            className="w-3 h-3" 
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="text-sm text-gray-600">{entry.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-2 shadow-lg rounded-lg border">
+        <p className="text-sm font-medium">{payload[0].name}</p>
+        <p className="text-sm text-gray-600">{`Visitors: ${payload[0].value}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export function Component({ data, isLoading, trending }) {
   const totalVisitors = React.useMemo(() => {
-    return data ? data.reduce((acc, curr) => acc + curr.visitors, 0) : 0
-  }, [data])
+    return data ? data.reduce((acc, curr) => acc + curr.visitors, 0) : 0;
+  }, [data]);
 
   if (isLoading) {
     return (
       <Card className="flex flex-col">
-        <Skeleton className="h-[400px] w-full" />
+        <div className="h-[400px] w-full animate-pulse bg-gray-200 rounded-lg" />
       </Card>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -54,75 +82,61 @@ export function Component({ data, isLoading }) {
       <Card className="flex flex-col h-full items-center justify-center">
         <p className="text-muted-foreground">No data available</p>
       </Card>
-    )
+    );
   }
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col h-[420px] w-full">
       <CardHeader className="items-center pb-0">
         <CardTitle>Visitors</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription>Room vs Venue</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
+        <div className="w-full h-full flex items-center justify-center mt-[-20px]">
+          <PieChart width={300} height={300}>
             <Pie
               data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={renderCustomizedLabel}
+              outerRadius={100}
+              innerRadius={60}
+              fill="#8884d8"
               dataKey="visitors"
               nameKey="name"
-              innerRadius={60}
-              outerRadius={80}
-              strokeWidth={5}
             >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {totalVisitors.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Visitors
-                        </tspan>
-                      </text>
-                    )
-                  }
-                }}
-              />
+              {data.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`}
+                  fill={COLORS[entry.name]}
+                  stroke={COLORS[entry.name]}
+                />
+              ))}
             </Pie>
-            <ChartLegend content={<ChartLegendContent />} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend content={<CustomLegend />} />
           </PieChart>
-        </ChartContainer>
+        </div>
+        <div className="text-center">
+          <p className="text-3xl font-bold justify-between items-center mt-[-175px]">{totalVisitors.toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground">Total Visitors</p>
+        </div>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          {trending > 0 ? "Trending up" : "Trending down"} by{" "}
+          {Math.abs(trending)}% this month{" "}
+          {trending > 0 ? (
+            <TrendingUp className="h-4 w-4 text-green-500" />
+          ) : (
+            <TrendingDown className="h-4 w-4 text-red-500" />
+          )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing total visitors for rooms and venues
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

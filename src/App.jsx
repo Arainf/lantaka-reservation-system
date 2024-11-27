@@ -7,7 +7,13 @@ import { GuestProvider } from './context/guestContext';
 import { ReservationsProvider } from './context/reservationContext';
 import { DashboardProvider } from './context/dashboardContext';
 import  { RoomVenueContentsProvider } from './context/roomandVenueContext';
-import { RegistrationProvider } from './context/registrationContext';
+import { RegistrationProvider } from './context/utilContext';
+import { RoomTypeProvider } from './context/RoomTypeContext';
+import { DiscountProvider } from './context/discountContext';
+import { AdditionalFeeProvider } from './context/additionalFeeContext';
+import { ToastProvider } from './context/toastContext';
+import { NotificationProvider } from './context/notificationContext';
+import { HeroProvider } from './context/heroContext';
 
 
 
@@ -15,9 +21,12 @@ import { RegistrationProvider } from './context/registrationContext';
 function App() {
   return (
     <>
+    <NotificationProvider>
+    <ToastProvider>
     <RegistrationProvider>
     <UserProvider>
       <AccountProvider>
+        <HeroProvider>
         <ReservationProvider>
           <RoomandVenueProvider>
             <PriceProvider>
@@ -25,7 +34,13 @@ function App() {
                 <DashboardProvider>
                   <ReservationsProvider>
                     <RoomVenueContentsProvider>
-                      <AppRoutes />
+                      <DiscountProvider>
+                      <RoomTypeProvider>
+                        < AdditionalFeeProvider>
+                          <AppRoutes />
+                        </AdditionalFeeProvider>
+                      </RoomTypeProvider>
+                      </DiscountProvider>
                     </RoomVenueContentsProvider>
                   </ReservationsProvider>
                 </DashboardProvider>
@@ -33,9 +48,12 @@ function App() {
             </PriceProvider>
           </RoomandVenueProvider>
         </ReservationProvider>
+        </HeroProvider>
       </AccountProvider>
     </UserProvider> 
     </RegistrationProvider>
+    </ToastProvider>
+    </NotificationProvider>
     </>
   );
 }

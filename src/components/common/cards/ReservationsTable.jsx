@@ -59,34 +59,64 @@ export default function ReservationsTable({ data = [], keys }) {
     "Triple Bed": 0,
     "Matrimonial Bed": 0,
   });
-  const { price, setClientType } = usePriceContext();
+  const { price, setClientType, fetchPrice, clientType } = usePriceContext();
   const { setDeleteData, setSaveNote } = useReservationsContext();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [userRole, setUserRole] = useState("");
 
+  useEffect(() => {
+    // Get the user role from local storage
+    const role = localStorage.getItem("userRole");
+    setUserRole(role);
+  }, []);
+
+  useEffect(() => {
+    if (selectedGuest?.guestType && setClientType) {
+      setClientType(selectedGuest.guestType);
+      console.log(selectedGuest.guestType);
+      fetchPrice(selectedGuest.guestType); // Pass the correct value to fetchPrice
+    }
+  }, [selectedGuest, setClientType]);
+  
+  useEffect(() => {
+    if (price) {
+      setRoomRates({
+        "Double Bed": price.double_price || 0,
+        "Triple Bed": price.triple_price || 0,
+        "Matrimonial Bed": price.matrimonial_price || 0,
+      });
+    }
+  }, [price]);
+  
   const groupedData = useMemo(() => {
     const result = data.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}-${reservation.reservation_type}-${reservation.receipt_total_amount}`;
-
+      // Use `timestamp` explicitly in the key to group by timestamp
+      const key = reservation.timestamp;
+  
+      // Initialize the grouping if it's not already done
       if (!acc[key]) {
         acc[key] = {
+          timestamp: reservation.timestamp,
+          reservations: [],
           guestId: reservation.guest_id,
           guestName: reservation.guest_name,
           guestEmail: reservation.guest_email,
           guestType: reservation.guest_type,
           reservationType: reservation.reservation_type,
+          receiptId: reservation.receipt_id,
           receiptDate: reservation.receipt_date,
           receiptTotal: reservation.receipt_total_amount,
           receiptSubTotal: reservation.receipt_initial_total,
           additionalNotes: reservation.additional_notes,
           receiptDiscounts: [],
-          reservations: [],
           reservationRoomID: [],
           reservationVenueID: [],
         };
       }
-
+  
+      // Process receipt discounts
       reservation.receipt_discounts.forEach((discount) => {
         if (
           discount &&
@@ -97,7 +127,8 @@ export default function ReservationsTable({ data = [], keys }) {
           acc[key].receiptDiscounts.push(discount);
         }
       });
-
+  
+      // Group reservations by type (room, venue, or both)
       if (reservation.reservation_type === "room") {
         acc[key].reservationRoomID.push(reservation.reservation_id);
       } else if (reservation.reservation_type === "venue") {
@@ -109,24 +140,31 @@ export default function ReservationsTable({ data = [], keys }) {
           acc[key].reservationVenueID.push(reservation.reservation_id);
         }
       }
-
+  
+      // Add the current reservation to the group
       acc[key].reservations.push(reservation);
-     
+  
       return acc;
     }, {});
-   
-
+  
+    // Convert the result object into an array and paginate
     const groupedArray = Object.values(result);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = groupedArray.slice(indexOfFirstItem, indexOfLastItem);
-
+  
     return {
       allItems: groupedArray,
       currentItems: currentItems,
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
   }, [data, currentPage, itemsPerPage]);
+  
+  
+  
+  
+
+   console.log("grouped data" , groupedData);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= itemsPerPage) {
@@ -283,13 +321,7 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   }, [price]);
 
-  useEffect(() => {
-    setRoomRates({
-      "Double Bed": price.double_price || 0,
-      "Triple Bed": price.triple_price || 0,
-      "Matrimonial Bed": price.matrimonial_price || 0,
-    });
-  }, [price]);
+
 
   const getStatusColor = (status) => {
     const statusColors = {
@@ -328,18 +360,12 @@ export default function ReservationsTable({ data = [], keys }) {
     setIsDialogOpen(true);
   };
 
-  const handleEdit = () => {
-    console.log("Edit clicked for guest:", selectedGuest);
-    toast({
-      title: "Edit Functionality",
-      description: "Edit functionality is not yet implemented.",
-      variant: "default",
-    });
-  };
 
   const handleDelete = (guest) => {
-    setAccountToDelete(guest);
-    setDeleteModalOpen(true);
+    if (userRole === "Administrator") {
+      setAccountToDelete(guest);
+      setDeleteModalOpen(true);
+    }
   };
 
   const confirmDelete = async (type) => {
@@ -942,8 +968,10 @@ export default function ReservationsTable({ data = [], keys }) {
             selectedGuest.reservations[0]?.status || "default"
           )}
           disabled={
-            selectedGuest.reservations[0]?.status === "done" ? true : false
+            selectedGuest.reservations[0]?.status === "done" ? true : userRole !== "Administrator"
           }
+          
+          
         >
           <SelectValue
             placeholder={
@@ -951,7 +979,7 @@ export default function ReservationsTable({ data = [], keys }) {
             }
           />
         </SelectTrigger>
-        { selectedGuest.reservations[0]?.status === "done" ? (
+        { selectedGuest.reservations[0]?.status === "done"  ? (
           <SelectContent>
           {/* Exclude "done" from selectable options */}
           {["done"].map(
@@ -976,15 +1004,17 @@ export default function ReservationsTable({ data = [], keys }) {
         </SelectContent>)}
         
       </Select>
-      <Button
-        variant="outline"
-        onClick={() => handleSaveStatus(selectedGuest.reservationType)}
-        disabled={
-          selectedGuest.reservations[0]?.status === "done" ? true : false
-        }
-      >
-        Save Changes
-      </Button>
+      {userRole === "Administrator"  &&  (
+        <Button
+          variant="outline"
+          onClick={() => handleSaveStatus(selectedGuest.reservationType)}
+          disabled={
+            selectedGuest.reservations[0]?.status === "done" ? true : false
+          }
+        >
+          Save Changes
+        </Button>
+    )}
     </div>
   </div>
 </Card>
@@ -1164,7 +1194,7 @@ export default function ReservationsTable({ data = [], keys }) {
             </div>
             {/* buttons */}
             <div className="relative bottom-0">
-              <div className="flex  flex-col h-full items-center gap-3">
+              <div className="flex flex-col h-full items-center gap-3">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1183,13 +1213,15 @@ export default function ReservationsTable({ data = [], keys }) {
                   <Files className="h-4 w-4" />
                 </Button>
 
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(selectedGuest)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {userRole === "Administrator" && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(selectedGuest)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </DialogContent>

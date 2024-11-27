@@ -43,7 +43,7 @@ export default function Component({
   selectedRooms = ["Double Room", "Triple Room"],
   selectedVenues = ["Conference Hall"],
   numberOfNights = 0,
-  clientType = "Regular",
+  clientType = "Internal",
   showDiscount = true,
 }) {
   const {

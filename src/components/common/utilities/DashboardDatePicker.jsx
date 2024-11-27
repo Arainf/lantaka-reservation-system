@@ -13,35 +13,30 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-// Add props for date and onDateChange
-export function DashboardDatePickerDemo({ date, onDateChange, state }) {
+export function DashboardDatePickerDemo({ date, onDateChange }) {
   return (
-    <Popover style={{backgroundColor: "#95c1ff"}}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-[200px] justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
-          style={{backgroundColor: "#95c1ff"}}
-          disabled={state === true}
         >
           <IoCalendarSharp className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Calendar</span>}
+          {date ? format(date, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar2
           mode="single"
-          selected={date}  // Pass the selected date to the Calendar
-          onSelect={(newDate) => {
-            onDateChange(newDate);  // Call the parent's onDateChange function
-          }}
+          selected={date}
+          onSelect={onDateChange}
           initialFocus
-          className="rounded-md border"
         />
       </PopoverContent>
     </Popover>
   )
 }
+

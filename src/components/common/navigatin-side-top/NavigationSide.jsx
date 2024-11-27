@@ -31,17 +31,7 @@ const navLinks = [
     display: "Guest", // Text displayed for Guest
     url: "/guestlist", 
   },
-  {
-    icon: <ListCheck style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Activity", // Text displayed for Accounts
-    url: "/eventlogs" // URL for Accounts
-  },
 
-  {
-    icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
-    display: "Accounts", // Text displayed for Accounts
-    url: "/accounts" // URL for Accounts
-  },
 
   {
     icon: <MdOutlineRoomService style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Venue
@@ -53,6 +43,11 @@ const navLinks = [
     icon: <RiListSettingsFill style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Venue
     display: "Utilities", // Text displayed for Accounts
     url: "/Utilities" // URL for Accounts
+  },
+  {
+    icon: <IoPerson style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Accounts
+    display: "Accounts", // Text displayed for Accounts
+    url: "/accounts" // URL for Accounts
   },
   
 ];

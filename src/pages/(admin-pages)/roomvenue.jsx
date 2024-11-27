@@ -37,6 +37,7 @@ import NavigationSide from "@/components/common/navigatin-side-top/NavigationSid
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
 import { useRoomVenueContentsContext } from "@/context/roomandVenueContext";
 import { Toaster } from "@/components/ui/toaster";
+import { useNotifications } from "@/context/notificationContext";
 
 export default function VenueRoomManagement({
   sidebarOpen = false,
@@ -76,6 +77,7 @@ export default function VenueRoomManagement({
   const [newItemDescription, setNewItemDescription] = useState("");
   const [newItemImage, setNewItemImage] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
+  const { createNotification } = useNotifications();
 
   const allItems = [
     ...rooms.map((room) => ({ ...room, type: "Room" })),
@@ -157,7 +159,7 @@ export default function VenueRoomManagement({
 
   const handleSaveChanges = async () => {
     if (!selectedItem) return;
-
+  
     const updatedItem = {
       id: selectedItem.room_id || selectedItem.venue_id,
       type: selectedItem.type,
@@ -165,7 +167,7 @@ export default function VenueRoomManagement({
       description: editedDescription,
       status: status,
     };
-
+  
     if (selectedItem.type === "Venue") {
       updatedItem.capacity = parseInt(editedCapacity);
       updatedItem.pricing_internal = parseFloat(editedInternalPrice);
@@ -173,14 +175,11 @@ export default function VenueRoomManagement({
     } else if (selectedItem.type === "Room") {
       updatedItem.room_type_id = editedRoomType;
     }
-
-    if (
-      editedImageUrl !==
-      selectedItem.venue_img_url
-    ) {
+  
+    if (editedImageUrl !== selectedItem.venue_img_url) {
       updatedItem.image_url = editedImageUrl;
     }
-
+  
     try {
       const response = await fetch(
         `http://localhost:5000/api/venue-room/${updatedItem.id}`,
@@ -190,11 +189,11 @@ export default function VenueRoomManagement({
           body: JSON.stringify(updatedItem),
         }
       );
-
+  
       if (!response.ok) throw new Error("Failed to update item");
-
+  
       const result = await response.json();
-
+  
       if (selectedItem.type === "Room") {
         setRooms(
           rooms.map((room) =>
@@ -211,13 +210,38 @@ export default function VenueRoomManagement({
       setRenderers((prevKey) => prevKey + 1);
       setIsEditing(false);
       setIsDialogOpen(false);
-
+  
       toast({
         title: "Success",
         description: "Item updated successfully",
         variant: "success",
       });
-
+  
+      createNotification({
+        type: "Modified",
+        description: `${selectedItem.type} "${editedName}" has been updated. Modifications include: ${
+          editedName !== selectedItem.name ? "Name, " : ""
+        }${editedDescription !== selectedItem.description ? "Description, " : ""}${
+          status !== selectedItem.status ? "Status, " : ""
+        }${
+          selectedItem.type === "Venue"
+            ? editedCapacity !== selectedItem.capacity
+              ? "Capacity, "
+              : "" +
+                (editedInternalPrice !== selectedItem.pricing_internal
+                  ? "Internal Price, "
+                  : "") +
+                (editedExternalPrice !== selectedItem.pricing_external
+                  ? "External Price"
+                  : "")
+            : selectedItem.type === "Room" && editedRoomType !== selectedItem.room_type_id
+            ? "Room Type"
+            : ""
+        }`,
+        role: "employee",
+      });
+      
+  
       setRenderers((prevKey) => prevKey + 1);
     } catch (error) {
       console.error("Error updating item:", error);
@@ -226,12 +250,14 @@ export default function VenueRoomManagement({
         description: "Failed to update item",
         variant: "destructive",
       });
+  
+      
     }
   };
-
+  
   const handleDelete = async () => {
     if (!selectedItem) return;
-
+  
     try {
       const response = await fetch(
         `http://localhost:5000/api/venue-room/${
@@ -241,9 +267,9 @@ export default function VenueRoomManagement({
           method: "DELETE",
         }
       );
-
+  
       if (!response.ok) throw new Error("Failed to delete item");
-
+  
       if (selectedItem.type === "Room") {
         setRooms(rooms.filter((room) => room.room_id !== selectedItem.room_id));
       } else {
@@ -253,11 +279,17 @@ export default function VenueRoomManagement({
       }
       setRenderers((prevKey) => prevKey + 1);
       setIsDialogOpen(false);
-
+  
       toast({
-        title: "success",
+        title: "Success",
         description: "Item deleted successfully",
         variant: "success",
+      });
+  
+      createNotification({
+        type: "Deleted",
+        description: `${selectedItem.type} "${selectedItem.name}" has been deleted`,
+        role: "employee",
       });
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -266,6 +298,8 @@ export default function VenueRoomManagement({
         description: "Failed to delete item",
         variant: "destructive",
       });
+  
+
     }
   };
 
@@ -313,23 +347,25 @@ export default function VenueRoomManagement({
     const idExists = allItems.some(
       (item) => item.room_id === newItemId || item.venue_id === newItemId
     );
-
+  
     if (idExists) {
       toast({
         title: "Error",
         description: "An item with this ID already exists",
         variant: "destructive",
       });
+  
+  
       return;
     }
-
+  
     const newItem = {
       type: newItemType,
       name: newItemName,
       id: newItemId,
       status: "ready",
     };
-
+  
     if (newItemType === "Room") {
       newItem.room_type = newItemRoomType;
     } else {
@@ -339,6 +375,9 @@ export default function VenueRoomManagement({
           description: "Please fill in all required fields",
           variant: "destructive",
         });
+  
+
+  
         return;
       }
       newItem.capacity = parseInt(newItemCapacity);
@@ -349,32 +388,39 @@ export default function VenueRoomManagement({
         newItem.image = newItemImage;
       }
     }
-
+  
     try {
       const response = await fetch("http://localhost:5000/api/add-venue-room", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newItem),
       });
-
+  
       if (!response.ok) throw new Error("Failed to add new item");
-
+  
       const result = await response.json();
-
+  
       if (newItemType === "Room") {
         setRooms([...rooms, result]);
       } else {
         setVenues([...venues, result]);
       }
-
+  
       setIsAddDialogOpen(false);
       setRenderers((prevKey) => prevKey + 1);
-
+  
       toast({
         title: "Success",
         description: "New item added successfully",
         variant: "success",
       });
+  
+      createNotification({
+        type: "Created",
+        description: `${newItemType} "${newItemName}" has been added`,
+        role: "employee",
+      });
+
     } catch (error) {
       console.error("Error adding new item:", error);
       toast({
@@ -382,6 +428,8 @@ export default function VenueRoomManagement({
         description: "Failed to add new item",
         variant: "destructive",
       });
+  
+
     }
   };
 

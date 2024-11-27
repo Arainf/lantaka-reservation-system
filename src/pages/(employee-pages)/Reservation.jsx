@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useContext } from "react"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -14,6 +14,8 @@ import { IoIosBriefcase } from "react-icons/io"
 import { TbMessageCircleFilled } from "react-icons/tb"
 import { BsFileTextFill } from "react-icons/bs"
 import { Label } from "@/components/ui/label"
+import moment from 'moment-timezone';
+import Spinner from "@/components/ui/spinner"
 import {
   Select,
   SelectContent,
@@ -48,10 +50,13 @@ import CostCalculator from "@/components/common/cards/Receipt"
 import { Badge } from "@/components/ui/badge"
 import { usePriceContext } from "@/context/priceContext"
 import { Separator } from "@/components/ui/separator"
+import { useNotifications } from "@/context/notificationContext";
+import { UserContext } from "@/context/contexts";
+
 
 const step1Schema = z.object({
   clientAlias: z.string().min(1, "*"),
-  clientType: z.enum(["Internal", "External"], {
+  clientType: z.enum(["internal", "external"], {
     errorMap: () => ({ message: "*" }),
   }),
   reservationType: z.enum(["room", "venue", "both"], {
@@ -105,9 +110,11 @@ export default function Component() {
     triple: [],
     matrimonial: [],
   })
-  const { price, clientType, setClientType, discounts, initialTotalPrice } =
+  const { createNotification } = useNotifications();
+  const { price, clientType, setClientType, discounts, initialTotalPrice, fetchDiscount } =
     usePriceContext()
   const [venueMessage, setVenueMessage] = useState("")
+  const [search, setSearch] = useState("")
   const [roomMessage, setRoomMessage] = useState("")
   const [dateRangeRoomsetter, setDateRangeRoomsetter] = useState({
     from: "",
@@ -124,6 +131,11 @@ export default function Component() {
     "Matrimonial capacity": 0,
   })
   const [venueCapacity, setVenueCapacity] = useState([])
+  const [clients, setClients] = useState([])
+  const [selectedClient, setSelectedClient] = useState(null)
+  const [loading, setLoading] = useState(false);
+  const { userData  } = useContext(UserContext);
+
 
   const form = useForm({
     resolver: zodResolver(reservationSchema),
@@ -160,6 +172,7 @@ export default function Component() {
       "Triple capacity": price.triple_capacity || 0,
       "Matrimonial capacity": price.Matrimonial_capacity || 0,
     })
+    console.log(capacity)
   }, [price])
 
   useEffect(() => {
@@ -176,7 +189,8 @@ export default function Component() {
   }, [price])
 
   useEffect(() => {
-    fetchEverythingAvailable()
+    fetchEverythingAvailable();
+    fetchDiscount();
   }, [])
 
   useEffect(() => {
@@ -205,7 +219,7 @@ export default function Component() {
         capacity["Matrimonial capacity"]
     }
     return totalGuests
-  }, [selectedRoomReceipt, capacity])
+  }, [selectedRoomReceipt, capacity, price])
 
   useEffect(() => {
     const newMaxGuests = calculateMaxGuests()
@@ -282,43 +296,73 @@ export default function Component() {
   }, [price.venue_Holder, form])
 
   const onPass = async (data) => {
+    console.log(data);
     if (step < 3) {
-      await nextStep()
+      await nextStep();
     } else {
       try {
-        await step3Schema.parseAsync(data)
-
-        data.accountId = localStorage.getItem("account_id")
-        data.totalPrice = calculateTotalPrice()
-        data.discount = discounts
-        data.initialTotalPrice = initialTotalPrice
-        data.MaxnumberofGuest = maxGuests
-
-        data.dateRangeRoom = {
-          from: dateRangeRoomsetter.from,
-          to: dateRangeRoomsetter.to,
+        await step3Schema.parseAsync(data);
+  
+        // Get the timezone (e.g., from a user setting or default to system's timezone)
+        const timeZone = 'Asia/Manila';  // Example: set this dynamically if needed
+  
+        // Adjust the date range for room with the selected timezone
+        const fromRoom = dateRangeRoomsetter.from ? moment(dateRangeRoomsetter.from).tz(timeZone, true).format() : null;
+        const toRoom = dateRangeRoomsetter.to ? moment(dateRangeRoomsetter.to).tz(timeZone, true).format() : null;
+  
+        // Adjust the date range for venue with the selected timezone
+        const fromVenue = dateRangeVenueSetter.from ? moment(dateRangeVenueSetter.from).tz(timeZone, true).format() : null;
+        const toVenue = dateRangeVenueSetter.to ? moment(dateRangeVenueSetter.to).tz(timeZone, true).format() : null;
+  
+        data.accountId = localStorage.getItem("account_id");
+        data.totalPrice = calculateTotalPrice();
+        data.discount = discounts;
+        data.initialTotalPrice = initialTotalPrice;
+        data.MaxnumberofGuest = maxGuests;
+  
+        // Check if `fromRoom` and `toRoom` are defined, if so, set `dateRangeRoom`
+        if (fromRoom && toRoom) {
+          data.dateRangeRoom = {
+            from: fromRoom,
+            to: toRoom,
+          };
         }
-
-        data.dateRangeVenue = {
-          from: dateRangeVenueSetter.from,
-          to: dateRangeVenueSetter.to,
+  
+        // If no dates are selected for room, set it to "none"
+        if (!fromRoom && !toRoom) {
+          data.dateRangeRoom = "none";
         }
-
-        data.selectedReservationRooms = selectedRooms
-        data.selectedReservationVenues = selectedVenues
-        data.clientType = clientType
-        console.log("data:", JSON.stringify(data, null, 2))
-        setFormData(data)
+  
+        // Check if `fromVenue` and `toVenue` are defined, if so, set `dateRangeVenue`
+        if (fromVenue && toVenue) {
+          data.dateRangeVenue = {
+            from: fromVenue,
+            to: toVenue,
+          };
+        }
+  
+        // If no dates are selected for venue, set it to "none"
+        if (!fromVenue && !toVenue) {
+          data.dateRangeVenue = "none";
+        }
+  
+        data.selectedReservationRooms = selectedRooms;
+        data.selectedReservationVenues = selectedVenues;
+        data.clientType = clientType;
+  
+        console.log("data:", JSON.stringify(data, null, 2));
+        setFormData(data);
       } catch (error) {
-        console.error("Final validation error:", error)
+        console.error("Final validation error:", error);
         if (error instanceof z.ZodError) {
           error.errors.forEach((err) => {
-            form.setError(err.path[0], { message: err.message })
-          })
+            form.setError(err.path[0], { message: err.message });
+          });
         }
       }
     }
   }
+  
 
   const calculateTotalPrice = () => {
     let total = initialTotalPrice
@@ -368,6 +412,18 @@ export default function Component() {
       setSelectedRooms([])
       setSelectedVenues([])
     } else if (reservationType === "both") {
+      form.setValue("dateRangeVenue", { from: "", to: "" })
+      form.setValue("dateRangeRoom", { from: "", to: "" })
+
+      form.reset({
+        ...form.getValues(),
+        dateRangeRoom: { from: "", to: "" },
+        dateRangeVenue: { from: "", to: "" },
+        MaxnumberofGuest: 0,
+        selectedReservationRooms: [""],
+        selectedReservationVenues: [" "],
+      })
+
       setRoomState(false)
       setVenueState(false)
     }
@@ -378,64 +434,97 @@ export default function Component() {
   }, [reservationType])
 
   const handleConfirmSubmit = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/submitReservation",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      )
-
-      const result = await response.json()
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: result.message || "Reservation submitted successfully!",
-          variant: "success",
-        })
-        setIsConfirmationOpen(false)
-        form.reset()
-        setSelectedRooms([])
-        setSelectedVenues([])
-        setTimeout(() => {
-          navigate(0)
-        }, 1500)
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description:
-            result.error ||
-            "An error occurred while submitting the reservation.",
-        })
+      const response = await fetch("http://localhost:5000/api/submitReservation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(result.error || "An error occurred while submitting the reservation.");
       }
+  
+      toast({
+        title: "Success",
+        description: result.message || "Reservation submitted successfully!",
+        variant: "success",
+      });
+  
+      let fullName = userData.first_name + " " + userData.last_name;
+
+        // Create a formatted timestamp
+      const timestamp = new Date().toLocaleString('en-US', {
+        weekday: 'long', // Day of the week
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true, // 12-hour format (AM/PM)
+      });
+
+      await createNotification({
+        type: 'Created',
+        description: `Account Name: "${fullName}" has created reservations for: "${formData.clientAlias} (${formData.firstName}) at Timestamp: "${timestamp} ".`,
+        role: 'Administrator',
+      });
+  
+      setIsConfirmationOpen(false);
+      form.reset();
+      setSelectedRooms([]);
+      setSelectedVenues([]);
+  
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      navigate(0);
+  
     } catch (error) {
-      console.error("Error submitting reservation:", error)
+      console.error("Error submitting reservation:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-      })
+        description: error.message || "An unexpected error occurred. Please try again.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
+      setLoading(false);
+    }
+  };
+
+  const callAvailableRoom = (dateRange) => {
+    console.log(`Date Range Raw: ${dateRange.from.toLocaleString()}, to ${dateRange.to.toLocaleString()}`)
+    if (dateRange.from && dateRange.to) {
+      const adjustedDateRange = {
+        from: new Date(dateRange.from),
+        to: new Date(dateRange.to),
+      }
+
+      console.log(`Date Range Adjusted: ${adjustedDateRange.from.toLocaleString()}, to ${adjustedDateRange.to.toLocaleString()}`)
+      setDateRangeRoomsetter(adjustedDateRange)
+      fetchAvailableRoom(adjustedDateRange)
+      setShowResultsRoom(true)
     }
   }
 
-  const callAvailableRoom = (dateRange) => {
-    setDateRangeRoomsetter(dateRange)
-    fetchAvailableRoom(dateRange)
-    setShowResultsRoom(true)
-  }
-
   const callAvailableVenue = (dateRange) => {
-    setDateRangeVenueSetter(dateRange)
-    fetchAvailableVenue(dateRange)
-    setShowResultsVenue(true)
+    console.log(`Date Range Raw: ${dateRange.from.toLocaleString()}, to ${dateRange.to.toLocaleString()}`)
+    if (dateRange.from && dateRange.to) {
+      const adjustedDateRange = {
+        from: new Date(dateRange.from),
+        to: new Date(dateRange.to),
+      }
+
+      console.log(`Date Range Adjusted: ${adjustedDateRange.from.toLocaleString()}, to ${adjustedDateRange.to.toLocaleString()}`)
+      setDateRangeVenueSetter(adjustedDateRange)
+      fetchAvailableVenue(adjustedDateRange)
+      setShowResultsVenue(true)
+    }
   }
 
   const callAvailableRoomAndVenue = (dateRange) => {
@@ -446,6 +535,8 @@ export default function Component() {
     setShowResultsRoom(true)
     setShowResultsVenue(true)
   }
+
+
 
   const nextStep = async () => {
     try {
@@ -626,6 +717,45 @@ export default function Component() {
     }).format(amount)
   }
 
+  useEffect(() => {
+    if (search.trim()) {
+      fetch(`http://localhost:5000/api/clients?search=${search}`)
+        .then(response => response.json())
+        .then(data => {
+          setClients(data)
+        })
+        .catch(error => {
+          console.error("Error fetching clients:", error)
+        })
+    } else {
+      setClients([])
+    }
+  }, [search])
+
+  const [clnTpe, serClnTpe ] = useState("")
+  
+  const handleClientSelect = (client) => {
+    setSelectedClient(client)
+    form.reset({
+      ...form.getValues(),
+      clientAlias: client.guest_client,
+      clientType: client.guest_type,
+      firstName: client.guest_fName,
+      lastName: client.guest_lName,
+      gender: client.guest_gender,
+      email: client.guest_email,
+      phone: client.guest_phone,
+      designation: client.guest_designation,
+      messengerAccount: client.guest_messenger_account,
+      address: client.guest_address,
+    })
+    setSearch(client.guest_client)
+    setClients([])
+    serClnTpe(client.guest_type)
+    setClientType(client.guest_type)
+    console.log(client.guest_type)
+  }
+
   return (
     <>
       <main className="flex flex-col h-screen w-screen overflow-hidden">
@@ -661,14 +791,36 @@ export default function Component() {
                                     <FormMessage className="form-message" />
                                   </div>
                                   <FormControl>
-                                    <Input
-                                      placeholder="Client Alias"
-                                      {...field}
-                                    />
+                                    <div className="relative">
+                                      <Input
+                                        placeholder="Client Alias"
+                                        {...field}
+                                        onChange={(e) => {
+                                          field.onChange(e.target.value)
+                                          setSearch(e.target.value)
+                                        }}
+                                        autocomplete="off"
+                                      />
+                                      {clients.length > 0 && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                          {clients.map((client) => (
+                                            <div
+                                              key={client.guest_id}
+                                              className="p-2 hover:bg-gray-100 cursor-pointer poppins-regular"
+                                              onClick={() => handleClientSelect(client)}
+                                            >
+                                              <p>{client.guest_client}</p>
+                                              <p className="poppins-light">{client.guest_fName} {client.guest_lName} </p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
                                   </FormControl>
                                 </FormItem>
                               )}
                             />
+                           
 
                             <div className="flex flex-row w-[500px] gap-4 ">
                               <FormField
@@ -688,7 +840,7 @@ export default function Component() {
                                         field.onChange(value)
                                         setClientType(value)
                                       }}
-                                      defaultValue={field.value}
+                                      defaultValue={field.value || clnTpe}
                                     >
                                       <FormControl>
                                         <SelectTrigger>
@@ -696,10 +848,10 @@ export default function Component() {
                                         </SelectTrigger>
                                       </FormControl>
                                       <SelectContent>
-                                        <SelectItem value="Internal">
+                                        <SelectItem value="internal">
                                           Internal
                                         </SelectItem>
-                                        <SelectItem value="External">
+                                        <SelectItem value="external">
                                           External
                                         </SelectItem>
                                       </SelectContent>
@@ -735,7 +887,7 @@ export default function Component() {
                                         <SelectItem value="room">
                                           Room
                                         </SelectItem>
-                                        <SelectItem value="venue">
+                                        <SelectItem value="venue">    
                                           Venue
                                         </SelectItem>
                                         <SelectItem value="both">
@@ -765,7 +917,10 @@ export default function Component() {
                                         <div className="flex flex-row gap-2">
                                           <DatePicker
                                             value={field.value}
-                                            onChange={field.onChange}
+                                            onChange={(value) => {
+                                              field.onChange(value)
+                                              callAvailableRoom(value)
+                                            }}
                                             className="custom-datepicker w-full"
                                             state={roomState}
                                           />
@@ -798,7 +953,10 @@ export default function Component() {
                                         <div className="flex flex-row gap-2 ">
                                           <DatePicker
                                             value={field.value}
-                                            onChange={field.onChange}
+                                            onChange={(value) => {
+                                              field.onChange(value)
+                                              callAvailableVenue(value)
+                                            }}
                                             className="custom-datepicker w-full"
                                             state={venueState}
                                           />
@@ -1237,9 +1395,18 @@ export default function Component() {
         <DialogContent className="bg-transparent p-0 max-w-5xl border-none flex flex-row gap-3" showCloseButton={false}>
           <div className="w-3/5 flex flex-col gap-2">
             <Card className="flex-1 flex flex-col">
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">Confirm Your Reservation</CardTitle>
-              </CardHeader>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Confirm Your Reservation</CardTitle>
+              <p>
+                {formData?.dateRangeRoom?.from && formData?.dateRangeRoom?.to ? (
+                  `From: ${new Date(formData.dateRangeRoom.from).toLocaleDateString()} To: ${new Date(formData.dateRangeRoom.to).toLocaleDateString()}`
+                ) : (
+                  "No date range selected"
+                )}
+              </p>
+            </CardHeader>
+
+
               <CardContent className="p-4 flex flex-col h-full">
                 <ScrollArea className="h-[calc(80vh-8rem)] w-full pr-4">
                   <div className="space-y-4">
@@ -1250,6 +1417,7 @@ export default function Component() {
                           <Label className="font-medium">Full Name</Label>
                           <p>{`${formData.firstName || ""} ${formData.lastName || ""}`}</p>
                         </div>
+                        
                         <div>
                           <Label className="font-medium">Gender</Label>
                           <p>{formData.gender || "Not specified"}</p>
@@ -1370,16 +1538,6 @@ export default function Component() {
             </Card>
 
 
-                {/* <CostCalculator
-                  clientType={clientType}
-                  selectedRooms={getSelectedRooms()}
-                  selectedVenues={selectedVenues}
-                  numberOfNights={calculateNumberOfNights(
-                    form.getValues("dateRangeRoom") ||
-                    form.getValues("dateRangeVenue")
-                  )}
-                  showDiscount={true}
-                /> */}
 
 
             <div className="flex justify-end mt-4 space-x-2">
@@ -1393,6 +1551,10 @@ export default function Component() {
           </div>
         </DialogContent>
       </Dialog>
+      <div>
+      {/* Conditionally render the spinner */}
+      {loading && <Spinner />}
+      </div>
       <Toaster />
     </>
   );
