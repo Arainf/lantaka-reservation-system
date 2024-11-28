@@ -32,7 +32,7 @@ export const AdditionalFeeProvider = ({ children }) => {
 
   useEffect(() => {
     fetchAddFees();
-  }, [fetchAddFees]);
+  }, []);
 
   const addFee = useCallback(async (fee) => {
     try {

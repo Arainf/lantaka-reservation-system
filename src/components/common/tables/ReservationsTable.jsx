@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback  } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,9 +49,7 @@ import { useReservationsContext } from "@/context/reservationContext";
 import Slogo from "@/assets/images/SchoolLogo.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useAdditionalFees } from "@/context/additionalFeeContext";
-
-
-
+import { useRegistrationContext } from "@/context/utilContext";
 
 const calculateNumberOfNights = (checkInDate, checkOutDate) => {
   const checkIn = new Date(checkInDate);
@@ -74,7 +72,7 @@ export default function ReservationsTable({ data = [], keys }) {
     "Matrimonial Bed": 0,
   });
   const { price, setClientType, fetchPrice, clientType } = usePriceContext();
-  const { setDeleteData, setSaveNote } = useReservationsContext();
+  const { setDeleteData, setSaveNote, fetchReservations, setReservationsData, reservationsData  } = useReservationsContext();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -90,6 +88,8 @@ export default function ReservationsTable({ data = [], keys }) {
   const [feeDescription, setFeeDescription] = useState("");
   const [feeAmount, setFeeAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { renders, setRenderers} = useRegistrationContext();
+
 
   const handleAddFee = useCallback(async () => {
     if (!feeDescription || !feeAmount) {
@@ -118,7 +118,7 @@ export default function ReservationsTable({ data = [], keys }) {
       };
 
       const addedFee = await addFee(newFee);
-      setSelectedFees(prev => [...prev, addedFee]);
+      setSelectedFees((prev) => [...prev, addedFee]);
       setFeeDescription("");
       setFeeAmount("");
 
@@ -127,10 +127,10 @@ export default function ReservationsTable({ data = [], keys }) {
           selectedGuest.receiptSubTotal,
           [...selectedFees, addedFee]
         );
-        
-        setSelectedGuest(prev => ({
+
+        setSelectedGuest((prev) => ({
           ...prev,
-          receiptTotal: updatedTotal
+          receiptTotal: updatedTotal,
         }));
       }
 
@@ -139,167 +139,84 @@ export default function ReservationsTable({ data = [], keys }) {
         description: "Additional fee has been added successfully.",
         variant: "success",
       });
+
+      setRenderers((prevKey) => prevKey + 1);
+      setDeleteData((prevKey) => prevKey + 1);
+      loadFees();
     } catch (error) {
       console.error("Failed to add fee:", error);
       toast({
-        title: "Error",
-        description: "Failed to add additional fee.",
-        variant: "destructive",
+        title: "Success",
+        description: "Additional fee has been added successfully.",
+        variant: "success",
       });
     }
-  }, [feeDescription, feeAmount, selectedGuest, selectedFees, addFee, calculateTotalWithFees]);
+  }, [
+    feeDescription,
+    feeAmount,
+    selectedGuest,
+    selectedFees,
+    addFee,
+    calculateTotalWithFees,
+  ]);
 
-  // Additional Fees Dialog Content
-  const AdditionalFeesContent = () => (
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle className="text-xl font-bold">Additional Fees</DialogTitle>
-        <DialogDescription className="text-sm text-gray-500">
-          Add or manage additional fees for this reservation
-        </DialogDescription>
-      </DialogHeader>
+  // Optimize fee deletion with useCallback
+  const handleDeleteFee = useCallback(
+    async (feeId) => {
 
-      <div className="space-y-4 mt-4">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold mb-2">Current Fees</h4>
-          <ScrollArea className="h-[150px] rounded-md border p-2">
-            {selectedFees.length > 0 ? (
-              selectedFees.map((fee) => (
-                <div
-                  key={fee.additional_fee_id}
-                  className="flex items-center justify-between py-2 px-3 hover:bg-gray-100 rounded-md"
-                >
-                  <div>
-                    <span className="font-medium">{fee.additional_fee_name}</span>
-                    <span className="text-sm text-gray-600 ml-2">
-                      ({formatCurrency(fee.additional_fee_amount)})
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteFee(fee.additional_fee_id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center py-4">No additional fees</p>
-            )}
-          </ScrollArea>
-        </div>
+      try {
+        await deleteFee(feeId);
 
-        <div className="space-y-3">
-          <div>
-            <Label htmlFor="feeDescription">Description</Label>
-            <Input
-              id="feeDescription"
-              value={feeDescription}
-              onChange={(e) => setFeeDescription(e.target.value)}
-              placeholder="Enter fee description"
-              className="mt-1"
-            />
-          </div>
+        setSelectedFees((prev) =>
+          prev.filter((fee) => fee.additional_fee_id !== feeId)
+        );
 
-          <div>
-            <Label htmlFor="feeAmount">Amount</Label>
-            <div className="relative mt-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                ₱
-              </span>
-              <Input
-                id="feeAmount"
-                type="number"
-                value={feeAmount}
-                onChange={(e) => setFeeAmount(e.target.value)}
-                placeholder="0.00"
-                className="pl-7"
-              />
-            </div>
-          </div>
+        // Update the total amount after removing the fee
+        if (selectedGuest) {
+          const updatedFees = selectedFees.filter(
+            (fee) => fee.additional_fee_id !== feeId
+          );
+          const newTotal = calculateTotalWithFees(
+            selectedGuest.receiptSubTotal,
+            updatedFees
+          );
 
-          <Button
-            onClick={handleAddFee}
-            className="w-full"
-          >
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Add Fee
-          </Button>
-        </div>
+          setSelectedGuest((prev) => ({
+            ...prev,
+            receiptTotal: newTotal,
+          }));
+        }
 
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">Total Additional Fees:</span>
-            <span className="text-blue-600 font-bold">
-              {formatCurrency(
-                selectedFees.reduce((sum, fee) => sum + fee.additional_fee_amount, 0)
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-    </DialogContent>
+        toast({
+          title: "Success",
+          description: "Additional fee has been deleted successfully.",
+          variant: "success",
+        });
+        setDeleteData((prevKey) => prevKey + 1);
+        setRenderers((prevKey) => prevKey + 1);
+      } catch (error) {
+        console.error("Error deleting fee:", error);
+        toast({
+          title: "Error",
+          description: "Failed to delete additional fee.",
+          variant: "destructive",
+        });
+      }
+    },
+    [selectedGuest, selectedFees, deleteFee, calculateTotalWithFees]
   );
 
   
-
-  // Optimize fee deletion with useCallback
-  const handleDeleteFee = useCallback(async (feeId) => {
-    if (!feeId) {
-      toast({
-        title: "Error",
-        description: "Invalid fee ID.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await deleteFee(feeId);
-      
-      setSelectedFees(prev => prev.filter(fee => fee.additional_fee_id !== feeId));
-
-      // Update the total amount after removing the fee
-      if (selectedGuest) {
-        const updatedFees = selectedFees.filter(fee => fee.additional_fee_id !== feeId);
-        const newTotal = calculateTotalWithFees(
-          selectedGuest.receiptSubTotal,
-          updatedFees
-        );
-        
-        setSelectedGuest(prev => ({
-          ...prev,
-          receiptTotal: newTotal
-        }));
-      }
-
-      toast({
-        title: "Success",
-        description: "Additional fee has been deleted successfully.",
-        variant: "success",
-      });
-    } catch (error) {
-      console.error("Error deleting fee:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete additional fee.",
-        variant: "destructive",
-      });
-    }
-  }, [selectedGuest, selectedFees, deleteFee, calculateTotalWithFees]);
-
   // Load fees only when selectedGuest changes
   useEffect(() => {
     const loadFees = async () => {
       if (!selectedGuest?.receiptId) return;
-      
+
       try {
         const response = await fetch("http://localhost:5000/api/getAddFees2");
         if (!response.ok) throw new Error("Failed to fetch fees");
         const data = await response.json();
-        
+
         setSelectedFees(data);
 
         // Update total with fees
@@ -308,9 +225,9 @@ export default function ReservationsTable({ data = [], keys }) {
             selectedGuest.receiptSubTotal,
             data
           );
-          setSelectedGuest(prev => ({
+          setSelectedGuest((prev) => ({
             ...prev,
-            receiptTotal: newTotal
+            receiptTotal: newTotal,
           }));
         }
       } catch (error) {
@@ -324,14 +241,19 @@ export default function ReservationsTable({ data = [], keys }) {
     };
 
     loadFees();
-  }, [selectedGuest?.receiptId, calculateTotalWithFees]);
-
+  }, [selectedGuest?.receiptId, calculateTotalWithFees, addFee, renders ]);
 
   useEffect(() => {
     // Get the user role from local storage
     const role = localStorage.getItem("userRole");
     setUserRole(role);
   }, []);
+
+  useEffect(() => {
+    fetchReservations()
+    setReservationsData(reservationsData)
+  },[selectedGuest?.receiptId, calculateTotalWithFees, addFee, selectedGuest, renders])
+
 
   useEffect(() => {
     if (selectedGuest?.guestType && setClientType) {
@@ -372,12 +294,12 @@ export default function ReservationsTable({ data = [], keys }) {
           receiptSubTotal: reservation.receipt_initial_total,
           additionalNotes: reservation.additional_notes,
           receiptDiscounts: [],
-          receiptAddFees:[],
+          receiptAddFees: [],
           reservationRoomID: [],
           reservationVenueID: [],
         };
       }
-     
+
       // Process receipt discounts
       reservation.receipt_discounts.forEach((discount) => {
         if (
@@ -431,7 +353,7 @@ export default function ReservationsTable({ data = [], keys }) {
       currentItems: currentItems,
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
-  }, [data, currentPage, itemsPerPage]);
+  }, [data, currentPage, itemsPerPage,fetchReservations, addFee, renders, selectedGuest]);
 
   console.log("grouped data", groupedData);
 
@@ -828,6 +750,8 @@ export default function ReservationsTable({ data = [], keys }) {
         );
     }
   };
+
+  
 
   return (
     <>
@@ -1350,20 +1274,29 @@ export default function ReservationsTable({ data = [], keys }) {
                       </ScrollArea>
                       <Separator />
                       <div className="space-y-2 text-sm">
+                        <ScrollArea className="h-[40px]" >
                         <div className="flex justify-between">
                           <span>Subtotal:</span>
                           <span>
                             {formatCurrency(selectedGuest.receiptSubTotal)}
                           </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Additional Fees:</span>
-                          <span className="text-green-600">
-                          {formatCurrency(
-                            calculateTotalWithFees(0, selectedGuest.receiptAddFees)
-                          )}
-                          </span>
-                        </div>
+                        {selectedGuest && selectedGuest.receiptAddFees && (
+                          <div className="flex justify-between">
+                            <span>Additional Fees:</span>
+                            <span className="text-green-600">
+                              {formatCurrency(
+                                calculateTotalWithFees(
+                                  0,
+                                  selectedGuest.receiptAddFees
+                                )
+                              )}
+                            </span>
+                          </div>
+                        )}
+
+                        
+
                         {selectedGuest.receiptDiscounts.map(
                           (discount, index) => (
                             <div
@@ -1382,6 +1315,8 @@ export default function ReservationsTable({ data = [], keys }) {
                             </div>
                           )
                         )}
+                        </ScrollArea>
+                        
                         <div className="flex justify-between font-bold">
                           <span>Total:</span>
                           <span>
@@ -1427,87 +1362,101 @@ export default function ReservationsTable({ data = [], keys }) {
                   </div>
                 </div>
 
-                <div className="relative group ">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={openModal}
-                    className="bg-white flex items-center justify-center"
-                  >
-                    <PhilippinePeso className="h-4 w-4" />
-                  </Button>
-
-                  <div className="absolute left-full ml-3 bottom-1/2 transform translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-800 text-white text-xs px-3 py-1 rounded-md shadow-lg whitespace-nowrap">
-                    Additional Fees
-                  </div>
-
-                  <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogContent className="2xl:left-[75%] xl:left-[81.5%] 2xl:top-[55%] xl:top-[56%] w-[300px] h-auto z-50">
-                      <DialogHeader>
-                        <DialogTitle>Additional Fees</DialogTitle>
-                        <DialogDescription className="py-5">
-                          Fee Breakdown (Total:{" "}
-                          {formatCurrency(
-                            calculateTotalWithFees(0, selectedGuest.receiptAddFees)
-                          )}
-                          )
-                        </DialogDescription>
-                      </DialogHeader>
-
-                      <ScrollArea className="h-[100px] overflow-hidden">
-    <ScrollArea className="h-full">
-     
-    <ul className="list-disc list-inside">
-        {fees.map((fee, index) => (
-          <li key={index} className="flex items-center justify-between">
-            {fee.description}: ₱{fee.amount}
-            <button
-              onClick={() => deleteFee(index)}
-              className=" text-red-500 p-1 mr-2  rounded-full hover:border-black bg-white"
-            >
-              <X className="w-3 h-3 text-black" />
-            </button>
-          </li>
-        ))}
-      </ul>
-    </ScrollArea>
-    <ScrollArea orientation="vertical" className="w-2 bg-gray-300 rounded-full" />
-    <ScrollArea />
-  </ScrollArea>
-
-                      <div className="flex flex-col gap-2">
-                        <input
-                          type="text"
-                          value={feeDescription}
-                          onChange={(e) => setFeeDescription(e.target.value)}
-                          placeholder="Enter fee description"
-                          className="border px-2 py-1 rounded-md flex-grow bg-white text-black"
-                        />
-
-                        {/* Fee Amount */}
-                        <div className="relative">
-                        <input
-                            type="number"
-                            value={feeAmount}
-                            onChange={(e) => setFeeAmount(e.target.value)}
-                            placeholder="Enter fee amount"
-                            className="border px-2 py-1 rounded-md flex-grow bg-white text-black pl-7" // added padding for the icon
-                        />
-                        <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-black">₱</span> {/* Icon position */}
+                {selectedGuest.reservations[0].status != "done" && selectedGuest.reservations[0].status != "cancelled" && (
+                    <div className="relative group ">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={openModal}
+                      className="bg-white flex items-center justify-center"
+                    >
+                      <PhilippinePeso className="h-4 w-4" />
+                    </Button>
+  
+                    <div className="absolute left-full ml-3 bottom-1/2 transform translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-800 text-white text-xs px-3 py-1 rounded-md shadow-lg whitespace-nowrap">
+                      Additional Fees
+                    </div>
+  
+                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                      <DialogContent className="2xl:left-[81.5%] xl:left-[81.5%] 2xl:top-[55%] xl:top-[56%] w-[300px] h-auto z-50">
+                        <DialogHeader>
+                          <DialogTitle>Additional Fees</DialogTitle>
+                          <DialogDescription className="py-5">
+                            Fee Breakdown (Total:{" "}
+                            {formatCurrency(
+                              calculateTotalWithFees(
+                                0,
+                                selectedGuest.receiptAddFees
+                              )
+                            )}
+                            )
+                          </DialogDescription>
+                        </DialogHeader>
+  
+                        <ScrollArea className="h-[100px] overflow-hidden">
+                          <ScrollArea className="h-full">
+                            <ul className="list-disc list-inside">
+                              
+                              {selectedGuest.receiptAddFees.map((fee, index) => (
+                                <li
+                                  key={fee.additional_fee_id}
+                                  className="flex items-center justify-between poppins-semibold"
+                                >
+                                  {fee.additional_fee_name}: ₱{fee.additional_fee_amount}
+                                  <button
+                                    onClick={() => handleDeleteFee(fee.additional_fee_id)}
+                                    className=" text-red-500 p-1 mr-2  rounded-full hover:border-black bg-white"
+                                  >
+                                    <X className="w-3 h-3 text-black" />
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </ScrollArea>
+                          <ScrollArea
+                            orientation="vertical"
+                            className="w-2 bg-gray-300 rounded-full"
+                          />
+                          <ScrollArea />
+                        </ScrollArea>
+  
+                        <div className="flex flex-col gap-2">
+                          <input
+                            type="text"
+                            value={feeDescription}
+                            onChange={(e) => setFeeDescription(e.target.value)}
+                            placeholder="Enter fee description"
+                            className="border px-2 py-1 rounded-md flex-grow bg-white text-black"
+                          />
+  
+                          {/* Fee Amount */}
+                          <div className="relative">
+                            <input
+                              type="number"
+                              value={feeAmount}
+                              onChange={(e) => setFeeAmount(e.target.value)}
+                              placeholder="Enter fee amount"
+                              className="border px-2 py-1 rounded-md flex-grow bg-white text-black pl-7" // added padding for the icon
+                            />
+                            <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-black">
+                              ₱
+                            </span>{" "}
+                            {/* Icon position */}
+                          </div>
+  
+                          <Button
+                            onClick={handleAddFee}
+                            className="bg-blue-500 text-white mt-2"
+                          >
+                            <PlusCircle className="h-4 w-4 mr-2" />
+                            Add Fee
+                          </Button>
                         </div>
-
-                        <Button
-                          onClick={handleAddFee}
-                          className="bg-blue-500 text-white mt-2"
-                        >
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Add Fee
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                ) }
+                
 
                 {userRole === "Administrator" && (
                   <div className="absolute group bottom-0">

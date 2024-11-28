@@ -33,6 +33,7 @@ export const ReservationsProvider = ({ children }) => {
   const contextValue = {
     reservationsData,
     fetchReservations,
+    setReservationsData,
     deleteData,
     setDeleteData,
     saveNotes,

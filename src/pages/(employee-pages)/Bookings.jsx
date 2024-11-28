@@ -322,13 +322,7 @@ export default function ReservationCalendar() {
               )}
             </div>
             <div className="flex justify-center w-full sm:w-auto">
-              <Button
-                onClick={() => setIsCalendarModalOpen(true)}
-                className="px-6 py-2 text-sm rounded-lg w-full sm:w-auto"
-              >
-                <CalendarIcon className="mr-2 h-5 w-5" />
-                Open Calendar
-              </Button>
+              
             </div>
           </div>
           {activeFilters.length > 0 && (
