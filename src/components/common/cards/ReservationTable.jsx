@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback  } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,10 +48,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { useReservationsContext } from "@/context/reservationContext";
 import Slogo from "@/assets/images/SchoolLogo.png";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useAdditionalFees } from "@/context/additionalFeeContext";
-
-
-
 
 const calculateNumberOfNights = (checkInDate, checkOutDate) => {
   const checkIn = new Date(checkInDate);
@@ -79,253 +75,40 @@ export default function ReservationsTable({ data = [], keys }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [userRole, setUserRole] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [feeDescription, setFeeDescription] = useState("");
+  const [feeAmount, setFeeAmount] = useState("");
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
+  const [fees, setFees] = useState([]);
   const [newFee, setNewFee] = useState("");
 
-  const { additionalFees, addFee, deleteFee, calculateTotalWithFees } =
-    useAdditionalFees();
-  const [selectedFees, setSelectedFees] = useState([]);
-  const [feeDescription, setFeeDescription] = useState("");
-  const [feeAmount, setFeeAmount] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleAddFee = useCallback(async () => {
-    if (!feeDescription || !feeAmount) {
-      toast({
-        title: "Error",
-        description: "Please enter both description and amount.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!selectedGuest?.receiptId) {
-      toast({
-        title: "Error",
-        description: "No receipt selected.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
+  // Add fee to the fees list
+  const addFee = () => {
+    if (feeDescription && feeAmount) {
       const newFee = {
-        receiptID: selectedGuest.receiptId,
-        name: feeDescription,
-        amount: parseFloat(feeAmount),
+        description: feeDescription,
+        amount: feeAmount,
       };
 
-      const addedFee = await addFee(newFee);
-      setSelectedFees(prev => [...prev, addedFee]);
-      setFeeDescription("");
-      setFeeAmount("");
-
-      if (selectedGuest) {
-        const updatedTotal = calculateTotalWithFees(
-          selectedGuest.receiptSubTotal,
-          [...selectedFees, addedFee]
-        );
-        
-        setSelectedGuest(prev => ({
-          ...prev,
-          receiptTotal: updatedTotal
-        }));
-      }
-
-      toast({
-        title: "Success",
-        description: "Additional fee has been added successfully.",
-        variant: "success",
-      });
-    } catch (error) {
-      console.error("Failed to add fee:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add additional fee.",
-        variant: "destructive",
-      });
+      setFees([...fees, newFee]); // Add the new fee
+      setFeeDescription(''); // Clear the description input
+      setFeeAmount(''); // Clear the amount input
     }
-  }, [feeDescription, feeAmount, selectedGuest, selectedFees, addFee, calculateTotalWithFees]);
+  };
 
-  // Additional Fees Dialog Content
-  const AdditionalFeesContent = () => (
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle className="text-xl font-bold">Additional Fees</DialogTitle>
-        <DialogDescription className="text-sm text-gray-500">
-          Add or manage additional fees for this reservation
-        </DialogDescription>
-      </DialogHeader>
+  const deleteFee = (index) => {
+    const updatedFees = fees.filter((_, i) => i !== index); // Filter out the fee
+    setFees(updatedFees); // Update the state with the new fees list
+  };
 
-      <div className="space-y-4 mt-4">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-semibold mb-2">Current Fees</h4>
-          <ScrollArea className="h-[150px] rounded-md border p-2">
-            {selectedFees.length > 0 ? (
-              selectedFees.map((fee) => (
-                <div
-                  key={fee.additional_fee_id}
-                  className="flex items-center justify-between py-2 px-3 hover:bg-gray-100 rounded-md"
-                >
-                  <div>
-                    <span className="font-medium">{fee.additional_fee_name}</span>
-                    <span className="text-sm text-gray-600 ml-2">
-                      ({formatCurrency(fee.additional_fee_amount)})
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteFee(fee.additional_fee_id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center py-4">No additional fees</p>
-            )}
-          </ScrollArea>
-        </div>
-
-        <div className="space-y-3">
-          <div>
-            <Label htmlFor="feeDescription">Description</Label>
-            <Input
-              id="feeDescription"
-              value={feeDescription}
-              onChange={(e) => setFeeDescription(e.target.value)}
-              placeholder="Enter fee description"
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="feeAmount">Amount</Label>
-            <div className="relative mt-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                ₱
-              </span>
-              <Input
-                id="feeAmount"
-                type="number"
-                value={feeAmount}
-                onChange={(e) => setFeeAmount(e.target.value)}
-                placeholder="0.00"
-                className="pl-7"
-              />
-            </div>
-          </div>
-
-          <Button
-            onClick={handleAddFee}
-            className="w-full"
-          >
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Add Fee
-          </Button>
-        </div>
-
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">Total Additional Fees:</span>
-            <span className="text-blue-600 font-bold">
-              {formatCurrency(
-                selectedFees.reduce((sum, fee) => sum + fee.additional_fee_amount, 0)
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-    </DialogContent>
-  );
-
-  
-
-  // Optimize fee deletion with useCallback
-  const handleDeleteFee = useCallback(async (feeId) => {
-    if (!feeId) {
-      toast({
-        title: "Error",
-        description: "Invalid fee ID.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await deleteFee(feeId);
-      
-      setSelectedFees(prev => prev.filter(fee => fee.additional_fee_id !== feeId));
-
-      // Update the total amount after removing the fee
-      if (selectedGuest) {
-        const updatedFees = selectedFees.filter(fee => fee.additional_fee_id !== feeId);
-        const newTotal = calculateTotalWithFees(
-          selectedGuest.receiptSubTotal,
-          updatedFees
-        );
-        
-        setSelectedGuest(prev => ({
-          ...prev,
-          receiptTotal: newTotal
-        }));
-      }
-
-      toast({
-        title: "Success",
-        description: "Additional fee has been deleted successfully.",
-        variant: "success",
-      });
-    } catch (error) {
-      console.error("Error deleting fee:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete additional fee.",
-        variant: "destructive",
-      });
-    }
-  }, [selectedGuest, selectedFees, deleteFee, calculateTotalWithFees]);
-
-  // Load fees only when selectedGuest changes
-  useEffect(() => {
-    const loadFees = async () => {
-      if (!selectedGuest?.receiptId) return;
-      
-      try {
-        const response = await fetch("http://localhost:5000/api/getAddFees2");
-        if (!response.ok) throw new Error("Failed to fetch fees");
-        const data = await response.json();
-        
-        setSelectedFees(data);
-
-        // Update total with fees
-        if (selectedGuest) {
-          const newTotal = calculateTotalWithFees(
-            selectedGuest.receiptSubTotal,
-            data
-          );
-          setSelectedGuest(prev => ({
-            ...prev,
-            receiptTotal: newTotal
-          }));
-        }
-      } catch (error) {
-        console.error("Error loading fees:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load additional fees.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    loadFees();
-  }, [selectedGuest?.receiptId, calculateTotalWithFees]);
-
+  // Save the fees
+  const saveFees = () => {
+    // Logic to save the fees (e.g., sending to an API or updating the state)
+    console.log("Fees saved:", fees);
+    setIsOpen(false); // Close the modal after saving
+  };
 
   useEffect(() => {
     // Get the user role from local storage
@@ -339,7 +122,7 @@ export default function ReservationsTable({ data = [], keys }) {
       console.log(selectedGuest.guestType);
       fetchPrice(selectedGuest.guestType); // Pass the correct value to fetchPrice
     }
-  }, []);
+  }, [selectedGuest, setClientType]);
 
   useEffect(() => {
     if (price) {
@@ -372,12 +155,11 @@ export default function ReservationsTable({ data = [], keys }) {
           receiptSubTotal: reservation.receipt_initial_total,
           additionalNotes: reservation.additional_notes,
           receiptDiscounts: [],
-          receiptAddFees:[],
           reservationRoomID: [],
           reservationVenueID: [],
         };
       }
-     
+
       // Process receipt discounts
       reservation.receipt_discounts.forEach((discount) => {
         if (
@@ -387,17 +169,6 @@ export default function ReservationsTable({ data = [], keys }) {
           )
         ) {
           acc[key].receiptDiscounts.push(discount);
-        }
-      });
-
-      reservation.receipt_additional_fees.forEach((addfees) => {
-        if (
-          addfees &&
-          !acc[key].receiptAddFees.some(
-            (d) => d.additional_fee_id === addfees.additional_fee_id
-          )
-        ) {
-          acc[key].receiptAddFees.push(addfees);
         }
       });
 
@@ -441,6 +212,86 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   };
 
+  // console.log("grouped data:" , groupedData);
+
+  // const handleGeneratePDF = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/api/generate-pdf", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         guest_id: selectedGuest.guestId,
+  //         reservation_ids:
+  //           selectedGuest.reservationType === "both"
+  //             ? [
+  //                 ...selectedGuest.reservationRoomID,
+  //                 ...selectedGuest.reservationVenueID,
+  //               ]
+  //             : selectedGuest.reservationType === "room"
+  //             ? selectedGuest.reservationRoomID
+  //             : selectedGuest.reservationVenueID,
+  //         type: selectedGuest.reservationType,
+  //       }),
+  //     });
+
+  //     // Check if response is not OK
+  //     if (!response.ok) {
+  //       const contentType = response.headers.get("content-type");
+  //       if (contentType && contentType.includes("application/json")) {
+  //         const errorData = await response.json();
+  //         throw new Error(errorData.error || "Failed to generate PDF");
+  //       }
+  //       throw new Error("Failed to generate PDF");
+  //     }
+
+  //     // Process the response if it's a PDF
+  //     const contentType = response.headers.get("content-type");
+  //     if (contentType && contentType.includes("application/pdf")) {
+  //       // Convert response to blob
+  //       const blob = await response.blob();
+
+  //       // Create URL for the blob
+  //       const url = window.URL.createObjectURL(blob);
+
+  //       // Create a temporary anchor element to trigger the download
+  //       const link = document.createElement("a");
+  //       link.href = url;
+  //       link.setAttribute("download", `guestFolio_${selectedGuest.guestName}.pdf`);
+  //       document.body.appendChild(link);
+
+  //       // Trigger download
+  //       link.click();
+
+  //       // Cleanup: remove the anchor element and revoke the blob URL
+  //       document.body.removeChild(link);
+  //       window.URL.revokeObjectURL(url);
+
+  //       // Show success toast
+  //       toast({
+  //         title: "PDF Generated",
+  //         description: "Your PDF has been generated and downloaded successfully.",
+  //         variant: "default",
+  //       });
+  //     } else {
+  //       throw new Error("Server did not return a PDF");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+
+  //     // Handle errors and show failure toast
+  //     toast({
+  //       title: "PDF Generation Failed",
+  //       description:
+  //         error instanceof Error
+  //           ? error.message
+  //           : "There was an error generating the PDF. Please try again.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
+
   const handleGeneratePDF = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/generate-pdf", {
@@ -460,9 +311,6 @@ export default function ReservationsTable({ data = [], keys }) {
               ? selectedGuest.reservationRoomID
               : selectedGuest.reservationVenueID,
           type: selectedGuest.reservationType,
-          discounts: selectedGuest.reservationDicounts,
-          addFees: selectedGuest.receiptAddFees,
-          basePrice: selectedGuest.receiptSubTotal,
         }),
       });
 
@@ -1356,14 +1204,6 @@ export default function ReservationsTable({ data = [], keys }) {
                             {formatCurrency(selectedGuest.receiptSubTotal)}
                           </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Additional Fees:</span>
-                          <span className="text-green-600">
-                          {formatCurrency(
-                            calculateTotalWithFees(0, selectedGuest.receiptAddFees)
-                          )}
-                          </span>
-                        </div>
                         {selectedGuest.receiptDiscounts.map(
                           (discount, index) => (
                             <div
@@ -1442,16 +1282,10 @@ export default function ReservationsTable({ data = [], keys }) {
                   </div>
 
                   <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogContent className="2xl:left-[75%] xl:left-[81.5%] 2xl:top-[55%] xl:top-[56%] w-[300px] h-auto z-50">
-                      <DialogHeader>
+                  <DialogContent className="2xl:left-[75%] xl:left-[81.5%] 2xl:top-[55%] xl:top-[56%] w-[300px] h-auto z-50">
+                  <DialogHeader>
                         <DialogTitle>Additional Fees</DialogTitle>
-                        <DialogDescription className="py-5">
-                          Fee Breakdown (Total:{" "}
-                          {formatCurrency(
-                            calculateTotalWithFees(0, selectedGuest.receiptAddFees)
-                          )}
-                          )
-                        </DialogDescription>
+                        <DialogDescription>Fee Breakdown:</DialogDescription>
                       </DialogHeader>
 
                       <ScrollArea className="h-[100px] overflow-hidden">
@@ -1475,7 +1309,9 @@ export default function ReservationsTable({ data = [], keys }) {
     <ScrollArea />
   </ScrollArea>
 
-                      <div className="flex flex-col gap-2">
+                      {/* Input Fields to Add Fee Name and Amount */}
+                      <div className=" flex flex-col gap-2">
+                        {/* Fee Description */}
                         <input
                           type="text"
                           value={feeDescription}
@@ -1496,17 +1332,25 @@ export default function ReservationsTable({ data = [], keys }) {
                         <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-black">₱</span> {/* Icon position */}
                         </div>
 
+                        {/* Button to Add Fee */}
                         <Button
-                          onClick={handleAddFee}
+                          onClick={addFee}
                           className="bg-blue-500 text-white mt-2"
                         >
                           <PlusCircle className="h-4 w-4 mr-2" />
                           Add Fee
                         </Button>
+
+                        {/* Save Button */}
+                        <Button
+                          onClick={saveFees} // Define the save function for your logic
+                          className="bg-green-500 text-white mt-2"
+                        >
+                          Save
+                        </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
-
                 </div>
 
                 {userRole === "Administrator" && (
