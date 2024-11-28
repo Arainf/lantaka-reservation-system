@@ -23,8 +23,10 @@ export const AdditionalFeeProvider = ({ children }) => {
       }
       const dataAdditionalFees = await response.json();
       setAdditionalFees(dataAdditionalFees);
+      return dataAdditionalFees;
     } catch (error) {
       console.error("Error fetching Additional Fees", error);
+      return [];
     }
   }, []);
 
@@ -42,39 +44,49 @@ export const AdditionalFeeProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error('Failed to add fee');
       }
-      await fetchAddFees();
+      const newFee = await response.json();
+      setAdditionalFees(prevFees => [...prevFees, newFee]);
       createNotification({
         type: 'Added',
-        description: `Additional fee "${fee.additional_fee_name}" has been  added.`,
+        description: `Additional fee "${fee.additional_fee_name}" has been added.`,
         role: 'employee',
       });
+      return newFee;
     } catch (error) {
       console.error('Error adding fee:', error);
+      throw error;
     }
-  }, [fetchAddFees, createNotification]);
+  }, [createNotification]);
 
   const updateFee = useCallback(async (id, fee) => {
     try {
       const response = await fetch(`http://localhost:5000/api/updateFee/${id}`, {
         method: 'PUT',
-        body: fee instanceof FormData ? fee : JSON.stringify(fee),
-        headers: fee instanceof FormData ? {} : { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fee),
       });
       if (!response.ok) {
         throw new Error('Failed to update fee');
       }
-      await fetchAddFees();
+      const updatedFee = await response.json();
+      setAdditionalFees(prevFees => 
+        prevFees.map(f => f.additional_fee_id === id ? updatedFee : f)
+      );
       createNotification({
         type: 'Modified',
-        description: `Additional fee "${fee.additional_fee_name}" has been  updated.`,
+        description: `Additional fee "${fee.additional_fee_name}" has been updated.`,
         role: 'employee',
       });
     } catch (error) {
       console.error('Error updating fee:', error);
+      throw error;
     }
-  }, [fetchAddFees, createNotification]);
+  }, [createNotification]);
 
   const deleteFee = useCallback(async (id) => {
+    if (!id) {
+      throw new Error('Fee ID is required for deletion');
+    }
     try {
       const response = await fetch(`http://localhost:5000/api/deleteFee/${id}`, {
         method: 'DELETE',
@@ -82,16 +94,24 @@ export const AdditionalFeeProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error('Failed to delete fee');
       }
-      await fetchAddFees();
+      setAdditionalFees(prevFees => 
+        prevFees.filter(fee => fee.additional_fee_id !== id)
+      );
       createNotification({
         type: 'Deleted',
-        description: `Additional fee "${id}" has been deleted.`,
+        description: `Additional fee has been deleted.`,
         role: 'employee',
       });
     } catch (error) {
       console.error('Error deleting fee:', error);
+      throw error;
     }
-  }, [fetchAddFees, createNotification]);
+  }, [createNotification]);
+
+  const calculateTotalWithFees = useCallback((baseTotal, selectedFees = []) => {
+    const feesTotal = selectedFees.reduce((sum, fee) => sum + (parseFloat(fee.additional_fee_amount) || 0), 0);
+    return baseTotal + feesTotal;
+  }, []);
 
   return (
     <AdditionalFeeContext.Provider
@@ -101,6 +121,7 @@ export const AdditionalFeeProvider = ({ children }) => {
         addFee,
         updateFee,
         deleteFee,
+        calculateTotalWithFees,
       }}
     >
       {children}

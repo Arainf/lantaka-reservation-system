@@ -53,6 +53,7 @@ export function EventDialog({ event, isOpen, onClose }) {
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right font-semibold">Reservations</Label>
                 <div className="col-span-3">
+                <ScrollArea className=" 2xl:h-[300px] md:h-[100px] xl:h-[200px] pr-4">
                   <div className="space-y-2">
                     {event.reservations.map((res) => (
                       <div 
@@ -72,6 +73,7 @@ export function EventDialog({ event, isOpen, onClose }) {
                       </div>
                     ))}
                   </div>
+                  </ScrollArea>
                 </div>
               </div>
               {event.description && (
