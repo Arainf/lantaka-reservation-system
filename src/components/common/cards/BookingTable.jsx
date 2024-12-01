@@ -27,10 +27,11 @@ export default function ReservationsTable({ data = [] }) {
     }
 
     const groupedData = dataToFilter.reduce((acc, reservation) => {
-      const key = `${reservation.guest_name}-${reservation.guest_email}`;
+      const key = `${reservation.timestamp}-${reservation.userData }`;
 
       if (!acc[key]) {
         acc[key] = {
+          timestamp: reservation.timestamp,
           guestId: reservation.guest_id,
           guestName: reservation.guest_name,
           guestEmail: reservation.guest_email,
@@ -43,6 +44,8 @@ export default function ReservationsTable({ data = [] }) {
           reservationCheckin: reservation.reservation_checkin,
           reservationCheckout: reservation.reservation_checkout,
           reservations: [],
+          reservationType: reservation.reservation_type,
+
           reservationRoomID: [],
           reservationVenueID: [],
         };
@@ -138,6 +141,8 @@ export default function ReservationsTable({ data = [] }) {
                     <div className="text-sm text-gray-500">
                       {reservation.guestEmail}
                     </div>
+                    
+                 
                   </div>
                 </div>
               </p>
@@ -257,12 +262,8 @@ export default function ReservationsTable({ data = [] }) {
                 <div className="flex items-center justify-between">
                   <div className="font-bold">
                     {toSentenceCase(reservation.guestName)} -{" "}
-                    {reservation.reservationRoomID.length > 0 &&
-                    reservation.reservationVenueID.length > 0
-                      ? "Room & Venue"
-                      : reservation.reservationRoomID.length > 0
-                      ? "Room"
-                      : "Venue"}
+                    {toSentenceCase(reservation.reservationType)}
+
                   </div>
                   <div className="text-sm text-gray-500">
                     {new Date(reservation.receiptDate).toLocaleDateString()}
