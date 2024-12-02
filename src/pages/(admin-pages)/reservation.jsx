@@ -55,6 +55,7 @@ export default function AdminReservation({ sidebarOpen = false, toggleSidebar = 
   }, [fetchReservations])
 
   useEffect(() => {
+    console.log("fetchReservations in parent")
     fetchReservationsAttachment()
   }, [deleteData, saveNote])
 

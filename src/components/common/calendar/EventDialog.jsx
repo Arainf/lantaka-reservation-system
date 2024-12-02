@@ -85,9 +85,6 @@ export function EventDialog({ event, isOpen, onClose }) {
             </div>
           </DialogDescription>
         </ScrollArea>
-        <DialogFooter>
-          <Button onClick={onClose} variant="outline">Close</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

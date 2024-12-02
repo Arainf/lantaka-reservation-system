@@ -59,7 +59,7 @@ const calculateNumberOfNights = (checkInDate, checkOutDate) => {
   return Math.max(nightsDiff, 1);
 };
 
-export default function ReservationsTable({ data = [], keys }) {
+export default function ReservationsTable({ data = [], keys, onDelete }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [accountToDelete, setAccountToDelete] = useState(null);
@@ -71,7 +71,7 @@ export default function ReservationsTable({ data = [], keys }) {
     "Triple Bed": 0,
     "Matrimonial Bed": 0,
   });
-  const { price, setClientType, fetchPrice, clientType } = usePriceContext();
+  const { price, setClientType, fetchPrice } = usePriceContext();
   const { setDeleteData, setSaveNote, fetchReservations, setReservationsData, reservationsData  } = useReservationsContext();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,6 +89,7 @@ export default function ReservationsTable({ data = [], keys }) {
   const [feeAmount, setFeeAmount] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const { renders, setRenderers} = useRegistrationContext();
+  const [totalAmount, setTotalAmount] = useState("");
 
 
   const handleAddFee = useCallback(async () => {
@@ -154,7 +155,6 @@ export default function ReservationsTable({ data = [], keys }) {
   }, [
     feeDescription,
     feeAmount,
-    selectedGuest,
     selectedFees,
     addFee,
     calculateTotalWithFees,
@@ -165,7 +165,12 @@ export default function ReservationsTable({ data = [], keys }) {
     async (feeId) => {
 
       try {
-        await deleteFee(feeId);
+        const delFee = {
+          receiptID: selectedGuest.receiptId,
+          feeId: feeId,
+        };
+
+        await deleteFee(delFee);
 
         setSelectedFees((prev) =>
           prev.filter((fee) => fee.additional_fee_id !== feeId)
@@ -192,6 +197,7 @@ export default function ReservationsTable({ data = [], keys }) {
           description: "Additional fee has been deleted successfully.",
           variant: "success",
         });
+        refreshTable();
         setDeleteData((prevKey) => prevKey + 1);
         setRenderers((prevKey) => prevKey + 1);
       } catch (error) {
@@ -203,7 +209,7 @@ export default function ReservationsTable({ data = [], keys }) {
         });
       }
     },
-    [selectedGuest, selectedFees, deleteFee, calculateTotalWithFees]
+    [ selectedFees, deleteFee, calculateTotalWithFees]
   );
 
   
@@ -241,7 +247,7 @@ export default function ReservationsTable({ data = [], keys }) {
     };
 
     loadFees();
-  }, [selectedGuest?.receiptId, calculateTotalWithFees, addFee, renders ]);
+  }, [selectedGuest?.receiptId, calculateTotalWithFees, addFee, renders]);
 
   useEffect(() => {
     // Get the user role from local storage
@@ -249,10 +255,11 @@ export default function ReservationsTable({ data = [], keys }) {
     setUserRole(role);
   }, []);
 
-  useEffect(() => {
-    fetchReservations()
-    setReservationsData(reservationsData)
-  },[selectedGuest?.receiptId, calculateTotalWithFees, addFee, selectedGuest, renders])
+  // useEffect(() => {
+  //   fetchReservations()
+  //   setReservationsData(reservationsData)
+  //   console.log("refresh!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+  // },[selectedGuest?.receiptId, calculateTotalWithFees, addFee])
 
 
   useEffect(() => {
@@ -353,7 +360,7 @@ export default function ReservationsTable({ data = [], keys }) {
       currentItems: currentItems,
       totalPages: Math.ceil(groupedArray.length / itemsPerPage),
     };
-  }, [data, currentPage, itemsPerPage,fetchReservations, addFee, renders, selectedGuest]);
+  }, [data, currentPage, itemsPerPage]);
 
   console.log("grouped data", groupedData);
 
@@ -382,7 +389,7 @@ export default function ReservationsTable({ data = [], keys }) {
               ? selectedGuest.reservationRoomID
               : selectedGuest.reservationVenueID,
           type: selectedGuest.reservationType,
-          discounts: selectedGuest.reservationDicounts,
+          adddiscounts: selectedGuest.receiptDiscounts,
           addFees: selectedGuest.receiptAddFees,
           basePrice: selectedGuest.receiptSubTotal,
         }),
@@ -467,10 +474,19 @@ export default function ReservationsTable({ data = [], keys }) {
   };
 
   const handleCellClick = (guest) => {
+    fetchReservations()
     setSelectedGuest(guest);
     setNotes(guest.additionalNotes || "");
     setIsDialogOpen(true);
+    setTotalAmount(guest.receiptTotal)
+    console.log("cellClick", guest)
   };
+
+  const refreshTable = () => {
+    console.log("refreshing")
+    fetchReservations()
+    // setTotalAmount(guest.receiptTotal)
+  }
 
   const handleDelete = (guest) => {
     if (userRole === "Administrator") {
@@ -691,16 +707,6 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   };
 
-  const getGuestTypeColor = (type) => {
-    switch (type.toLowerCase()) {
-      case "internal":
-        return "bg-blue-100 text-blue-800";
-      case "external":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   const getReservationTypeBadge = (type, status) => {
     switch (type.toLowerCase()) {
@@ -751,8 +757,11 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   };
 
+  // useEffect(() => {
+  //   console.log("refresh")
+  //   fetchReservations()
+  // }, [selectedGuest]);
   
-
   return (
     <>
       <Table>
@@ -1274,7 +1283,7 @@ export default function ReservationsTable({ data = [], keys }) {
                       </ScrollArea>
                       <Separator />
                       <div className="space-y-2 text-sm">
-                        <ScrollArea className="h-[40px]" >
+                        <ScrollArea className="h-[20%]" >
                         <div className="flex justify-between">
                           <span>Subtotal:</span>
                           <span>
@@ -1320,7 +1329,7 @@ export default function ReservationsTable({ data = [], keys }) {
                         <div className="flex justify-between font-bold">
                           <span>Total:</span>
                           <span>
-                            {formatCurrency(selectedGuest.receiptTotal)}
+                            {formatCurrency(totalAmount)}
                           </span>
                         </div>
                       </div>

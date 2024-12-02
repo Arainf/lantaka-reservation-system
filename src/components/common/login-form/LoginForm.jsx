@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import './loginform.css';
+import { Loader2 } from "lucide-react"
 
 const loginSchema = z.object({
   username: z.string().nonempty({
@@ -31,6 +32,7 @@ const LoginForm = () => {
   const [toastType, setToastType] = useState('error');
   const { setUserRole, setUserData } = useContext(UserContext);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -41,6 +43,7 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (values) => {
+    setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/login', {
         username: values.username,
@@ -78,6 +81,9 @@ const LoginForm = () => {
       setToastType('error');
       setToastMessage(errorMessage);
       console.error('Login failed', error);
+    } finally {
+      setIsLoading(false);
+      
     }
   };
 
@@ -133,8 +139,17 @@ const LoginForm = () => {
           />
 
           <div className="flex justify-center">
-            <Button className="LoginForm_button " type="submit">
-              <span className='poppins-semibold'>Login</span>
+            <Button className="LoginForm_button  " type="submit" disabled={isLoading}>
+                {isLoading ? (
+                    <>
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                      Checking
+                    </>
+                  ) : (
+                    <span className='poppins-regular text-sm'>
+                    Login
+                    </span>
+                  )}
             </Button>
           </div>
         </form>

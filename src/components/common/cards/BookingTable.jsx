@@ -221,8 +221,8 @@ export default function ReservationsTable({ data = [] }) {
 
   return (
     <>
-      <CardContent className="p-6">
-        <div className="mb-4 fixed bottom-[410px] flex space-x-2">
+      <CardContent className="p-1">
+        <div className="mb-4 flex space-x-1">
           <Button
             onClick={() => setFilter("all")}
             variant={filter === "all" ? "default" : "outline"}
@@ -250,7 +250,7 @@ export default function ReservationsTable({ data = [] }) {
             Sort {sortOrder === "newest" ? "Oldest" : "Newest"}
           </Button>
         </div>
-
+        <ScrollArea className="h-[48vh]">
         <div className="space-y-4">
           {filteredData.map((reservation, index) => (
             <Card
@@ -279,6 +279,7 @@ export default function ReservationsTable({ data = [] }) {
             </Card>
           ))}
         </div>
+        </ScrollArea>
       </CardContent>
       <Modal isOpen={isModalOpen} reservation={selectedReservation} onClose={closeModal} />
     </>

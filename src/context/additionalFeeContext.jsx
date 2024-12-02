@@ -83,24 +83,26 @@ export const AdditionalFeeProvider = ({ children }) => {
     }
   }, [createNotification]);
 
-  const deleteFee = useCallback(async (id) => {
-    if (!id) {
+  const deleteFee = useCallback(async (fee) => {
+    if (!fee) {
       throw new Error('Fee ID is required for deletion');
     }
     try {
-      const response = await fetch(`http://localhost:5000/api/deleteFee/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/deleteFee`, {
         method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(fee),
       });
       if (!response.ok) {
         throw new Error('Failed to delete fee');
       }
       setAdditionalFees(prevFees => 
-        prevFees.filter(fee => fee.additional_fee_id !== id)
+        prevFees.filter(fee => fee.additional_fee_id !== fee.feeId)
       );
       createNotification({
         type: 'Deleted',
         description: `Additional fee has been deleted.`,
-        role: 'employee',
+        role: 'Employee',
       });
     } catch (error) {
       console.error('Error deleting fee:', error);

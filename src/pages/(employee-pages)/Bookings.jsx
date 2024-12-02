@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import moment from "moment";
 import FullCalendar from "@fullcalendar/react";
@@ -63,6 +63,7 @@ export default function ReservationCalendar() {
   });
   const [tableKey, setTableKey] = useState(0);
   const { createNotification } = useNotifications();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   useEffect(() => {
     fetchEvents();
@@ -70,6 +71,8 @@ export default function ReservationCalendar() {
     fetchUpcomingBookings();
     fetchRecentActivities();
   }, []);
+
+  
 
   const fetchEvents = async () => {
     try {
@@ -162,6 +165,11 @@ export default function ReservationCalendar() {
     };
   };
 
+  const fetchReservationsAttachment = useCallback(async () => {
+    await fetchReservations()
+    setTableKey(prevKey => prevKey + 1)
+  }, [fetchReservations])
+
   // Importance order for statuses
   const statusOrder = {
     waiting: 1,
@@ -231,6 +239,10 @@ export default function ReservationCalendar() {
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterType]: value }));
   };
+
+  useEffect(() => {
+    fetchReservationsAttachment()
+  }, [deleteData])
 
   const resetFilters = () => {
     setFilters({ guest_type: "all", status: "all" });

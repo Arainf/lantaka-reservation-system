@@ -177,10 +177,8 @@ export default function Account() {
             </TabsContent>
 
             <TabsContent value="bookings">
-              <div className="pt-8">
-                <ScrollArea className="h-[400px]">
+              <div className="pt-1">
                   <BookingTable data={reservationsData} />
-                </ScrollArea>
               </div>
             </TabsContent>
           </Tabs>

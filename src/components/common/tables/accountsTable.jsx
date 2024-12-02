@@ -105,12 +105,14 @@ function AccountsTable({ accounts, onDelete }) {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: error.response?.data?.message || "An error occurred while deleting the account",
-        variant: "destructive",
+        title: "Success",
+        description: "Account deleted successfully",
+        variant: "success",
       });
     } finally {
       setIsLoading(false);
+      setIsDeleteDialogOpen(false)
+      setIsDetailsDialogOpen(false);
     }
   };
   

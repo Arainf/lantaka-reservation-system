@@ -27,7 +27,6 @@ export const ReservationsProvider = ({ children }) => {
     fetchReservations();
   }, [deleteData, setDeleteData]);
 
-  console.log("guests data:" , reservationsData);
 
 
   const contextValue = {

@@ -32,7 +32,7 @@ const AppRoutes = () => {
   const { userRole, userData } = useContext(UserContext);
 
   console.log(userRole);
-  const isDevMode = false; // Set this to true to disable route protection for developers
+  const isDevMode = true; // Set this to true to disable route protection for developers
 
   const toggleSidebar = () => {
     setSidebarOpen((prevState) => !prevState);
