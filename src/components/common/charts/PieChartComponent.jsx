@@ -12,8 +12,8 @@ import {
 
 // Color mapping for the chart with updated colors
 const COLORS = {
-  "Room Guests": "#7BA7E9", 
-  "Venue Visitors": "#246DDB", 
+  "Room": "#7BA7E9", 
+  "Venue": "#246DDB", 
 };
 
 const RADIAN = Math.PI / 180;
@@ -66,7 +66,7 @@ const CustomTooltip = ({ active, payload }) => {
 
 export function Component({ data, isLoading, trending }) {
   const totalVisitors = React.useMemo(() => {
-    return data ? data.reduce((acc, curr) => acc + curr.visitors, 0) : 0;
+    return data ? data.reduce((acc, curr) => acc + curr.Reservations, 0) : 0;
   }, [data]);
 
   if (isLoading) {
@@ -88,7 +88,7 @@ export function Component({ data, isLoading, trending }) {
   return (
     <Card className="flex flex-col h-[420px] w-full">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Visitors</CardTitle>
+        <CardTitle>Reservations</CardTitle>
         <CardDescription>Room vs Venue</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -103,7 +103,7 @@ export function Component({ data, isLoading, trending }) {
               outerRadius={100}
               innerRadius={60}
               fill="#8884d8"
-              dataKey="visitors"
+              dataKey="Reservations"
               nameKey="name"
             >
               {data.map((entry, index) => (
@@ -120,7 +120,7 @@ export function Component({ data, isLoading, trending }) {
         </div>
         <div className="text-center">
           <p className="text-3xl font-bold justify-between items-center mt-[-175px]">{totalVisitors.toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground">Total Visitors</p>
+          <p className="text-sm text-muted-foreground">Total</p>
         </div>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
@@ -134,7 +134,7 @@ export function Component({ data, isLoading, trending }) {
           )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for rooms and venues
+          Showing total reservations for rooms and venues
         </div>
       </CardFooter>
     </Card>

@@ -31,9 +31,9 @@ export function Component({ data, isLoading, viewMode }) {
   return (
     <Card className="w-full h-full">
       <CardHeader>
-        <CardTitle>Occupancy</CardTitle>
+        <CardTitle>Spaces Occupied</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Occupancy from {viewMode === 'monthly' ? 'monthly' : 'daily'} data
+          Occupancy from {viewMode === 'monthly' ? 'monthly' : 'weekly'} data
         </p>
       </CardHeader>
       <CardContent className="p-0">
