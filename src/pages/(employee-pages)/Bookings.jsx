@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import moment from "moment";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,16 +40,15 @@ import BookingSummary from "@/components/common/cards/BookingSummary";
 import UpcomingBooking from "@/components/common/cards/UpcomingBooking";
 import UpcomingBookingdue from "@/components/common/cards/UpcomingBookingdue";
 import { useNotifications } from "@/context/notificationContext";
+import { useReservations } from "@/context/contexts";
 
 export default function ReservationCalendar() {
   const { reservationsData, fetchReservations, deleteData, saveNote } =
     useReservationsContext();
   const [events, setEvents] = useState([]);
-  const [bookingSummary, setBookingSummary] = useState({
-    total: 0,
-    rooms: 0,
-    venues: 0,
-  });
+
+  const { bookingSummary } = useReservations();
+
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -63,7 +63,6 @@ export default function ReservationCalendar() {
   });
   const [tableKey, setTableKey] = useState(0);
   const { createNotification } = useNotifications();
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   useEffect(() => {
     fetchEvents();
@@ -71,8 +70,6 @@ export default function ReservationCalendar() {
     fetchUpcomingBookings();
     fetchRecentActivities();
   }, []);
-
-  
 
   const fetchEvents = async () => {
     try {
@@ -140,17 +137,15 @@ export default function ReservationCalendar() {
               type: event.resource.type,
             }
           )
-
-          
       );
       await Promise.all(updatePromises);
       await fetchEvents();
       handleCloseEventDialog();
       const account = localStorage.getItem("userData.first_name");
       createNotification({
-        type: 'Modified',
+        type: "Modified",
         description: `Account Name: "${account}" has updated event id "${event.reservation}".`,
-        role: 'Administrator',
+        role: "Administrator",
       });
     } catch (error) {
       console.error("Error updating events:", error);
@@ -164,11 +159,6 @@ export default function ReservationCalendar() {
         "bg-primary/10 text-primary border border-primary/20 rounded-md shadow-sm hover:bg-primary/20 transition-colors",
     };
   };
-
-  const fetchReservationsAttachment = useCallback(async () => {
-    await fetchReservations()
-    setTableKey(prevKey => prevKey + 1)
-  }, [fetchReservations])
 
   // Importance order for statuses
   const statusOrder = {
@@ -240,10 +230,6 @@ export default function ReservationCalendar() {
     setFilters((prevFilters) => ({ ...prevFilters, [filterType]: value }));
   };
 
-  useEffect(() => {
-    fetchReservationsAttachment()
-  }, [deleteData])
-
   const resetFilters = () => {
     setFilters({ guest_type: "all", status: "all" });
     setSearchTerm("");
@@ -265,17 +251,17 @@ export default function ReservationCalendar() {
   );
 
   return (
-    <main className="min-h-screen bg-background pt-[65px] px-2 sm:px-4 md:px-6 lg:px-8">
+<main className="bg-background pt-[65px] px-4 flex flex-col h-screen w-screen">
       <div className="fixed top-0 left-0 right-0 z-50 w-full">
         <NavigationTop />
       </div>
-      <div className="flex flex-col lg:flex-row gap-4 pt-[6px]">
+      <div className="flex flex-col md:flex-row h-full">
         <div className="space-y-4 flex-grow">
           <h1 className="text-2xl pt-[20px] font-bold">
             Reservations Management
           </h1>
-          <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:items-center md:justify-between mb-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full md:w-auto">
+          <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 w-full lg:w-auto">
               <div className="relative w-full">
                 <input
                   type="text"
@@ -294,7 +280,7 @@ export default function ReservationCalendar() {
                   handleFilterChange("guest_type", value)
                 }
               >
-                <SelectTrigger className="w-full ">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Guest Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -310,7 +296,7 @@ export default function ReservationCalendar() {
                 value={filters.status}
                 onValueChange={(value) => handleFilterChange("status", value)}
               >
-                <SelectTrigger className="w-full ">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -327,15 +313,13 @@ export default function ReservationCalendar() {
                   variant="ghost"
                   onClick={resetFilters}
                   title="Reset all filters"
-                  className=" text-xs w-[50px]"
+                  className="text-xs w-[50px]"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               )}
             </div>
-            <div className="flex justify-center w-full sm:w-auto">
-              
-            </div>
+           
           </div>
           {activeFilters.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
@@ -348,7 +332,7 @@ export default function ReservationCalendar() {
           )}
 
           <div className="w-full overflow-x-auto rounded-lg border bg-card">
-            <div className="min-w-[800px]">
+            <div className="min-w-screen lg:w-full">
               <ReservationsTable
                 key={tableKey}
                 data={sortedReservations}
@@ -360,49 +344,43 @@ export default function ReservationCalendar() {
           </div>
         </div>
 
-        <div className="w-full lg:w-[320px] mt-3 ">
-          <div className="mb-5">
-            <BookingSummary data={sortedReservations} />
-          </div>
-          <div className="mb-5">
-            <UpcomingBooking data={sortedReservations} />
-          </div>
-
-          <div className="mb-5">
-            <UpcomingBookingdue data={sortedReservations} />
-          </div>
+        <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 ">
+          <Card>
+            <CardHeader>
+              <CardTitle>Booking Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold">
+                    {bookingSummary.total}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">
+                    {bookingSummary.rooms}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Rooms</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">
+                    {bookingSummary.venues}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Venues</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <UpcomingBooking data={sortedReservations} />
+          <UpcomingBookingdue data={sortedReservations} />
         </div>
       </div>
 
-      <Dialog open={isCalendarModalOpen} onOpenChange={setIsCalendarModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Reservation Calendar</DialogTitle>
-          </DialogHeader>
-          <div className="flex-[2] p-6">
-            <FullCalendar
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              events={events}
-              eventClick={handleEventClick}
-              editable={false}
-              selectable={true}
-              headerToolbar={{
-                left: "prev,next",
-                center: "title",
-                right: "",
-              }}
-              eventContent={renderEventContent}
-              eventClassNames={eventStyleGetter}
-              height="auto"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-
+    
       {isEventDialogOpen && (
         <Dialog open={isEventDialogOpen} onOpenChange={handleCloseEventDialog}>
-          <DialogContent>
+          <DialogContent className="w-[90vw] max-w-lg">
             <DialogHeader>
               <DialogTitle>Edit Reservation</DialogTitle>
               <DialogDescription>
@@ -450,12 +428,18 @@ function renderEventContent(eventInfo) {
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="w-full h-full p-1">
-            <div className="text-xs font-medium">{eventInfo.event.title}</div>
+            <div className="text-[10px] sm:text-xs font-medium truncate">
+              {eventInfo.event.title}
+            </div>
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Rooms: {eventInfo.event.extendedProps.rooms.length}</p>
-          <p>Venues: {eventInfo.event.extendedProps.venues.length}</p>
+          <p className="text-xs sm:text-sm">
+            Rooms: {eventInfo.event.extendedProps.rooms.length}
+          </p>
+          <p className="text-xs sm:text-sm">
+            Venues: {eventInfo.event.extendedProps.venues.length}
+          </p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
