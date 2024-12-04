@@ -54,6 +54,8 @@ export default function CalendarPage() {
                  ? '#FB923C'
                  : reservation.status === 'onUse' 
                  ? '#60A5FA'
+                 : reservation.status === 'done' 
+                 ? '#c084fc'
                  : '#10B981' // Default to green if not waiting or cancelled
         };
         acc.push(group);
