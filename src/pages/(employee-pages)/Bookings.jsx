@@ -255,7 +255,7 @@ export default function ReservationCalendar() {
       <div className="fixed top-0 left-0 right-0 z-50 w-full">
         <NavigationTop />
       </div>
-      <div className="flex flex-col md:flex-row h-ful">
+      <div className="flex flex-col md:flex-row h-full">
         <div className="space-y-4 flex-grow">
           <h1 className="text-2xl pt-[20px] font-bold">
             Reservations Management
@@ -319,14 +319,7 @@ export default function ReservationCalendar() {
                 </Button>
               )}
             </div>
-            <div className="flex justify-center w-full sm:w-auto">
-              <Button
-                onClick={() => setIsCalendarModalOpen(true)}
-                className="w-full sm:w-auto"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" /> View Calendar
-              </Button>
-            </div>
+           
           </div>
           {activeFilters.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
@@ -351,7 +344,7 @@ export default function ReservationCalendar() {
           </div>
         </div>
 
-        <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 border-l">
+        <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 ">
           <Card>
             <CardHeader>
               <CardTitle>Booking Summary</CardTitle>
@@ -384,38 +377,7 @@ export default function ReservationCalendar() {
         </div>
       </div>
 
-      <Dialog open={isCalendarModalOpen} onOpenChange={setIsCalendarModalOpen}>
-        <DialogContent className="w-[90vw] max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Reservation Calendar</DialogTitle>
-          </DialogHeader>
-          <div className="flex-[2] p-2 sm:p-4 md:p-6">
-            <FullCalendar
-              plugins={[
-                dayGridPlugin,
-                timeGridPlugin,
-                listPlugin,
-                interactionPlugin,
-              ]}
-              initialView="dayGridMonth"
-              events={events}
-              eventClick={handleEventClick}
-              editable={false}
-              selectable={true}
-              headerToolbar={{
-                left: "prev,next",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,listWeek",
-              }}
-              eventContent={renderEventContent}
-              eventClassNames={eventStyleGetter}
-              height="auto"
-              aspectRatio={1.35}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-
+    
       {isEventDialogOpen && (
         <Dialog open={isEventDialogOpen} onOpenChange={handleCloseEventDialog}>
           <DialogContent className="w-[90vw] max-w-lg">
