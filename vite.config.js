@@ -9,7 +9,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: '0.0.0.0',  // Required for Docker to bind
+    port: 5173,
+  },
   build: {
-    outDir: 'dist', // Ensure the build output is in 'dist'
-  }
+    outDir: 'dist',
+  },
 })

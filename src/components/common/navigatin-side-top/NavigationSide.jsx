@@ -49,12 +49,25 @@ const navLinks = [
   
 ];
 
+const handleLogout = async () => {
+  setIsLoading(true);
+  try {
+    localStorage.clear();
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+    navigate("/");
+  } catch (error) {
+    console.error("Error logging out:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 // Array of additional navigation links (bottom) 
 const navMoreInfo = [
   {
     icon: <BiLogOut style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Logout
     display: "Logout", // Text displayed for Logout
-    url: "/" // URL for Logout
+    url: handleLogout // URL for Logout
   },
 ];
 
@@ -137,7 +150,7 @@ const NavigationSide = ({ isOpen }) => {
 
       <nav className="navstyleBottom">
         {navMoreInfo.map((item, index) => (
-          <NavLink key={index} to={item.url} className="navMoreInfo">
+          <NavLink key={index} onClick={item.url} className="navMoreInfo">
             {item.icon}
             <span className="linkTextStyle" style={linkTextStyle}>
               {item.display}

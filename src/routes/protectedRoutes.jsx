@@ -1,6 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { UserContext } from '@/context/contexts';
+import React, { Suspense } from 'react';
+
+
 
 const ProtectedRoute = ({ element, allowedRoles, isDevMode = false }) => {
   const { userRole } = useContext(UserContext);

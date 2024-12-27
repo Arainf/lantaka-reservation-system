@@ -22,6 +22,7 @@ const NavigationTop = memo(({ handleBackToHome }) => {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
+      localStorage.clear();
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
       navigate("/");
     } catch (error) {

@@ -2,11 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import listPlugin from "@fullcalendar/list";
-import interactionPlugin from "@fullcalendar/interaction";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,15 +11,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarIcon, ActivityIcon, Search, RefreshCw } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -36,39 +24,28 @@ import { Badge } from "@/components/ui/badge";
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import ReservationsTable from "@/components/common/tables/ReservationsTable";
 import { useReservationsContext } from "@/context/reservationContext";
-import BookingSummary from "@/components/common/cards/BookingSummary";
-import UpcomingBooking from "@/components/common/cards/UpcomingBooking";
-import UpcomingBookingdue from "@/components/common/cards/UpcomingBookingdue";
 import { useNotifications } from "@/context/notificationContext";
 import { useReservations } from "@/context/contexts";
 
 export default function ReservationCalendar() {
-  const { reservationsData, fetchReservations, deleteData, saveNote } =
-    useReservationsContext();
+  const { reservationsData, fetchReservations } = useReservationsContext();
   const [events, setEvents] = useState([]);
-
   const { bookingSummary } = useReservations();
-
-  const [upcomingBookings, setUpcomingBookings] = useState([]);
-  const [recentActivities, setRecentActivities] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [editedEvent, setEditedEvent] = useState(null);
-  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({ guest_type: "all", status: "all" });
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: "ascending",
   });
-  const [tableKey, setTableKey] = useState(0);
   const { createNotification } = useNotifications();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetchEvents();
     fetchBookingSummary();
-    fetchUpcomingBookings();
-    fetchRecentActivities();
   }, []);
 
   const fetchEvents = async () => {
@@ -88,28 +65,6 @@ export default function ReservationCalendar() {
       setBookingSummary(response.data);
     } catch (error) {
       console.error("Error fetching booking summary:", error);
-    }
-  };
-
-  const fetchUpcomingBookings = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/api/upcoming-bookings"
-      );
-      setUpcomingBookings(response.data);
-    } catch (error) {
-      console.error("Error fetching upcoming bookings:", error);
-    }
-  };
-
-  const fetchRecentActivities = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:5000/api/recent-activities"
-      );
-      setRecentActivities(response.data);
-    } catch (error) {
-      console.error("Error fetching recent activities:", error);
     }
   };
 
@@ -153,14 +108,6 @@ export default function ReservationCalendar() {
     }
   };
 
-  const eventStyleGetter = () => {
-    return {
-      className:
-        "bg-primary/10 text-primary border border-primary/20 rounded-md shadow-sm hover:bg-primary/20 transition-colors",
-    };
-  };
-
-  // Importance order for statuses
   const statusOrder = {
     waiting: 1,
     ready: 2,
@@ -170,7 +117,6 @@ export default function ReservationCalendar() {
     cancelled: 6,
   };
 
-  // Filter and sort the reservations
   const filteredReservations = reservationsData
     .filter((reservation) => {
       const matchesSearch =
@@ -189,7 +135,6 @@ export default function ReservationCalendar() {
       return matchesSearch && matchesGuestType && matchesStatus;
     })
     .sort((a, b) => {
-      // Sort by the importance of status
       return statusOrder[a.status] - statusOrder[b.status];
     });
 
@@ -222,7 +167,6 @@ export default function ReservationCalendar() {
   };
 
   const handleDelete = (reservation) => {
-    // Implement delete functionality
     console.log(`Deleting reservation for ${reservation.guest_name}`);
   };
 
@@ -250,13 +194,54 @@ export default function ReservationCalendar() {
     ([_, value]) => value !== "all"
   );
 
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
   return (
-<main className="bg-background pt-[65px] px-4 flex flex-col h-screen w-screen">
+    <main className="bg-background pt-[65px] px-4 flex flex-col h-screen w-screen">
       <div className="fixed top-0 left-0 right-0 z-50 w-full">
         <NavigationTop />
       </div>
-      <div className="flex flex-col md:flex-row h-full">
-        <div className="space-y-4 flex-grow">
+      <div className="flex flex-row h-full relative">
+        {/* Booking Summary Drawer */}
+        <div
+          className={`fixed left-0 top-[65px] bottom-0 bg-white shadow-lg transition-transform duration-300 ease-in-out transform ${
+            isDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          style={{ width: '300px', zIndex: 40 }}
+        >
+          <Button
+            onClick={toggleDrawer}
+            className="absolute -right-10 bottom-0 transform -translate-y-1/2 bg-primary text-white p-2 rounded-r-md"
+          >
+            {isDrawerOpen ? <ChevronLeft /> : <ChevronRight />}
+          </Button>
+          <Card className="h-full">
+            <CardHeader className="text-center">
+              <CardTitle>Booking Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold">{bookingSummary.total}</div>
+                  <div className="text-sm text-muted-foreground">Total</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{bookingSummary.rooms}</div>
+                  <div className="text-sm text-muted-foreground">Rooms</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{bookingSummary.venues}</div>
+                  <div className="text-sm text-muted-foreground">Venues</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <div className={`space-y-4 flex-grow transition-all duration-300 ${isDrawerOpen ? 'ml-[300px]' : ''}`}>
           <h1 className="text-2xl pt-[20px] font-bold">
             Reservations Management
           </h1>
@@ -276,9 +261,7 @@ export default function ReservationCalendar() {
               </div>
               <Select
                 value={filters.guest_type}
-                onValueChange={(value) =>
-                  handleFilterChange("guest_type", value)
-                }
+                onValueChange={(value) => handleFilterChange("guest_type", value)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Guest Type" />
@@ -319,7 +302,6 @@ export default function ReservationCalendar() {
                 </Button>
               )}
             </div>
-           
           </div>
           {activeFilters.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
@@ -334,7 +316,6 @@ export default function ReservationCalendar() {
           <div className="w-full overflow-x-auto rounded-lg border bg-card">
             <div className="min-w-screen lg:w-full">
               <ReservationsTable
-                key={tableKey}
                 data={sortedReservations}
                 onDelete={handleDelete}
                 onSort={handleSort}
@@ -343,41 +324,8 @@ export default function ReservationCalendar() {
             </div>
           </div>
         </div>
-
-        <div className="flex flex-col md:w-1/3 h-auto p-6 space-y-3 ">
-          <Card>
-            <CardHeader>
-              <CardTitle>Booking Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold">
-                    {bookingSummary.total}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Total</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">
-                    {bookingSummary.rooms}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Rooms</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">
-                    {bookingSummary.venues}
-                  </div>
-                  <div className="text-sm text-muted-foreground">Venues</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <UpcomingBooking data={sortedReservations} />
-          <UpcomingBookingdue data={sortedReservations} />
-        </div>
       </div>
 
-    
       {isEventDialogOpen && (
         <Dialog open={isEventDialogOpen} onOpenChange={handleCloseEventDialog}>
           <DialogContent className="w-[90vw] max-w-lg">
@@ -422,26 +370,3 @@ export default function ReservationCalendar() {
   );
 }
 
-function renderEventContent(eventInfo) {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="w-full h-full p-1">
-            <div className="text-[10px] sm:text-xs font-medium truncate">
-              {eventInfo.event.title}
-            </div>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className="text-xs sm:text-sm">
-            Rooms: {eventInfo.event.extendedProps.rooms.length}
-          </p>
-          <p className="text-xs sm:text-sm">
-            Venues: {eventInfo.event.extendedProps.venues.length}
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}

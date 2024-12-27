@@ -189,10 +189,10 @@ const AdminDashboard = () => {
             <div>
               <h1 className="text-xl text-gray-400">Home / Dashboard</h1>
               <h2 className="text-3xl font-bold">
-                Welcome back, Hotel Manager!
+                Welcome back, Administrator!
               </h2>
               <p className="text-gray-500">
-                Here's what's happening with your hotel today.
+                Here's what's happening with your system today.
               </p>
             </div>
             <div className="hidden lg:flex items-center space-x-4">

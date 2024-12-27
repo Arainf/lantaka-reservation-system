@@ -1,7 +1,9 @@
 "use client"
+import React from "react";
+const LazyLoginForm = React.lazy(() => import('@/components/common/login-form/LoginForm'));
 
-import LoginForm from "../../components/common/login-form/LoginForm";
 import LogoLRRS from "@/assets/images/LRSlogo.png";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 import '../../components/common/login-form/LoginForm';
 import LantakaBg from "../../assets/images/DJI_0198.webp";
 
@@ -18,8 +20,8 @@ const LoginPage = () => {
         className="flex justify-center items-center min-h-screen ">
         <div
           className="w-96 p-6 z-10 form-title">
-          <img src={LogoLRRS} className="mb-[-8%]"/>
-          <LoginForm />
+          <LazyLoadImage src={LogoLRRS} className="mb-[-8%]" loading="lazy"  />
+          <LazyLoginForm />
         </div>
       </div>
     </div>

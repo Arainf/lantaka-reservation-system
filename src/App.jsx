@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 // import { lazyLoad } from './utils/lazyLoad';
-import AppRoutes from './routes/routes';  // Import the routing setup
+const LazyAppRoutes = React.lazy(() => import('./routes/routes'));
+
 import { UserProvider, AccountProvider, ReservationProvider, RoomandVenueProvider } from './context/contexts';
 import { PriceProvider } from './context/priceContext';
 import { GuestProvider } from './context/guestContext';
@@ -37,7 +38,7 @@ function App() {
                       <DiscountProvider>
                       <RoomTypeProvider>
                         < AdditionalFeeProvider>
-                          <AppRoutes />
+                          <LazyAppRoutes />
                         </AdditionalFeeProvider>
                       </RoomTypeProvider>
                       </DiscountProvider>

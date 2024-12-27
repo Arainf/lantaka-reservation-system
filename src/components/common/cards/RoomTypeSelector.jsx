@@ -90,7 +90,7 @@ const RoomAndVenueSelector = () => {
               <div className="flex justify-between items-center">
                 <div className="font-semibold truncate">{room.room_name}</div>
                 <div className={`text-xs font-medium ${getStatusColor(currentStatus)}`}>
-                  {currentStatus}
+                  {currentStatus || cleaningTime}
                 </div>
               </div>
             </Card>

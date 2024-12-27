@@ -39,10 +39,6 @@ export const UserProvider = ({ children }) => {
     [userRole, userData]
   );
 
-  if (loading) {
-    return <div>Loading...</div>; 
-  }
-
   return (
     <UserContext.Provider value={value}>
       {children}

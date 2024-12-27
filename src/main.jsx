@@ -1,16 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+const LazyApp = React.lazy(() => import('./App'));
 
 import {
-  BrowserRouter,
+  HashRouter, // Switch from BrowserRouter to HashRouter
 } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <HashRouter>
+      <LazyApp />
+    </HashRouter>
   </React.StrictMode>
 );
