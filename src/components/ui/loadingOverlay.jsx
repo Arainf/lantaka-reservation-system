@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Spinner from "./Spinner";
+import Spinner from "./spinner";
 import LantakaBg from "../../assets/images/DJI_0198.webp";
 
 const LoadingOverlay = ({ isLoading }) => {
