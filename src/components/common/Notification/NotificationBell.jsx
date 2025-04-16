@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Bell, Plus, Trash2, Calendar, Pencil } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useNotifications } from "@/context/NotificationContext";
+import { useNotifications } from "@/context/notificationContext";
 
 const NotificationBell = () => {
   const { notifications, markAllAsRead } = useNotifications();
