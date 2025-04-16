@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom"; // Import NavLink for routing
+import { NavLink, Navigate } from "react-router-dom"; // Import NavLink for routing
 import { FaHome } from "react-icons/fa"; // Import home icon
 import { IoCalendarSharp } from "react-icons/io5"; // Import calendar icon
 import { FaPeopleGroup } from "react-icons/fa6"; // Import people group icon
@@ -49,16 +49,14 @@ const navLinks = [
   
 ];
 
+
 const handleLogout = async () => {
-  setIsLoading(true);
   try {
     localStorage.clear();
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-    navigate("/");
   } catch (error) {
     console.error("Error logging out:", error);
   } finally {
-    setIsLoading(false);
+    console.log("logging out successful");
   }
 };
 
@@ -67,7 +65,7 @@ const navMoreInfo = [
   {
     icon: <BiLogOut style={{ height: '1rem', width: '1rem', margin: '5px 0' }} />, // Icon for Logout
     display: "Logout", // Text displayed for Logout
-    url: handleLogout // URL for Logout
+    url: "/" // URL for Logout
   },
 ];
 
@@ -150,7 +148,7 @@ const NavigationSide = ({ isOpen }) => {
 
       <nav className="navstyleBottom">
         {navMoreInfo.map((item, index) => (
-          <NavLink key={index} onClick={item.url} className="navMoreInfo">
+          <NavLink key={index} onClick={handleLogout} to={item.url} className="navMoreInfo">
             {item.icon}
             <span className="linkTextStyle" style={linkTextStyle}>
               {item.display}

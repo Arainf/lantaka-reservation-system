@@ -432,9 +432,6 @@ export default function VenueRoomManagement({
 
     }
   };
-
-  console.log("room Type: " , roomTypes)
-
   return (
     <>
       <div className="flex flex-row overflow-hidden relative w-screen h-screen bg-gray-100">

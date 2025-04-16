@@ -62,9 +62,8 @@ export const AccountProvider = ({ children }) => {
         }
         const data = await res.json();
         setAccountData(data);
-        console.log("Fetched account data:", data);  // Log fetched data
       } catch (error) {
-        console.error('Failed to fetch account data:', error);
+        console.error(error)
       }
     };
 

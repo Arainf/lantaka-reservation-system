@@ -27,6 +27,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/hooks/use-toast"
 import DeleteConfirmationDialog from '../cards/DeleteConfirmationDialog'
 import axios from 'axios'
+import { useAccountContext } from "@/context/contexts"
 
 function AccountsTable({ accounts, onDelete }) {
   const [selectedAccount, setSelectedAccount] = useState(null)
@@ -38,6 +39,7 @@ function AccountsTable({ accounts, onDelete }) {
   const totalPages = Math.ceil(accounts.length / itemsPerPage)
   const currentAccounts = accounts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
   const { toast } = useToast()
+  const { fetchAccountData } = useAccountContext()
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -72,6 +74,7 @@ function AccountsTable({ accounts, onDelete }) {
     try {
       // First, verify the password
       const verifyResponse = await axios.post('http://localhost:5000/deletelogin', {
+        email: username.email,
         username: username.username,
         password: values.password,
       });
@@ -110,6 +113,7 @@ function AccountsTable({ accounts, onDelete }) {
         variant: "success",
       });
     } finally {
+      fetchAccountData();
       setIsLoading(false);
       setIsDeleteDialogOpen(false)
       setIsDetailsDialogOpen(false);
