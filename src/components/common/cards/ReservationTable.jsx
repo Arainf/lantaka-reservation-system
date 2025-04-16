@@ -42,7 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { usePriceContext } from "@/context/PriceContext";
+import { usePriceContext } from "@/context/priceContext";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { useReservationsContext } from "@/context/reservationContext";
