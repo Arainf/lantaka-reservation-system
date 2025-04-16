@@ -53,6 +53,8 @@ export default function Account() {
       phone: account.phone,
       date_of_birth: account.dob,
     };
+
+    // safe
   
     setIsSaving(true);  // Set loading state
     try {
