@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createIcons, icons } from "lucide";
 import NavigationSide from "@/components/common/navigatin-side-top/NavigationSide";
 import NavigationTop from "@/components/common/navigatin-side-top/NavigationTop";
-import GuestTable from "@/components/common/tables/GuestTable";
+import GuestTable from "@/components/common/tables/guesttable";
 import { Search, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
