@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Loader2, Mail, Phone, User, Building2 } from 'lucide-react';
 import NavigationTop from "@/components/common/navigatin-side-top/clientNavigationTop";
 import BookingTable from "@/components/common/cards/BookingTable";
