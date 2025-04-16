@@ -16,7 +16,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form"
-import { usePriceContext } from "@/context/PriceContext"
+import { usePriceContext } from "@/context/priceContext"
 import {
   Select,
   SelectContent,
