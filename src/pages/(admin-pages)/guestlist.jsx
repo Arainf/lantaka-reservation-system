@@ -8,7 +8,7 @@ import GuestTable from "@/components/common/tables/guesttable";
 import { Search, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useGuestContext } from "@/context/GuestContext";
+import { useGuestContext } from "@/context/guestContext";
 import { Input } from "@/components/ui/input";
 import {
   Select,
