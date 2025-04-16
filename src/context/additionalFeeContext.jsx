@@ -15,9 +15,12 @@ export const AdditionalFeeProvider = ({ children }) => {
   const [additionalFees, setAdditionalFees] = useState([]);
   const { createNotification } = useNotifications();
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   const fetchAddFees = useCallback(async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getAddFees2`);
+      const response = await fetch(`${API_BASE_URL}/api/getAddFees2`);
       if (!response.ok) {
         throw new Error("Failed to fetch Additional Fees");
       }
@@ -28,15 +31,15 @@ export const AdditionalFeeProvider = ({ children }) => {
       console.error("Error fetching Additional Fees", error);
       return [];
     }
-  }, []);
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     fetchAddFees();
-  }, []);
+  }, [fetchAddFees]);
 
   const addFee = useCallback(async (fee) => {
     try {
-      const response = await fetch('http://localhost:5000/api/addFee', {
+      const response = await fetch(`${API_BASE_URL}/api/addFee`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fee),
@@ -56,11 +59,11 @@ export const AdditionalFeeProvider = ({ children }) => {
       console.error('Error adding fee:', error);
       throw error;
     }
-  }, [createNotification]);
+  }, [API_BASE_URL, createNotification]);
 
   const updateFee = useCallback(async (id, fee) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/updateFee/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/updateFee/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fee),
@@ -69,7 +72,7 @@ export const AdditionalFeeProvider = ({ children }) => {
         throw new Error('Failed to update fee');
       }
       const updatedFee = await response.json();
-      setAdditionalFees(prevFees => 
+      setAdditionalFees(prevFees =>
         prevFees.map(f => f.additional_fee_id === id ? updatedFee : f)
       );
       createNotification({
@@ -81,14 +84,14 @@ export const AdditionalFeeProvider = ({ children }) => {
       console.error('Error updating fee:', error);
       throw error;
     }
-  }, [createNotification]);
+  }, [API_BASE_URL, createNotification]);
 
   const deleteFee = useCallback(async (fee) => {
     if (!fee) {
       throw new Error('Fee ID is required for deletion');
     }
     try {
-      const response = await fetch(`http://localhost:5000/api/deleteFee`, {
+      const response = await fetch(`${API_BASE_URL}/api/deleteFee`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fee),
@@ -96,19 +99,19 @@ export const AdditionalFeeProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error('Failed to delete fee');
       }
-      setAdditionalFees(prevFees => 
-        prevFees.filter(fee => fee.additional_fee_id !== fee.feeId)
+      setAdditionalFees(prevFees =>
+        prevFees.filter(f => f.additional_fee_id !== fee.feeId)
       );
       createNotification({
         type: 'Deleted',
         description: `Additional fee has been deleted.`,
-        role: 'Employee',
+        role: 'employee',
       });
     } catch (error) {
       console.error('Error deleting fee:', error);
       throw error;
     }
-  }, [createNotification]);
+  }, [API_BASE_URL, createNotification]);
 
   const calculateTotalWithFees = useCallback((baseTotal, selectedFees = []) => {
     const feesTotal = selectedFees.reduce((sum, fee) => sum + (parseFloat(fee.additional_fee_amount) || 0), 0);

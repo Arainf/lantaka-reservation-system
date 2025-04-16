@@ -9,9 +9,12 @@ export const RoomVenueContentsProvider = ({ children }) => {
   const [venues, setVenues] = useState([]);
   const [room_Types, setRoom_Types] = useState([]);
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   const fetchRoomAndVenue = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getRoomandVenue`);
+      const response = await fetch(`${API_BASE_URL}/api/getRoomandVenue`);
       if (!response.ok) {
         throw new Error("Failed to fetch room and venue data");
       }
@@ -25,7 +28,7 @@ export const RoomVenueContentsProvider = ({ children }) => {
 
   const fetchRoomTypes = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getRoomTypes`);
+      const response = await fetch(`${API_BASE_URL}/api/getRoomTypes`);
       if (!response.ok) {
         throw new Error("Failed to fetch room types");
       }
@@ -34,7 +37,7 @@ export const RoomVenueContentsProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching room types:", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchRoomAndVenue();
@@ -48,7 +51,7 @@ export const RoomVenueContentsProvider = ({ children }) => {
     setVenues,
     fetchRoomAndVenue,
     room_Types,
-    fetchRoomTypes
+    fetchRoomTypes,
   };
 
   return (

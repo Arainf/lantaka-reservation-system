@@ -5,9 +5,12 @@ const NotificationContext = createContext(undefined);
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   const fetchUnreadNotifications = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/notifications/unread');
+      const response = await fetch(`${API_BASE_URL}/api/notifications/unread`);
       if (!response.ok) {
         throw new Error('Failed to fetch notifications');
       }
@@ -16,11 +19,11 @@ export const NotificationProvider = ({ children }) => {
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
-  }, []);
+  }, [API_BASE_URL]);
 
   const createNotification = useCallback(async (data) => {
     try {
-      const response = await fetch('http://localhost:5000/api/notifications/create', {
+      const response = await fetch(`${API_BASE_URL}/api/notifications/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,11 +37,11 @@ export const NotificationProvider = ({ children }) => {
     } catch (error) {
       console.error('Error creating notification:', error);
     }
-  }, [fetchUnreadNotifications]);
+  }, [API_BASE_URL, fetchUnreadNotifications]);
 
   const markAllAsRead = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/notifications/markRead', {
+      const response = await fetch(`${API_BASE_URL}/api/notifications/markRead`, {
         method: 'PATCH',
       });
       if (!response.ok) {
@@ -48,7 +51,7 @@ export const NotificationProvider = ({ children }) => {
     } catch (error) {
       console.error('Error marking notifications as read:', error);
     }
-  }, []);
+  }, [API_BASE_URL]);
 
   // Add real-time polling
   useEffect(() => {

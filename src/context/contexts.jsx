@@ -1,8 +1,12 @@
-import React, { createContext, useState, useEffect, useMemo, useContext  } from 'react';
+import React, { createContext, useState, useEffect, useMemo, useContext } from 'react';
 import { formatDateToYYYYMMDD } from "@/utils/colorsUtils";
 import axios from 'axios';
-import moment from 'moment'
+import moment from 'moment';
 
+// Use environment variable for the API base URL
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+// User Context
 export const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
@@ -46,7 +50,7 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-
+// Account Context
 export const AccountContext = createContext(null);
 
 export const useAccountContext = () => useContext(AccountContext);
@@ -54,24 +58,22 @@ export const useAccountContext = () => useContext(AccountContext);
 export const AccountProvider = ({ children }) => {
   const [accountData, setAccountData] = useState(null);
 
-    const fetchAccountData = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/accounts');
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.json();
-        setAccountData(data);
-      } catch (error) {
-        console.error(error)
+  const fetchAccountData = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/accounts`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
       }
-    };
+      const data = await res.json();
+      setAccountData(data);
+    } catch (error) {
+      console.error('Error fetching account data:', error);
+    }
+  };
 
-  
-    useEffect(() => {
-      fetchAccountData();
-    }, []);
-   // Empty dependency array to run only once on mount
+  useEffect(() => {
+    fetchAccountData();
+  }, []);
 
   return (
     <AccountContext.Provider value={{ accountData, fetchAccountData }}>
@@ -80,12 +82,14 @@ export const AccountProvider = ({ children }) => {
   );
 };
 
+// Data Context
+export const DataContext = createContext(null);
 
-export const DataContext = ({ children }) => {
+export const DataProvider = ({ children }) => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const eventSource = new EventSource('https://localhost:5000/CustomerData');
+    const eventSource = new EventSource(`${API_BASE_URL}/CustomerData`);
 
     eventSource.onmessage = (event) => {
       const updatedData = JSON.parse(event.data);
@@ -110,27 +114,24 @@ export const DataContext = ({ children }) => {
   );
 };
 
+// Reservation Context
+export const ReservationContext = createContext();
 
-
-export const ReservationContext = createContext()
-
-export const useReservations = () => {
-  return useContext(ReservationContext)
-}
+export const useReservations = () => useContext(ReservationContext);
 
 export const ReservationProvider = ({ children }) => {
-  const [events, setEvents] = useState([])
-  const [bookingSummary, setBookingSummary] = useState({ total: 0, rooms: 0, venues: 0 })
-  const [upcomingBookings, setUpcomingBookings] = useState([])
-  const [recentActivities, setRecentActivities] = useState([])
+  const [events, setEvents] = useState([]);
+  const [bookingSummary, setBookingSummary] = useState({ total: 0, rooms: 0, venues: 0 });
+  const [upcomingBookings, setUpcomingBookings] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
-    fetchEvents()
-  }, [])
+    fetchEvents();
+  }, []);
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/getreservationCalendar')
+      const response = await axios.get(`${API_BASE_URL}/api/getreservationCalendar`);
       const formattedEvents = response.data.map(event => ({
         reservation: event.reservationid,
         id: event.id,
@@ -144,31 +145,31 @@ export const ReservationProvider = ({ children }) => {
           type: event.type,
           status: event.status,
         },
-      }))
+      }));
 
-      const groupedEvents = groupEventsByDay(formattedEvents)
-      setEvents(groupedEvents)
-      updateBookingSummary(formattedEvents)
-      updateUpcomingBookings(formattedEvents)
-      generateRecentActivities(formattedEvents)
+      const groupedEvents = groupEventsByDay(formattedEvents);
+      setEvents(groupedEvents);
+      updateBookingSummary(formattedEvents);
+      updateUpcomingBookings(formattedEvents);
+      generateRecentActivities(formattedEvents);
     } catch (error) {
-      console.error('Error fetching events:', error)
+      console.error('Error fetching events:', error);
     }
-  }
+  };
 
   const groupEventsByDay = (events) => {
     const grouped = events.reduce((acc, event) => {
-      const dateKey = moment(event.start).format('YYYY-MM-DD')
+      const dateKey = moment(event.start).format('YYYY-MM-DD');
       if (!acc[dateKey]) {
-        acc[dateKey] = { rooms: [], venues: [] }
+        acc[dateKey] = { rooms: [], venues: [] };
       }
       if (event.resource.type.toLowerCase() === 'room') {
-        acc[dateKey].rooms.push(event)
+        acc[dateKey].rooms.push(event);
       } else if (event.resource.type.toLowerCase() === 'venue') {
-        acc[dateKey].venues.push(event)
+        acc[dateKey].venues.push(event);
       }
-      return acc
-    }, {})
+      return acc;
+    }, {});
 
     return Object.entries(grouped).map(([date, { rooms, venues }]) => ({
       start: moment(date).toDate(),
@@ -176,29 +177,29 @@ export const ReservationProvider = ({ children }) => {
       allDay: true,
       title: `${rooms.length + venues.length} Bookings`,
       extendedProps: { rooms, venues, date },
-    }))
-  }
+    }));
+  };
 
   const updateBookingSummary = (events) => {
     const summary = events.reduce((acc, event) => {
-      acc.total++
+      acc.total++;
       if (event.resource.type.toLowerCase() === 'room') {
-        acc.rooms++
+        acc.rooms++;
       } else if (event.resource.type.toLowerCase() === 'venue') {
-        acc.venues++
+        acc.venues++;
       }
-      return acc
-    }, { total: 0, rooms: 0, venues: 0 })
-    setBookingSummary(summary)
-  }
+      return acc;
+    }, { total: 0, rooms: 0, venues: 0 });
+    setBookingSummary(summary);
+  };
 
   const updateUpcomingBookings = (events) => {
     const upcoming = events
       .filter(event => moment(event.start).isAfter(moment()))
       .sort((a, b) => moment(a.start).diff(moment(b.start)))
-      .slice(0, 5)
-    setUpcomingBookings(upcoming)
-  }
+      .slice(0, 5);
+    setUpcomingBookings(upcoming);
+  };
 
   const generateRecentActivities = (events) => {
     const activities = events
@@ -208,17 +209,16 @@ export const ReservationProvider = ({ children }) => {
         id: event.id,
         action: `${event.resource.type} ${event.id} ${event.resource.status}`,
         time: moment(event.start).fromNow(),
-      }))
-    setRecentActivities(activities)
-  }
+      }));
+    setRecentActivities(activities);
+  };
 
   return (
     <ReservationContext.Provider value={{ events, bookingSummary, upcomingBookings, recentActivities, fetchEvents }}>
       {children}
     </ReservationContext.Provider>
-  )
-}
-
+  );
+};
 
 // Initialize the context
 const RoomandVenueContext = createContext();
@@ -234,7 +234,6 @@ export const RoomandVenueProvider = ({ children }) => {
     double_rooms: [],
     triple_rooms: [],
     matrimonial_rooms: [],
-    
   });
   const [availableVenues, setAvailableVenues] = useState({
     venues_holder: [],
@@ -249,7 +248,7 @@ export const RoomandVenueProvider = ({ children }) => {
     setIsFetching(true); // Set loading state to true
     try {
       // Make the fetch request to your API
-      const response = await fetch("http://localhost:5000/api/everythingAvailable");
+      const response = await fetch(`${API_BASE_URL}/api/everythingAvailable`);
 
       // Check if the response is not OK
       if (!response.ok) {
@@ -299,7 +298,7 @@ export const RoomandVenueProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/availableRooms/${formattedFrom}/${formattedTo}`
+        `${API_BASE_URL}/api/availableRooms/${formattedFrom}/${formattedTo}`
       );
 
       if (!response.ok) {
@@ -329,7 +328,7 @@ export const RoomandVenueProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/availableVenues/${formattedFrom}/${formattedTo}`
+        `${API_BASE_URL}/api/availableVenues/${formattedFrom}/${formattedTo}`
       );
 
       if (!response.ok) {

@@ -17,11 +17,14 @@ export const DiscountProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { createNotification } = useNotifications();
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   const fetchDiscounts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/getDiscounts');
+      const response = await fetch(`${API_BASE_URL}/api/getDiscounts`);
       if (!response.ok) {
         throw new Error('Failed to fetch discounts');
       }
@@ -33,13 +36,13 @@ export const DiscountProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [API_BASE_URL]);
 
   const addDiscount = useCallback(async (discount) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/discountAdd', {
+      const response = await fetch(`${API_BASE_URL}/api/discountAdd`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(discount),
@@ -59,13 +62,13 @@ export const DiscountProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDiscounts, createNotification]);
+  }, [API_BASE_URL, fetchDiscounts, createNotification]);
 
   const updateDiscount = useCallback(async (discount) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://localhost:5000/api/discountEdit`, {
+      const response = await fetch(`${API_BASE_URL}/api/discountEdit`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(discount),
@@ -85,13 +88,13 @@ export const DiscountProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDiscounts, createNotification]);
+  }, [API_BASE_URL, fetchDiscounts, createNotification]);
 
   const deleteDiscount = useCallback(async (id) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://localhost:5000/api/discountDelete?id=${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/discountDelete?id=${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -109,7 +112,7 @@ export const DiscountProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [fetchDiscounts, createNotification]);
+  }, [API_BASE_URL, fetchDiscounts, createNotification]);
 
   useEffect(() => {
     fetchDiscounts();

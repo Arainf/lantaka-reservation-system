@@ -15,9 +15,12 @@ export const RoomTypeProvider = ({ children }) => {
   const [roomTypes, setRoomTypes] = useState([]);
   const { createNotification } = useNotifications();
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   const fetchRoomTypes = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/roomTypes');
+      const response = await fetch(`${API_BASE_URL}/api/roomTypes`);
       if (!response.ok) {
         throw new Error('Failed to fetch room types');
       }
@@ -26,11 +29,11 @@ export const RoomTypeProvider = ({ children }) => {
     } catch (error) {
       console.error('Error fetching room types:', error);
     }
-  }, []);
+  }, [API_BASE_URL]);
 
   const addRoomType = useCallback(async (roomType) => {
     try {
-      const response = await fetch('http://localhost:5000/api/roomTypes', {
+      const response = await fetch(`${API_BASE_URL}/api/roomTypes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(roomType),
@@ -47,11 +50,11 @@ export const RoomTypeProvider = ({ children }) => {
     } catch (error) {
       console.error('Error adding room type:', error);
     }
-  }, [fetchRoomTypes, createNotification]);
+  }, [API_BASE_URL, fetchRoomTypes, createNotification]);
 
   const updateRoomType = useCallback(async (id, roomType) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/roomTypes/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/roomTypes/${id}`, {
         method: 'PUT',
         body: roomType instanceof FormData ? roomType : JSON.stringify(roomType),
         headers: roomType instanceof FormData ? {} : { 'Content-Type': 'application/json' },
@@ -68,11 +71,11 @@ export const RoomTypeProvider = ({ children }) => {
     } catch (error) {
       console.error('Error updating room type:', error);
     }
-  }, [fetchRoomTypes, createNotification]);
+  }, [API_BASE_URL, fetchRoomTypes, createNotification]);
 
   const deleteRoomType = useCallback(async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/deleteRoomTypes/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/deleteRoomTypes/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -87,7 +90,7 @@ export const RoomTypeProvider = ({ children }) => {
     } catch (error) {
       console.error('Error deleting room type:', error);
     }
-  }, [fetchRoomTypes, createNotification]);
+  }, [API_BASE_URL, fetchRoomTypes, createNotification]);
 
   useEffect(() => {
     fetchRoomTypes();

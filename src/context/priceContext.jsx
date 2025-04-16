@@ -12,9 +12,12 @@ export const PriceProvider = ({ children }) => {
   const [discountsData, setDiscountsData] = useState({});
   const [addFeesData, setAddFeesData] = useState({});
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   const fetchPrice = async (clientType) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getPrice/${clientType}`);
+      const response = await fetch(`${API_BASE_URL}/api/getPrice/${clientType}`);
       if (!response.ok) {
         throw new Error("Failed to fetch prices");
       }
@@ -27,7 +30,7 @@ export const PriceProvider = ({ children }) => {
 
   const fetchDiscount = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getDiscounts`);
+      const response = await fetch(`${API_BASE_URL}/api/getDiscounts`);
       if (!response.ok) {
         throw new Error("Failed to fetch discounts");
       }
@@ -40,7 +43,7 @@ export const PriceProvider = ({ children }) => {
 
   const fetchAddFees = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/getAddFees`);
+      const response = await fetch(`${API_BASE_URL}/api/getAddFees`);
       if (!response.ok) {
         throw new Error("Failed to fetch Additional Fees");
       }
@@ -51,10 +54,9 @@ export const PriceProvider = ({ children }) => {
     }
   };
 
-
   const insertDiscount = async (newDiscount) => {
     try {
-      const response = await fetch('http://localhost:5000/api/insertDiscount', {
+      const response = await fetch(`${API_BASE_URL}/api/insertDiscount`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,9 +66,7 @@ export const PriceProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error("Failed to insert discount");
       }
-      const data = await response.json();
-      // Optionally, refetch the discounts after successful insertion
-      fetchDiscount();
+      await fetchDiscount(); // Refetch discounts after successful insertion
     } catch (error) {
       console.error("Error inserting discount:", error);
     }
@@ -74,7 +74,7 @@ export const PriceProvider = ({ children }) => {
 
   const insertAddFee = async (newAddFee) => {
     try {
-      const response = await fetch('http://localhost:5000/api/insertAdditionalFee', {
+      const response = await fetch(`${API_BASE_URL}/api/insertAdditionalFee`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,9 +84,7 @@ export const PriceProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error("Failed to insert additional fee");
       }
-      const data = await response.json();
-      // Optionally, refetch the additional fees after successful insertion
-      fetchAddFees();
+      await fetchAddFees(); // Refetch additional fees after successful insertion
     } catch (error) {
       console.error("Error inserting additional fee:", error);
     }
@@ -98,10 +96,11 @@ export const PriceProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    fetchPrice(clientType);
+    if (clientType) {
+      fetchPrice(clientType);
+    }
   }, [clientType]);
 
-  console.log("Fetching price",price)
   const contextValue = {
     price,
     clientType,
@@ -115,7 +114,7 @@ export const PriceProvider = ({ children }) => {
     insertDiscount,
     insertAddFee,
     fetchDiscount,
-    fetchPrice
+    fetchPrice,
   };
 
   return (

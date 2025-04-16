@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -14,13 +14,16 @@ export function HeroProvider({ children }) {
   const [isLoadingCalendar, setIsLoadingCalendar] = useState(false);
   const [error, setError] = useState(null);
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoadingCards(true);
-        const response = await fetch('http://localhost:5000/api/getCards');
+        const response = await fetch(`${API_BASE_URL}/api/getCards`);
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Failed to fetch card data');
         }
         const result = await response.json();
         setData(result);
@@ -32,19 +35,17 @@ export function HeroProvider({ children }) {
     };
 
     fetchData();
-  }, []);
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     const fetchCalendarReservations = async () => {
       try {
         setIsLoadingCalendar(true);
         const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-        const response = await fetch(`http://localhost:5000/api/getreservationCalendar/${formattedDate}`);
-        
+        const response = await fetch(`${API_BASE_URL}/api/getreservationCalendar/${formattedDate}`);
         if (!response.ok) {
           throw new Error('Failed to fetch calendar reservations');
         }
-        
         const reservationsData = await response.json();
         setCalendarReservations(reservationsData);
       } catch (err) {
@@ -55,7 +56,7 @@ export function HeroProvider({ children }) {
     };
 
     fetchCalendarReservations();
-  }, [selectedDate]);
+  }, [selectedDate, API_BASE_URL]);
 
   const updateSelectedDate = (newDate) => {
     setSelectedDate(newDate);
@@ -64,14 +65,16 @@ export function HeroProvider({ children }) {
   const isLoading = isLoadingCards || isLoadingCalendar;
 
   return (
-    <HeroContext.Provider value={{ 
-      data, 
-      isLoading,
-      error, 
-      calendarReservations,
-      selectedDate,
-      updateSelectedDate
-    }}>
+    <HeroContext.Provider
+      value={{
+        data,
+        isLoading,
+        error,
+        calendarReservations,
+        selectedDate,
+        updateSelectedDate,
+      }}
+    >
       {children}
     </HeroContext.Provider>
   );

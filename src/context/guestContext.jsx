@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNotifications } from "@/context/notificationContext";
@@ -20,10 +20,13 @@ export const GuestProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { createNotification } = useNotifications();
 
+  // Use environment variable for the API base URL
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   const fetchGuests = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/guests');
+      const response = await fetch(`${API_BASE_URL}/api/guests`);
       if (!response.ok) {
         throw new Error('Failed to fetch guests');
       }
@@ -39,7 +42,7 @@ export const GuestProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [createNotification]);
+  }, [API_BASE_URL, createNotification]);
 
   useEffect(() => {
     fetchGuests();
@@ -51,7 +54,7 @@ export const GuestProvider = ({ children }) => {
 
   const deleteGuest = async (guestId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/deleteGuests/${guestId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/deleteGuests/${guestId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {

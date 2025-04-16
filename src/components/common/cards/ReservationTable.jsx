@@ -212,107 +212,30 @@ export default function ReservationsTable({ data = [], keys }) {
     }
   };
 
-  // console.log("grouped data:" , groupedData);
-
-  // const handleGeneratePDF = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/generate-pdf", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         guest_id: selectedGuest.guestId,
-  //         reservation_ids:
-  //           selectedGuest.reservationType === "both"
-  //             ? [
-  //                 ...selectedGuest.reservationRoomID,
-  //                 ...selectedGuest.reservationVenueID,
-  //               ]
-  //             : selectedGuest.reservationType === "room"
-  //             ? selectedGuest.reservationRoomID
-  //             : selectedGuest.reservationVenueID,
-  //         type: selectedGuest.reservationType,
-  //       }),
-  //     });
-
-  //     // Check if response is not OK
-  //     if (!response.ok) {
-  //       const contentType = response.headers.get("content-type");
-  //       if (contentType && contentType.includes("application/json")) {
-  //         const errorData = await response.json();
-  //         throw new Error(errorData.error || "Failed to generate PDF");
-  //       }
-  //       throw new Error("Failed to generate PDF");
-  //     }
-
-  //     // Process the response if it's a PDF
-  //     const contentType = response.headers.get("content-type");
-  //     if (contentType && contentType.includes("application/pdf")) {
-  //       // Convert response to blob
-  //       const blob = await response.blob();
-
-  //       // Create URL for the blob
-  //       const url = window.URL.createObjectURL(blob);
-
-  //       // Create a temporary anchor element to trigger the download
-  //       const link = document.createElement("a");
-  //       link.href = url;
-  //       link.setAttribute("download", `guestFolio_${selectedGuest.guestName}.pdf`);
-  //       document.body.appendChild(link);
-
-  //       // Trigger download
-  //       link.click();
-
-  //       // Cleanup: remove the anchor element and revoke the blob URL
-  //       document.body.removeChild(link);
-  //       window.URL.revokeObjectURL(url);
-
-  //       // Show success toast
-  //       toast({
-  //         title: "PDF Generated",
-  //         description: "Your PDF has been generated and downloaded successfully.",
-  //         variant: "default",
-  //       });
-  //     } else {
-  //       throw new Error("Server did not return a PDF");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error generating PDF:", error);
-
-  //     // Handle errors and show failure toast
-  //     toast({
-  //       title: "PDF Generation Failed",
-  //       description:
-  //         error instanceof Error
-  //           ? error.message
-  //           : "There was an error generating the PDF. Please try again.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
   const handleGeneratePDF = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          guest_id: selectedGuest.guestId,
-          reservation_ids:
-            selectedGuest.reservationType === "both"
-              ? [
-                  ...selectedGuest.reservationRoomID,
-                  ...selectedGuest.reservationVenueID,
-                ]
-              : selectedGuest.reservationType === "room"
-              ? selectedGuest.reservationRoomID
-              : selectedGuest.reservationVenueID,
-          type: selectedGuest.reservationType,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/generate-pdf`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            guest_id: selectedGuest.guestId,
+            reservation_ids:
+              selectedGuest.reservationType === "both"
+                ? [
+                    ...selectedGuest.reservationRoomID,
+                    ...selectedGuest.reservationVenueID,
+                  ]
+                : selectedGuest.reservationType === "room"
+                ? selectedGuest.reservationRoomID
+                : selectedGuest.reservationVenueID,
+            type: selectedGuest.reservationType,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to generate PDF");
@@ -428,7 +351,7 @@ export default function ReservationsTable({ data = [], keys }) {
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/delete_reservations",
+        `${import.meta.env.VITE_BACKEND_URL}/api/delete_reservations`,
         {
           method: "DELETE",
           headers: {
@@ -493,26 +416,29 @@ export default function ReservationsTable({ data = [], keys }) {
   const handleSaveNotes = async () => {
     if (selectedGuest) {
       try {
-        const response = await fetch("http://localhost:5000/api/update_notes", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            guest_id: selectedGuest.guestId,
-            notes: notes,
-            reservation_ids:
-              selectedGuest.reservationType === "both"
-                ? [
-                    ...selectedGuest.reservationRoomID,
-                    ...selectedGuest.reservationVenueID,
-                  ]
-                : selectedGuest.reservationType === "room"
-                ? selectedGuest.reservationRoomID
-                : selectedGuest.reservationVenueID,
-            type: selectedGuest.reservationType,
-          }),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/update_notes`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              guest_id: selectedGuest.guestId,
+              notes: notes,
+              reservation_ids:
+                selectedGuest.reservationType === "both"
+                  ? [
+                      ...selectedGuest.reservationRoomID,
+                      ...selectedGuest.reservationVenueID,
+                    ]
+                  : selectedGuest.reservationType === "room"
+                  ? selectedGuest.reservationRoomID
+                  : selectedGuest.reservationVenueID,
+              type: selectedGuest.reservationType,
+            }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to update notes");
@@ -526,14 +452,6 @@ export default function ReservationsTable({ data = [], keys }) {
           additionalNotes: notes,
         }));
 
-        const updatedGroupedData = { ...groupedData };
-        const guestKey = Object.keys(updatedGroupedData).find(
-          (key) => updatedGroupedData[key].guestId === selectedGuest.guestId
-        );
-        if (guestKey) {
-          updatedGroupedData[guestKey].additionalNotes = notes;
-        }
-        setNotes(updatedGroupedData.additionalNotes);
         toast({
           title: "Notes Updated",
           description: `Additional notes for ${selectedGuest.reservationType} have been updated successfully.`,
@@ -583,13 +501,16 @@ export default function ReservationsTable({ data = [], keys }) {
 
       console.log("Sending status update:", payload);
 
-      const response = await fetch("http://localhost:5000/api/change_status", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/change_status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update reservation status.");
@@ -1215,8 +1136,7 @@ export default function ReservationsTable({ data = [], keys }) {
                                 -
                                 {formatCurrency(
                                   (selectedGuest.receiptSubTotal *
-                                    discount.discount_percentage) /
-                                    100
+                                    discount.discount_percentage) / 100
                                 )}
                               </span>
                             </div>
